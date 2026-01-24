@@ -136,7 +136,8 @@ docelium/
 │   │   │   ├── layout.tsx    # Layout avec sidebar
 │   │   │   ├── page.tsx      # Dashboard principal
 │   │   │   ├── studies/      # Gestion des protocoles
-│   │   │   ├── medications/  # Gestion des médicaments
+│   │   │   │   └── [id]/medications/  # Médicaments d'un protocole
+│   │   │   ├── medications/  # Vue globale des médicaments (tous protocoles)
 │   │   │   ├── equipments/   # Gestion des équipements
 │   │   │   ├── movements/    # Gestion des mouvements
 │   │   │   ├── stock/        # Vue du stock
@@ -149,7 +150,8 @@ docelium/
 │   │   ├── api/              # API Routes
 │   │   │   ├── auth/         # Endpoints authentification
 │   │   │   ├── studies/
-│   │   │   ├── medications/
+│   │   │   │   └── [id]/medications/  # Médicaments par protocole
+│   │   │   ├── medications/  # API globale médicaments (GET tous, filtres)
 │   │   │   ├── equipments/
 │   │   │   ├── movements/
 │   │   │   ├── stock/
@@ -2160,10 +2162,28 @@ async function createStudy(data: CreateStudyInput, userId: string) {
 
 ## 8.4 Interface Utilisateur
 
+### Liste Globale des Médicaments (`/medications`)
+Accessible depuis le menu latéral, cette vue affiche tous les médicaments de tous les protocoles.
+
+**Fonctionnalités** :
+- Tableau : Code, Nom, Protocole, Type, Forme, Stockage, Stock actuel, Actions
+- Filtres : Recherche texte, Protocole (dropdown), Type (IMP/NIMP)
+- Badge coloré pour IMP (bleu) / NIMP (gris)
+- Lien vers le protocole associé
+- Actions : Voir, Éditer, Désactiver
+
 ### Liste des Médicaments (dans un protocole)
 - Tableau : Code, Nom, Type, Forme, Stockage, Stock actuel, Actions
 - Badge coloré pour IMP (bleu) / NIMP (gris)
 - Actions : Voir, Éditer, Désactiver
+
+### Création de Médicament (`/medications/new`)
+
+**Règles de sélection du protocole** :
+1. Le protocole est un champ **obligatoire**
+2. Seuls les protocoles avec statut `DRAFT` ou `ACTIVE` sont proposés
+3. **Si un seul protocole est disponible** : il est automatiquement sélectionné et affiché en lecture seule (non modifiable)
+4. **Si plusieurs protocoles sont disponibles** : l'utilisateur doit sélectionner dans un dropdown
 
 ### Fiche Médicament
 - Informations générales
@@ -2856,6 +2876,12 @@ const menuItems = [
     roles: ['ADMIN', 'PHARMACIEN', 'TECHNICIEN', 'ARC', 'AUDITOR']
   },
   {
+    label: 'Medicaments',
+    icon: 'Medication',
+    path: '/medications',
+    roles: ['ADMIN', 'PHARMACIEN', 'TECHNICIEN', 'ARC', 'AUDITOR']
+  },
+  {
     label: 'Stock',
     icon: 'Inventory',
     path: '/stock',
@@ -3043,14 +3069,27 @@ GET    /api/studies/:id/audit    # Audit de l'étude
 
 ### Médicaments
 ```
-GET    /api/studies/:studyId/medications        # Liste médicaments
+# Vue globale (tous protocoles)
+GET    /api/medications                          # Liste tous les médicaments (filtres: studyId, type, search)
+
+# Par protocole
+GET    /api/studies/:studyId/medications        # Liste médicaments d'un protocole
 POST   /api/studies/:studyId/medications        # Créer médicament
-GET    /api/medications/:id                      # Détail médicament
-PATCH  /api/medications/:id                      # Modifier médicament
-DELETE /api/medications/:id                      # Désactiver médicament
-POST   /api/medications/:id/link-equipment       # Lier équipement
+
+# Détail et modifications
+GET    /api/studies/:studyId/medications/:id    # Détail médicament
+PATCH  /api/studies/:studyId/medications/:id    # Modifier médicament
+DELETE /api/studies/:studyId/medications/:id    # Désactiver médicament
+POST   /api/medications/:id/link-equipment      # Lier équipement
 DELETE /api/medications/:id/unlink-equipment/:equipmentId
 ```
+
+**Filtres pour GET /api/medications** :
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| studyId | string | Filtrer par protocole |
+| type | 'IMP' \| 'NIMP' | Filtrer par type |
+| search | string | Recherche dans code et nom |
 
 ### Équipements
 ```
@@ -4415,6 +4454,42 @@ jobs:
 ```
 
 ## 19.9 Règles de Développement
+
+### Mode Test (Test Mode Toggle)
+
+Les formulaires de création complexes doivent inclure un **toggle "Mode test"** pour faciliter le développement et les tests.
+
+**Implémentation** :
+```typescript
+// État local dans le composant
+const [testMode, setTestMode] = useState(false);
+
+// Données de test pré-définies
+const testFormData = {
+  // Valeurs réalistes pour chaque champ du formulaire
+};
+
+// Handler du toggle
+const handleTestModeToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const enabled = e.target.checked;
+  setTestMode(enabled);
+  if (enabled) {
+    setFormData(prev => ({ ...testFormData, ...preservedFields }));
+  } else {
+    setFormData(prev => ({ ...initialFormData, ...preservedFields }));
+  }
+};
+```
+
+**Formulaires concernés** :
+1. **Création de protocole** (`/studies/new`) - Pré-remplit tous les blocs du stepper
+2. **Création de médicament** (`/medications/new`) - Pré-remplit les informations du médicament (préserve le protocole sélectionné)
+
+**Règles** :
+- Le toggle est visible uniquement en environnement de développement (`NODE_ENV !== 'production'`) ou pour les utilisateurs ADMIN
+- Les données de test doivent être réalistes et valides selon les validators Zod
+- Le toggle doit préserver certains champs contextuels (ex: protocole sélectionné lors de la création d'un médicament)
+- Position UI : en haut du formulaire, avec un label explicite "Mode test"
 
 ### Workflow TDD Recommandé
 

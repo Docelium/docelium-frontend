@@ -1,0 +1,280 @@
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { getMedicationById } from '@/lib/services/medication.service';
+import { getStudyById } from '@/lib/services/study.service';
+import { notFound } from 'next/navigation';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import EditIcon from '@mui/icons-material/Edit';
+import { MedicationType, DosageForm, StorageCondition, CountingUnit } from '@prisma/client';
+import LinkButton from '@/components/ui/LinkButton';
+
+const typeLabels: Record<MedicationType, string> = {
+  IMP: 'Medicament experimental (IMP)',
+  NIMP: 'Medicament non-experimental (NIMP)',
+};
+
+const typeColors: Record<MedicationType, 'primary' | 'secondary'> = {
+  IMP: 'primary',
+  NIMP: 'secondary',
+};
+
+const dosageFormLabels: Record<DosageForm, string> = {
+  TABLET: 'Comprime',
+  CAPSULE: 'Gelule',
+  INJECTION: 'Injection',
+  SOLUTION: 'Solution',
+  CREAM: 'Creme',
+  PATCH: 'Patch',
+  INHALER: 'Inhalateur',
+  SUPPOSITORY: 'Suppositoire',
+  POWDER: 'Poudre',
+  GEL: 'Gel',
+  SPRAY: 'Spray',
+  DROPS: 'Gouttes',
+  OTHER: 'Autre',
+};
+
+const storageLabels: Record<StorageCondition, string> = {
+  ROOM_TEMPERATURE: 'Temperature ambiante',
+  REFRIGERATED: 'Refrigere (2-8C)',
+  FROZEN: 'Congele',
+  CONTROLLED_ROOM_TEMPERATURE: 'Temperature controlee',
+  PROTECT_FROM_LIGHT: 'Proteger de la lumiere',
+  OTHER: 'Autre',
+};
+
+const countingUnitLabels: Record<CountingUnit, string> = {
+  UNIT: 'Unite',
+  BOX: 'Boite',
+  VIAL: 'Flacon',
+  AMPOULE: 'Ampoule',
+  SYRINGE: 'Seringue',
+  BOTTLE: 'Bouteille',
+  SACHET: 'Sachet',
+  BLISTER: 'Blister',
+  KIT: 'Kit',
+  OTHER: 'Autre',
+};
+
+interface Props {
+  params: Promise<{ id: string; medId: string }>;
+}
+
+export default async function MedicationDetailPage({ params }: Props) {
+  const { id: studyId, medId } = await params;
+  const session = await getServerSession(authOptions);
+  if (!session?.user) return null;
+
+  const [study, medication] = await Promise.all([
+    getStudyById(studyId, session.user.id, session.user.role),
+    getMedicationById(medId),
+  ]);
+
+  if (!study || !medication) {
+    notFound();
+  }
+
+  const canEdit = ['ADMIN', 'PHARMACIEN'].includes(session.user.role) &&
+    !['ARCHIVED', 'TERMINATED'].includes(study.protocolStatus);
+
+  return (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+        <LinkButton href={`/studies/${studyId}/medications`} startIcon={<ArrowBackIcon />} color="inherit">
+          Retour aux medicaments
+        </LinkButton>
+      </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+            <Typography variant="h4">
+              {medication.code}
+            </Typography>
+            <Chip
+              label={typeLabels[medication.type]}
+              color={typeColors[medication.type]}
+              size="small"
+            />
+            {medication.isBlinded && (
+              <Chip label="Aveugle" variant="outlined" size="small" />
+            )}
+          </Box>
+          <Typography variant="h6" color="text.secondary">
+            {medication.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Protocole: {study.codeInternal} - {study.title}
+          </Typography>
+        </Box>
+        {canEdit && (
+          <LinkButton
+            href={`/studies/${studyId}/medications/${medId}/edit`}
+            variant="outlined"
+            startIcon={<EditIcon />}
+          >
+            Modifier
+          </LinkButton>
+        )}
+      </Box>
+
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Informations generales
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Forme galenique
+                  </Typography>
+                  <Typography variant="body2">{dosageFormLabels[medication.dosageForm]}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Dosage
+                  </Typography>
+                  <Typography variant="body2">{medication.strength || '-'}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Fabricant
+                  </Typography>
+                  <Typography variant="body2">{medication.manufacturer || '-'}</Typography>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Stockage
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Condition de stockage
+                  </Typography>
+                  <Typography variant="body2">{storageLabels[medication.storageCondition]}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Unite de comptage
+                  </Typography>
+                  <Typography variant="body2">{countingUnitLabels[medication.countingUnit]}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Unites par conditionnement
+                  </Typography>
+                  <Typography variant="body2">{medication.unitsPerPackage}</Typography>
+                </Grid>
+                {medication.storageInstructions && (
+                  <Grid size={{ xs: 12 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Instructions de stockage
+                    </Typography>
+                    <Typography variant="body2">{medication.storageInstructions}</Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Configuration
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    IWRS requis
+                  </Typography>
+                  <Typography variant="body2">{medication.iwrsRequired ? 'Oui' : 'Non'}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    E-signature destruction
+                  </Typography>
+                  <Typography variant="body2">{medication.requiresEsign ? 'Oui' : 'Non'}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Produit en aveugle
+                  </Typography>
+                  <Typography variant="body2">{medication.isBlinded ? 'Oui' : 'Non'}</Typography>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Statistiques
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Articles en stock
+                  </Typography>
+                  <Typography variant="body2" fontWeight="bold">
+                    {medication._count.stockItems}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Mouvements
+                  </Typography>
+                  <Typography variant="body2" fontWeight="bold">
+                    {medication._count.movements}
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+
+          {medication.equipmentLinks && medication.equipmentLinks.length > 0 && (
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Equipements associes
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {medication.equipmentLinks.map((link) => (
+                    <Box key={link.equipment.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2">
+                        {link.equipment.code} - {link.equipment.name}
+                      </Typography>
+                      {link.isRequired && (
+                        <Chip label="Requis" size="small" color="warning" />
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+      </Grid>
+    </Box>
+  );
+}

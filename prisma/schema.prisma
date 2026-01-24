@@ -1,0 +1,895 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMERATIONS - Must be respected exactly
+// ============================================
+
+enum UserRole {
+  ADMIN
+  PHARMACIEN
+  TECHNICIEN
+  ARC
+  AUDITOR
+}
+
+enum StudyStatus {
+  DRAFT
+  ACTIVE
+  TEMPORARILY_SUSPENDED
+  CLOSED_TO_ENROLLMENT
+  CLOSED_TO_TREATMENT
+  TERMINATED
+  ARCHIVED
+}
+
+enum StudyPhase {
+  I
+  I_II
+  II
+  III
+  IV
+  OTHER
+}
+
+enum ComplexityLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum BlindingType {
+  NONE
+  SINGLE
+  DOUBLE
+  TRIPLE
+}
+
+enum ReturnPolicy {
+  LOCAL_STOCK
+  SPONSOR_RETURN
+}
+
+enum TemperatureGovernance {
+  BASIC
+  FULL
+}
+
+enum IwrsIntegrationMode {
+  MANUAL
+  CSV
+  API
+}
+
+enum MedicationType {
+  IMP
+  NIMP
+}
+
+enum DosageForm {
+  TABLET
+  CAPSULE
+  INJECTION
+  SOLUTION
+  CREAM
+  PATCH
+  INHALER
+  SUPPOSITORY
+  POWDER
+  GEL
+  SPRAY
+  DROPS
+  OTHER
+}
+
+enum StorageCondition {
+  ROOM_TEMPERATURE
+  REFRIGERATED
+  FROZEN
+  CONTROLLED_ROOM_TEMPERATURE
+  PROTECT_FROM_LIGHT
+  OTHER
+}
+
+enum DestructionPolicy {
+  LOCAL
+  SPONSOR
+  MIXED
+}
+
+enum CountingUnit {
+  UNIT
+  BOX
+  VIAL
+  AMPOULE
+  SYRINGE
+  BOTTLE
+  SACHET
+  BLISTER
+  KIT
+  OTHER
+}
+
+enum MovementType {
+  RECEPTION
+  DISPENSATION
+  RETOUR
+  DESTRUCTION
+  TRANSFER
+}
+
+enum ReturnReason {
+  UNUSED
+  PARTIALLY_USED
+  EXPIRED
+  DAMAGED
+  PATIENT_WITHDRAWAL
+  PROTOCOL_DEVIATION
+  ADVERSE_EVENT
+  OTHER
+}
+
+enum ReturnDestination {
+  STOCK
+  QUARANTINE
+  DESTRUCTION
+  SPONSOR_RETURN
+}
+
+enum DestructionMethod {
+  INCINERATION
+  CHEMICAL
+  RETURN_TO_SPONSOR
+  OTHER
+}
+
+enum StockItemStatus {
+  AVAILABLE
+  QUARANTINE
+  RESERVED
+  EXPIRED
+  DESTROYED
+  RETURNED_TO_SPONSOR
+}
+
+enum AccountingPeriodStatus {
+  OPEN
+  PENDING_MONITORING
+  PENDING_PHARMACIST_SIGNATURE
+  LOCKED
+}
+
+enum DestructionBatchStatus {
+  DRAFT
+  PENDING_ARC_APPROVAL
+  ARC_APPROVED
+  ARC_REJECTED
+  PENDING_PHARMACIST_SIGNATURE
+  SIGNED
+  COMPLETED
+}
+
+enum AuditEntityType {
+  USER
+  STUDY
+  MEDICATION
+  EQUIPMENT
+  STOCK_ITEM
+  MOVEMENT
+  ACCOUNTING_PERIOD
+  DESTRUCTION_BATCH
+  DOCUMENT
+  STUDY_ACCOUNTING_FINAL
+}
+
+enum AuditAction {
+  // Security / Authentication
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+  USER_LOGOUT
+  PASSWORD_CHANGE
+  PASSWORD_RESET_REQUEST
+
+  // Users
+  CREATE_USER
+  UPDATE_USER
+  UPDATE_USER_ROLE
+  DEACTIVATE_USER
+
+  // Studies / Protocols
+  CREATE_STUDY
+  UPDATE_STUDY
+  UPDATE_STUDY_CONFIG
+  ACTIVATE_STUDY
+  SUSPEND_STUDY
+  CLOSE_STUDY
+  ARCHIVE_STUDY
+
+  // Medications
+  CREATE_MEDICATION
+  UPDATE_MEDICATION
+  DEACTIVATE_MEDICATION
+
+  // Equipment
+  CREATE_EQUIPMENT
+  UPDATE_EQUIPMENT
+  DEACTIVATE_EQUIPMENT
+  LINK_EQUIPMENT_MEDICATION
+  UNLINK_EQUIPMENT_MEDICATION
+
+  // Stock
+  CREATE_STOCK_ITEM
+  UPDATE_STOCK_ITEM
+  QUARANTINE_STOCK_ITEM
+  RELEASE_STOCK_ITEM
+
+  // Movements
+  CREATE_MOVEMENT_RECEPTION
+  CREATE_MOVEMENT_DISPENSATION
+  CREATE_MOVEMENT_RETOUR
+  CREATE_MOVEMENT_DESTRUCTION
+  CREATE_MOVEMENT_TRANSFER
+  UPDATE_MOVEMENT
+  CANCEL_MOVEMENT
+
+  // Accounting periods
+  CREATE_ACCOUNTING_PERIOD
+  ACCOUNTING_PERIOD_SET_STATUS_OPEN
+  ACCOUNTING_PERIOD_SET_STATUS_PENDING_MONITORING
+  ACCOUNTING_PERIOD_SET_STATUS_PENDING_PHARMACIST_SIGNATURE
+  ACCOUNTING_PERIOD_SET_STATUS_LOCKED
+
+  // E-Signatures
+  ESIGN_MOVEMENT
+  ESIGN_ACCOUNTING_PERIOD
+  ESIGN_DESTRUCTION_BATCH
+  ESIGN_STUDY_ACCOUNTING_FINAL
+  ARC_SIGN_ACCOUNTING_PERIOD
+
+  // Destruction
+  CREATE_DESTRUCTION_BATCH
+  UPDATE_DESTRUCTION_BATCH
+  ADD_MOVEMENT_TO_DESTRUCTION_BATCH
+  REMOVE_MOVEMENT_FROM_DESTRUCTION_BATCH
+  ARC_APPROVE_DESTRUCTION_BATCH
+  ARC_REJECT_DESTRUCTION_BATCH
+
+  // Documents
+  UPLOAD_DOCUMENT
+  DELETE_DOCUMENT
+  LINK_DOCUMENT_TO_ENTITY
+
+  // Exports
+  EXPORT_GENERATED
+  EXPORT_CERTIFIED
+  EXPORT_VERIFIED
+}
+
+enum EsignEntityType {
+  MOVEMENT
+  DESTRUCTION_BATCH
+  ACCOUNTING_PERIOD
+  STUDY_ACCOUNTING_FINAL
+}
+
+enum EsignPurpose {
+  VALIDATE_DESTRUCTION_MOVEMENT
+  VALIDATE_DESTRUCTION_BATCH
+  LOCK_ACCOUNTING_PERIOD
+  LOCK_STUDY_ACCOUNTING_FINAL
+  ARC_APPROVAL
+  CONFIG_CHANGE_APPROVAL
+}
+
+enum AuthMethod {
+  PASSWORD_ONLY
+  PASSWORD_2FA
+  SSO_2FA
+}
+
+// ============================================
+// DATA MODELS
+// ============================================
+
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  role              UserRole
+  isActive          Boolean   @default(true)
+  lastLoginAt       DateTime?
+  passwordChangedAt DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  movements        Movement[]
+  auditEvents      AuditEvent[]
+  esignatureLogs   EsignatureLog[]
+  studyAssignments StudyUserAssignment[]
+
+  @@map("users")
+}
+
+model Study {
+  id String @id @default(uuid())
+
+  // === BLOC A : Identification ===
+  protocolStatus       StudyStatus     @default(DRAFT) @map("protocol_status")
+  codeInternal         String          @unique @map("code_internal")
+  euCtNumber           String?         @map("eu_ct_number")
+  nctNumber            String?         @map("nct_number")
+  title                String
+  sponsor              String
+  phase                StudyPhase
+  therapeuticArea      String?         @map("therapeutic_area")
+  siteActivationDate   DateTime?       @map("site_activation_date")
+  expectedRecruitment  Int?            @map("expected_recruitment")
+  complexityLevel      ComplexityLevel @default(LOW) @map("complexity_level")
+
+  // === BLOC B : Contacts (JSON array) ===
+  contacts Json? // Array of {role: 'PI'|'SC'|'CRA'|'PM', name, email, phone?}
+
+  // === BLOC C : Regulatory Identifiers ===
+  protocolVersion          String?   @map("protocol_version")
+  protocolVersionDate      DateTime? @map("protocol_version_date")
+  amendments               Json?     // Array of {version, date}
+  euCtrApprovalReference   DateTime? @map("eu_ctr_approval_reference")
+  ethicsApprovalReference  String?   @map("ethics_approval_reference")
+  insuranceReference       String?   @map("insurance_reference")
+  eudamedId                String?   @map("eudamed_id")
+
+  // === BLOC D : Paramètres opérationnels ===
+  blinded                          BlindingType      @default(NONE)
+  arms                             Json?             // String[]
+  cohorts                          Json?             // String[]
+  destructionPolicy                DestructionPolicy @default(LOCAL) @map("destruction_policy")
+  returnPolicy                     ReturnPolicy      @default(LOCAL_STOCK) @map("return_policy")
+  requiresPatientForDispensation   Boolean           @default(true) @map("requires_patient_for_dispensation")
+  allowsDispensationWithoutIwrs    Boolean           @default(false) @map("allows_dispensation_without_iwrs")
+  temperatureTrackingEnabled       Boolean           @default(false) @map("temperature_tracking_enabled")
+  returnedMaterialReusable         Boolean           @default(false) @map("returned_material_reusable")
+
+  // === BLOC E : Data Quality Profile (JSON) ===
+  dataQualityProfile Json? @map("data_quality_profile")
+  // {requires_double_signature, requires_pharmacist_signature, requires_weight_recency_days, comment_required_on_override}
+
+  // === BLOC G : Visit Schedule (JSON) ===
+  visitSchedule    Json? @map("visit_schedule")   // Array of {visit_code, day, requires_dispense}
+  treatmentCycles  Json? @map("treatment_cycles") // {cycle_length, max_cycles}
+
+  // === BLOC H : Patient Constraints (JSON) ===
+  patientConstraints Json? @map("patient_constraints")
+  // {min_age, max_age, min_weight, requires_recent_weight_days, weight_variation_threshold, weight_reference}
+
+  // === BLOC I : Temperature Governance ===
+  temperatureGovernance    TemperatureGovernance? @map("temperature_governance")
+  excursionActionRequired  Boolean                @default(false) @map("excursion_action_required")
+  excursionTimeThreshold   String?                @map("excursion_time_threshold")
+
+  // === BLOC L : IWRS Governance (JSON) ===
+  iwrsGovernance Json? @map("iwrs_governance")
+  // {iwrs_integration, iwrs_integration_mode, iwrs_allows_partial_data, iwrs_requires_visit_code, iwrs_endpoint}
+
+  // === BLOC M : Equipment Requirements ===
+  protocolRequiredEquipments String[] @map("protocol_required_equipments")
+
+  // === BLOC N : Site Overrides (JSON) ===
+  siteOverrides Json? @map("site_overrides")
+  // {requires_local_quarantine_step, requires_extra_reception_fields, local_procedure_references}
+
+  // === Configuration consolidée ===
+  studyConfig Json? @map("study_config")
+
+  // === Dates legacy (pour compatibilité) ===
+  startDate       DateTime? @map("start_date")
+  expectedEndDate DateTime? @map("expected_end_date")
+  actualEndDate   DateTime? @map("actual_end_date")
+
+  // === Métadonnées ===
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id")
+
+  // === Relations ===
+  medications          Medication[]
+  equipments           Equipment[]
+  movements            Movement[]
+  stockItems           StockItem[]
+  accountingPeriods    AccountingPeriod[]
+  destructionBatches   DestructionBatch[]
+  documents            Document[]
+  userAssignments      StudyUserAssignment[]
+  auditEvents          AuditEvent[]
+  studyAccountingFinal StudyAccountingFinal?
+
+  @@map("studies")
+}
+
+model StudyUserAssignment {
+  id         String   @id @default(uuid())
+  studyId    String
+  userId     String
+  assignedAt DateTime @default(now())
+
+  study Study @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([studyId, userId])
+  @@map("study_user_assignments")
+}
+
+model Medication {
+  id      String @id @default(uuid())
+  studyId String
+
+  // Identification
+  code String
+  name String
+  type MedicationType
+
+  // Characteristics
+  dosageForm   DosageForm
+  strength     String?
+  manufacturer String?
+
+  // Storage
+  storageCondition    StorageCondition
+  storageInstructions String?
+
+  // Accounting
+  countingUnit    CountingUnit
+  unitsPerPackage Int          @default(1)
+
+  // Configuration
+  destructionPolicy DestructionPolicy?
+  iwrsRequired      Boolean            @default(false)
+  requiresEsign     Boolean            @default(false)
+  isBlinded         Boolean            @default(false)
+
+  // Metadata
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  study          Study                     @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  stockItems     StockItem[]
+  movements      Movement[]
+  equipmentLinks MedicationEquipmentLink[]
+
+  @@unique([studyId, code])
+  @@map("medications")
+}
+
+model Equipment {
+  id      String @id @default(uuid())
+  studyId String
+
+  // Identification
+  code        String
+  name        String
+  description String?
+
+  // Characteristics
+  category     String?
+  serialNumber String?
+
+  // Stock
+  countingUnit CountingUnit @default(UNIT)
+
+  // Configuration
+  requiresEsign Boolean @default(false)
+  isReusable    Boolean @default(false)
+
+  // Metadata
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  study           Study                     @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  stockItems      StockItem[]
+  movements       Movement[]
+  medicationLinks MedicationEquipmentLink[]
+
+  @@unique([studyId, code])
+  @@map("equipments")
+}
+
+model MedicationEquipmentLink {
+  id           String  @id @default(uuid())
+  medicationId String
+  equipmentId  String
+  isRequired   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  equipment  Equipment  @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([medicationId, equipmentId])
+  @@map("medication_equipment_links")
+}
+
+model StockItem {
+  id           String  @id @default(uuid())
+  studyId      String
+  medicationId String?
+  equipmentId  String?
+
+  // Lot identification
+  batchNumber String
+  kitNumber   String?
+
+  // Quantities
+  initialQuantity Int
+  currentQuantity Int
+
+  // Dates
+  expiryDate        DateTime?
+  manufacturingDate DateTime?
+  receptionDate     DateTime
+
+  // Status
+  status           StockItemStatus @default(AVAILABLE)
+  quarantineReason String?
+
+  // Location
+  storageLocation String?
+
+  // Locking
+  isLocked         Boolean   @default(false)
+  lockedAt         DateTime?
+  lockedByPeriodId String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  study      Study       @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  medication Medication? @relation(fields: [medicationId], references: [id])
+  equipment  Equipment?  @relation(fields: [equipmentId], references: [id])
+  movements  Movement[]
+
+  @@map("stock_items")
+}
+
+model Movement {
+  id           String  @id @default(uuid())
+  studyId      String
+  medicationId String?
+  equipmentId  String?
+  stockItemId  String?
+  periodId     String?
+
+  // Type and data
+  type         MovementType
+  quantity     Int
+  movementDate DateTime
+
+  // Patient (for dispensation/return)
+  patientId   String?
+  visitNumber String?
+
+  // Reception
+  supplierName       String?
+  deliveryNoteNumber String?
+
+  // Return specific
+  returnReason           ReturnReason?
+  returnDestination      ReturnDestination?
+  returnedQuantityUsed   Int?
+  returnedQuantityUnused Int?
+
+  // Destruction specific
+  destructionMethod            DestructionMethod?
+  destructionBatchId           String?
+  destructionWitnessName       String?
+  destructionCertificateNumber String?
+
+  // Transfer specific
+  transferFromLocation String?
+  transferToLocation   String?
+
+  // IWRS
+  iwrsConfirmationNumber String?
+
+  // Additional data
+  notes String?
+
+  // E-Signature
+  isSigned Boolean   @default(false)
+  signedBy String?
+  signedAt DateTime?
+
+  // Locking
+  isLocked Boolean   @default(false)
+  lockedAt DateTime?
+
+  // User
+  performedById String
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  study            Study              @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  medication       Medication?        @relation(fields: [medicationId], references: [id])
+  equipment        Equipment?         @relation(fields: [equipmentId], references: [id])
+  stockItem        StockItem?         @relation(fields: [stockItemId], references: [id])
+  period           AccountingPeriod?  @relation(fields: [periodId], references: [id])
+  destructionBatch DestructionBatch?  @relation(fields: [destructionBatchId], references: [id])
+  performedBy      User               @relation(fields: [performedById], references: [id])
+  esignatureLogs   EsignatureLog[]
+
+  @@map("movements")
+}
+
+model AccountingPeriod {
+  id      String @id @default(uuid())
+  studyId String
+
+  // Period
+  periodNumber Int
+  periodLabel  String
+  startDate    DateTime
+  endDate      DateTime
+
+  // Status
+  status AccountingPeriodStatus @default(OPEN)
+
+  // ARC validation
+  arcApprovalStatus String?
+  arcApprovedBy     String?
+  arcApprovedAt     DateTime?
+  arcComments       String?
+
+  // Pharmacist signature
+  pharmacistSignedBy String?
+  pharmacistSignedAt DateTime?
+
+  // Calculated totals (snapshot at locking time)
+  totalReceptions    Int?
+  totalDispensations Int?
+  totalReturns       Int?
+  totalDestructions  Int?
+  closingBalance     Int?
+
+  // Hash for verification
+  dataHash String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  study          Study           @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  movements      Movement[]
+  esignatureLogs EsignatureLog[]
+
+  @@unique([studyId, periodNumber])
+  @@map("accounting_periods")
+}
+
+model DestructionBatch {
+  id      String @id @default(uuid())
+  studyId String
+
+  // Identification
+  batchNumber String
+
+  // Period
+  destructionDate DateTime?
+
+  // Method
+  destructionMethod   DestructionMethod
+  destructionLocation String?
+
+  // Witness
+  witnessName String?
+  witnessFn   String?
+
+  // Status
+  status DestructionBatchStatus @default(DRAFT)
+
+  // ARC validation
+  arcApprovedBy     String?
+  arcApprovedAt     DateTime?
+  arcRejectedReason String?
+
+  // Pharmacist signature
+  pharmacistSignedBy String?
+  pharmacistSignedAt DateTime?
+
+  // Hash for verification
+  dataHash String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  study          Study           @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  movements      Movement[]
+  esignatureLogs EsignatureLog[]
+
+  @@unique([studyId, batchNumber])
+  @@map("destruction_batches")
+}
+
+model StudyAccountingFinal {
+  id      String @id @default(uuid())
+  studyId String @unique
+
+  // Status
+  status String @default("DRAFT")
+
+  // Global totals
+  totalReceived         Int?
+  totalDispensed        Int?
+  totalReturned         Int?
+  totalDestroyed        Int?
+  totalReturnedToSponsor Int?
+  finalBalance          Int?
+
+  // Signature
+  pharmacistSignedBy String?
+  pharmacistSignedAt DateTime?
+
+  // ARC
+  arcApprovedBy String?
+  arcApprovedAt DateTime?
+
+  // Hash
+  dataHash String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  study          Study           @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  esignatureLogs EsignatureLog[]
+
+  @@map("study_accounting_final")
+}
+
+model Document {
+  id      String @id @default(uuid())
+  studyId String
+
+  // File
+  fileName String
+  fileType String
+  fileSize Int
+  filePath String
+
+  // Metadata
+  description String?
+  category    String?
+
+  // Links
+  linkedEntityType String?
+  linkedEntityId   String?
+
+  // Upload
+  uploadedById String
+  uploadedAt   DateTime @default(now())
+
+  // Soft deletion
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  deletedBy String?
+
+  // Relations
+  study Study @relation(fields: [studyId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+// ============================================
+// AUDIT TRAIL - Append-only table
+// ============================================
+
+model AuditEvent {
+  id        String   @id @default(uuid())
+  timestamp DateTime @default(now())
+
+  // User
+  userId           String?
+  userRoleSnapshot UserRole?
+
+  // Action
+  action AuditAction
+
+  // Target entity
+  entityType AuditEntityType
+  entityId   String
+
+  // Context
+  studyId  String?
+  periodId String?
+  batchId  String?
+
+  // Before/after data (JSONB)
+  detailsBefore Json?
+  detailsAfter  Json?
+
+  // Client information
+  clientInfo Json?
+
+  // Cryptographic chaining
+  hash         String
+  previousHash String?
+
+  // E-signature metadata if applicable
+  signatureMetadata Json?
+
+  // Relations
+  user  User?  @relation(fields: [userId], references: [id])
+  study Study? @relation(fields: [studyId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([studyId])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("audit_events")
+}
+
+// ============================================
+// E-SIGNATURE
+// ============================================
+
+model EsignatureLog {
+  id String @id @default(uuid())
+
+  // Signed entity
+  entityType EsignEntityType
+  entityId   String
+
+  // Signer
+  signerUserId       String
+  signerRoleSnapshot UserRole
+
+  // Purpose of signature
+  purpose EsignPurpose
+
+  // Timestamp
+  signedAt DateTime @default(now())
+
+  // Authentication method
+  authMethod  AuthMethod
+  authContext Json?
+
+  // Integrity
+  signingDataHash       String
+  previousSignatureHash String?
+
+  // Metadata
+  metadata Json?
+
+  // Relations
+  signer               User                  @relation(fields: [signerUserId], references: [id])
+  movement             Movement?             @relation(fields: [entityId], references: [id], map: "esignature_movement")
+  accountingPeriod     AccountingPeriod?     @relation(fields: [entityId], references: [id], map: "esignature_period")
+  destructionBatch     DestructionBatch?     @relation(fields: [entityId], references: [id], map: "esignature_batch")
+  studyAccountingFinal StudyAccountingFinal? @relation(fields: [entityId], references: [id], map: "esignature_final")
+
+  @@index([entityType, entityId])
+  @@map("esignature_logs")
+}
