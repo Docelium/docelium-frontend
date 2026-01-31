@@ -37,6 +37,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import LinkButton from '@/components/ui/LinkButton';
 import { useToast } from '@/contexts/ToastContext';
+import { useSession } from 'next-auth/react';
 
 interface Study {
   id: string;
@@ -89,6 +90,8 @@ const storageLabels: Record<string, string> = {
 export default function MedicationsPage() {
   const router = useRouter();
   const { showSuccess, showError } = useToast();
+  const { data: session } = useSession();
+  const canWrite = ['ADMIN', 'PHARMACIEN'].includes(session?.user?.role ?? '');
 
   const [medications, setMedications] = useState<Medication[]>([]);
   const [studies, setStudies] = useState<Study[]>([]);
@@ -198,9 +201,11 @@ export default function MedicationsPage() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">Medicaments</Typography>
-        <LinkButton href="/medications/new" variant="contained" startIcon={<AddIcon />}>
-          Ajouter un medicament
-        </LinkButton>
+        {canWrite && (
+          <LinkButton href="/medications/new" variant="contained" startIcon={<AddIcon />}>
+            Ajouter un medicament
+          </LinkButton>
+        )}
       </Box>
 
       {/* Filters */}
@@ -261,7 +266,7 @@ export default function MedicationsPage() {
                   ? 'Aucun medicament enregistre'
                   : 'Aucun medicament ne correspond aux filtres'}
               </Typography>
-              {medications.length === 0 && (
+              {medications.length === 0 && canWrite && (
                 <Button
                   variant="outlined"
                   startIcon={<AddIcon />}
@@ -343,25 +348,29 @@ export default function MedicationsPage() {
                           >
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              router.push(
-                                `/studies/${medication.study.id}/medications/${medication.id}/edit`
-                              )
-                            }
-                            title="Modifier"
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleDeleteClick(medication)}
-                            title="Supprimer"
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
+                          {canWrite && (
+                            <>
+                              <IconButton
+                                size="small"
+                                onClick={() =>
+                                  router.push(
+                                    `/studies/${medication.study.id}/medications/${medication.id}/edit`
+                                  )
+                                }
+                                title="Modifier"
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => handleDeleteClick(medication)}
+                                title="Supprimer"
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </>
+                          )}
                         </Box>
                       </TableCell>
                     </TableRow>
