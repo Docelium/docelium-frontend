@@ -11,6 +11,8 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
 import { StudyStatus, StudyPhase, DestructionPolicy, BlindingType } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
 
@@ -275,15 +277,29 @@ export default async function StudyDetailPage({ params }: Props) {
                   Aucun utilisateur assigne
                 </Typography>
               ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {study.userAssignments.map((assignment) => (
                     <Box key={assignment.id}>
-                      <Typography variant="body2">
+                      <Typography variant="body2" fontWeight="medium">
                         {assignment.user.firstName} {assignment.user.lastName}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {assignment.user.role}
                       </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                        <EmailIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                        <Typography variant="caption" color="text.secondary">
+                          {assignment.user.email}
+                        </Typography>
+                      </Box>
+                      {assignment.user.phone && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <PhoneIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          <Typography variant="caption" color="text.secondary">
+                            {assignment.user.phone}
+                          </Typography>
+                        </Box>
+                      )}
                     </Box>
                   ))}
                 </Box>

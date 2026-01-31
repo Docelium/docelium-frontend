@@ -2,8 +2,20 @@ import { PrismaClient, UserRole, StudyPhase, MedicationType, DosageForm, Storage
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL || 'postgresql://hakim@localhost:5432/docelium' });
+// Load .env file
+dotenv.config();
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
+const pool = new Pool({
+  connectionString,
+  ssl: connectionString.includes('localhost') ? false : { rejectUnauthorized: false },
+});
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
@@ -16,9 +28,10 @@ async function main() {
   const users = await Promise.all([
     prisma.user.upsert({
       where: { email: 'admin@docelium.local' },
-      update: {},
+      update: { phone: '+33 1 00 00 00 00' },
       create: {
         email: 'admin@docelium.local',
+        phone: '+33 1 00 00 00 00',
         passwordHash: password,
         firstName: 'Admin',
         lastName: 'System',
@@ -27,9 +40,10 @@ async function main() {
     }),
     prisma.user.upsert({
       where: { email: 'pharmacien@docelium.local' },
-      update: {},
+      update: { phone: '+33 6 11 22 33 44' },
       create: {
         email: 'pharmacien@docelium.local',
+        phone: '+33 6 11 22 33 44',
         passwordHash: password,
         firstName: 'Jean',
         lastName: 'Dupont',
@@ -38,9 +52,10 @@ async function main() {
     }),
     prisma.user.upsert({
       where: { email: 'technicien@docelium.local' },
-      update: {},
+      update: { phone: '+33 6 22 33 44 55' },
       create: {
         email: 'technicien@docelium.local',
+        phone: '+33 6 22 33 44 55',
         passwordHash: password,
         firstName: 'Marie',
         lastName: 'Martin',
@@ -49,9 +64,10 @@ async function main() {
     }),
     prisma.user.upsert({
       where: { email: 'arc@docelium.local' },
-      update: {},
+      update: { phone: '+33 6 33 44 55 66' },
       create: {
         email: 'arc@docelium.local',
+        phone: '+33 6 33 44 55 66',
         passwordHash: password,
         firstName: 'Pierre',
         lastName: 'Bernard',
@@ -60,9 +76,10 @@ async function main() {
     }),
     prisma.user.upsert({
       where: { email: 'auditor@docelium.local' },
-      update: {},
+      update: { phone: '+33 6 44 55 66 77' },
       create: {
         email: 'auditor@docelium.local',
+        phone: '+33 6 44 55 66 77',
         passwordHash: password,
         firstName: 'Sophie',
         lastName: 'Leroy',
