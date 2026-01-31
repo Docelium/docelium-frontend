@@ -308,6 +308,28 @@ export default async function StudyDetailPage({ params }: Props) {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Commentaires par bloc */}
+      {study.blockComments && Object.keys(study.blockComments as Record<string, string>).length > 0 && (
+        <Card sx={{ mt: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Commentaires
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {Object.entries(study.blockComments as Record<string, string>).map(([blockId, comment]) => (
+                <Box key={blockId}>
+                  <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                    Bloc {blockId}
+                  </Typography>
+                  <Typography variant="body2">{comment}</Typography>
+                </Box>
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      )}
     </Box>
   );
 }

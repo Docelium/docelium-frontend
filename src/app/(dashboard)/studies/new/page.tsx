@@ -201,6 +201,9 @@ interface FormData {
   // Dates
   startDate: string;
   expectedEndDate: string;
+
+  // Commentaires par bloc
+  blockComments: Record<string, string>;
 }
 
 // Données de test pour le développement
@@ -297,6 +300,9 @@ const testFormData: FormData = {
   // Dates
   startDate: new Date().toISOString().slice(0, 10),
   expectedEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+
+  // Commentaires
+  blockComments: {},
 };
 
 const initialFormData: FormData = {
@@ -377,6 +383,9 @@ const initialFormData: FormData = {
   // Dates
   startDate: '',
   expectedEndDate: '',
+
+  // Commentaires
+  blockComments: {},
 };
 
 export default function NewStudyPage() {
@@ -681,6 +690,9 @@ export default function NewStudyPage() {
         // Dates
         startDate: formData.startDate ? new Date(formData.startDate) : null,
         expectedEndDate: formData.expectedEndDate ? new Date(formData.expectedEndDate) : null,
+
+        // Commentaires
+        blockComments: Object.keys(formData.blockComments).length > 0 ? formData.blockComments : null,
       };
 
       const response = await fetch('/api/studies', {
@@ -1633,7 +1645,29 @@ export default function NewStudyPage() {
             </Alert>
           )}
 
-          <Box sx={{ minHeight: 400, px: 2 }}>{renderStepContent(activeStep)}</Box>
+          <Box sx={{ minHeight: 400, px: 2 }}>
+            {renderStepContent(activeStep)}
+
+            <TextField
+              fullWidth
+              label="Commentaire sur ce bloc"
+              placeholder="Laissez un commentaire pour ce bloc (optionnel)"
+              value={formData.blockComments[steps[activeStep]!.id] || ''}
+              onChange={(e) => {
+                const blockId = steps[activeStep]!.id;
+                setFormData((prev) => ({
+                  ...prev,
+                  blockComments: {
+                    ...prev.blockComments,
+                    ...(e.target.value ? { [blockId]: e.target.value } : (() => { const { [blockId]: _, ...rest } = prev.blockComments; return rest; })()),
+                  },
+                }));
+              }}
+              multiline
+              rows={2}
+              sx={{ mt: 4 }}
+            />
+          </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
             <Button disabled={activeStep === 0} onClick={handleBack}>

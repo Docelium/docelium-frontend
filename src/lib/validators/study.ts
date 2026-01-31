@@ -193,6 +193,8 @@ export const createStudySchema = z.object({
   ...blocNSchema.shape,
   // Dates
   ...datesSchema.shape,
+  // Commentaires par bloc
+  blockComments: z.record(z.string(), z.string()).nullable().optional(),
 });
 
 export const updateStudySchema = createStudySchema.partial();

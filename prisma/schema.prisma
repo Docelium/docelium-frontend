@@ -390,6 +390,9 @@ model Study {
   siteOverrides Json? @map("site_overrides")
   // {requires_local_quarantine_step, requires_extra_reception_fields, local_procedure_references}
 
+  // === Commentaires par bloc ===
+  blockComments Json? @map("block_comments")
+
   // === Configuration consolidée ===
   studyConfig Json? @map("study_config")
 

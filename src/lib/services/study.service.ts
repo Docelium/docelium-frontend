@@ -187,6 +187,9 @@ export interface CreateStudyInput {
   startDate?: Date | null;
   expectedEndDate?: Date | null;
 
+  // Commentaires par bloc
+  blockComments?: Record<string, string> | null;
+
   // Metadata
   createdById?: string | null;
 }
@@ -271,6 +274,9 @@ export async function createStudy(data: CreateStudyInput) {
         startDate: data.startDate,
         expectedEndDate: data.expectedEndDate,
 
+        // Commentaires
+        blockComments: data.blockComments ?? undefined,
+
         // Metadata
         createdById: data.createdById,
       },
@@ -344,6 +350,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>) {
       ...(data.siteOverrides !== undefined && { siteOverrides: jsonValue(data.siteOverrides) }),
       ...(data.startDate !== undefined && { startDate: data.startDate }),
       ...(data.expectedEndDate !== undefined && { expectedEndDate: data.expectedEndDate }),
+      ...(data.blockComments !== undefined && { blockComments: jsonValue(data.blockComments) }),
     },
   });
 }

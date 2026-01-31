@@ -201,6 +201,9 @@ interface FormData {
   // Dates
   startDate: string;
   expectedEndDate: string;
+
+  // Commentaires par bloc
+  blockComments: Record<string, string>;
 }
 
 const initialFormData: FormData = {
@@ -258,6 +261,7 @@ const initialFormData: FormData = {
   localProcedureReferences: [],
   startDate: '',
   expectedEndDate: '',
+  blockComments: {},
 };
 
 // Helper to format date for input field
@@ -346,6 +350,7 @@ export default function EditStudyPage() {
           localProcedureReferences: study.siteOverrides?.local_procedure_references || [],
           startDate: formatDateForInput(study.startDate),
           expectedEndDate: formatDateForInput(study.expectedEndDate),
+          blockComments: study.blockComments || {},
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
@@ -642,6 +647,8 @@ export default function EditStudyPage() {
         // Dates
         startDate: formData.startDate ? new Date(formData.startDate) : null,
         expectedEndDate: formData.expectedEndDate ? new Date(formData.expectedEndDate) : null,
+
+        blockComments: Object.keys(formData.blockComments).length > 0 ? formData.blockComments : null,
       };
 
       const response = await fetch(`/api/studies/${studyId}`, {
@@ -1597,7 +1604,29 @@ export default function EditStudyPage() {
             </Alert>
           )}
 
-          <Box sx={{ minHeight: 400, px: 2 }}>{renderStepContent(activeStep)}</Box>
+          <Box sx={{ minHeight: 400, px: 2 }}>
+            {renderStepContent(activeStep)}
+
+            <TextField
+              fullWidth
+              label="Commentaire sur ce bloc"
+              placeholder="Laissez un commentaire pour ce bloc (optionnel)"
+              value={formData.blockComments[steps[activeStep]!.id] || ''}
+              onChange={(e) => {
+                const blockId = steps[activeStep]!.id;
+                setFormData((prev) => ({
+                  ...prev,
+                  blockComments: {
+                    ...prev.blockComments,
+                    ...(e.target.value ? { [blockId]: e.target.value } : (() => { const { [blockId]: _, ...rest } = prev.blockComments; return rest; })()),
+                  },
+                }));
+              }}
+              multiline
+              rows={2}
+              sx={{ mt: 4 }}
+            />
+          </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
             <Button disabled={activeStep === 0} onClick={handleBack}>
