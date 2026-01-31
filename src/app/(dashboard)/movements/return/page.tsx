@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -54,6 +55,8 @@ const returnDestinations = [
 
 export default function ReturnPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const canCreate = ['ADMIN', 'PHARMACIEN', 'TECHNICIEN'].includes(session?.user?.role ?? '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [studies, setStudies] = useState<Study[]>([]);
@@ -135,6 +138,14 @@ export default function ReturnPage() {
       setLoading(false);
     }
   };
+
+  if (!canCreate) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">Acces refuse. Seuls les pharmaciens et techniciens peuvent creer des mouvements.</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box>

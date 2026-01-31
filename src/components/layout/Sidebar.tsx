@@ -77,26 +77,31 @@ const navItems: NavItem[] = [
         title: 'Reception',
         path: '/movements/reception',
         icon: <LocalShippingIcon />,
+        roles: ['ADMIN', 'PHARMACIEN', 'TECHNICIEN'],
       },
       {
         title: 'Dispensation',
         path: '/movements/dispensation',
         icon: <LocalPharmacyIcon />,
+        roles: ['ADMIN', 'PHARMACIEN', 'TECHNICIEN'],
       },
       {
         title: 'Retour',
         path: '/movements/return',
         icon: <AssignmentReturnIcon />,
+        roles: ['ADMIN', 'PHARMACIEN', 'TECHNICIEN'],
       },
       {
         title: 'Destruction',
         path: '/movements/destruction',
         icon: <DeleteIcon />,
+        roles: ['ADMIN', 'PHARMACIEN', 'TECHNICIEN'],
       },
       {
         title: 'Transfert',
         path: '/movements/transfer',
         icon: <MoveUpIcon />,
+        roles: ['ADMIN', 'PHARMACIEN', 'TECHNICIEN'],
       },
     ],
   },
@@ -207,7 +212,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
                 {!collapsed && (
                   <Collapse in={openMenus[item.title]} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      {item.children.map((child) => (
+                      {item.children.filter((child) => !child.roles || child.roles.includes(userRole)).map((child) => (
                         <ListItem key={child.title} disablePadding sx={{ pl: 2 }}>
                           <ListItemButton
                             component={Link}
