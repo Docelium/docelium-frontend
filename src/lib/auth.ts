@@ -142,7 +142,8 @@ export function checkPermission(userRole: UserRole, permission: PermissionKey): 
 }
 
 export async function getAccessibleStudyIds(userId: string, role: UserRole): Promise<string[]> {
-  if (role === 'ADMIN') {
+  // ADMIN et ARC voient tous les protocoles (ARC en lecture seule)
+  if (role === 'ADMIN' || role === 'ARC' || role === 'AUDITOR') {
     const studies = await prisma.study.findMany({ select: { id: true } });
     return studies.map((s) => s.id);
   }

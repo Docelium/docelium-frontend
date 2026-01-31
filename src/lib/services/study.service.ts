@@ -69,6 +69,7 @@ export async function getStudyById(id: string, userId: string, role: UserRole) {
             select: {
               id: true,
               email: true,
+              phone: true,
               firstName: true,
               lastName: true,
               role: true,

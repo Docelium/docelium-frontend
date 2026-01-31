@@ -308,6 +308,46 @@ npx prisma migrate dev --name nom_migration
 npm run db:studio
 ```
 
+## Deploiement (Netlify + Neon)
+
+### 1. Base de donnees Neon
+
+1. Creer un compte sur [neon.tech](https://neon.tech)
+2. Creer un nouveau projet
+3. Copier la connection string (format: `postgresql://user:pass@ep-xxx.region.aws.neon.tech/dbname?sslmode=require`)
+
+### 2. Deployer sur Netlify
+
+1. Connecter le repository GitHub a Netlify
+2. Configurer les variables d'environnement dans Netlify :
+
+| Variable | Valeur |
+|----------|--------|
+| `DATABASE_URL` | Connection string Neon |
+| `NEXTAUTH_SECRET` | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | `https://votre-app.netlify.app` |
+
+3. Deployer
+
+### 3. Initialiser la base de donnees
+
+Apres le premier deploiement, executer localement :
+
+```bash
+# Configurer DATABASE_URL avec la connection Neon
+export DATABASE_URL="postgresql://..."
+
+# Appliquer les migrations
+npx prisma migrate deploy
+
+# Charger les donnees de test
+npm run db:seed
+```
+
+### 4. Mettre a jour NEXTAUTH_URL
+
+Apres le deploiement, mettre a jour `NEXTAUTH_URL` avec l'URL reelle de l'application.
+
 ## Licence
 
 Proprietaire - Tous droits reserves
