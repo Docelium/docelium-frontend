@@ -27,17 +27,17 @@ export async function GET(request: NextRequest, { params }: Params) {
 export async function PUT(request: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
-    await requirePermission('STUDY_UPDATE');
+    const user = await requirePermission('STUDY_UPDATE');
     const body = await request.json();
 
     // Check if this is a status update
     if (body.status && Object.keys(body).length === 1) {
-      const study = await updateStudyStatus(id, body.status as StudyStatus);
+      const study = await updateStudyStatus(id, body.status as StudyStatus, user.id, user.role);
       return successResponse(study);
     }
 
     const validatedData = updateStudySchema.parse(body);
-    const study = await updateStudy(id, validatedData);
+    const study = await updateStudy(id, validatedData, user.id, user.role);
 
     return successResponse(study);
   } catch (error) {

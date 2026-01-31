@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { StudyStatus, UserRole, Prisma } from '@prisma/client';
 import { getAccessibleStudyIds } from '@/lib/auth';
+import { createAuditEvent } from '@/lib/services/audit.service';
 
 export interface StudyFilters {
   status?: StudyStatus;
@@ -292,6 +293,19 @@ export async function createStudy(data: CreateStudyInput) {
       });
     }
 
+    // Audit trail
+    if (data.createdById) {
+      await createAuditEvent({
+        userId: data.createdById,
+        userRole: 'PHARMACIEN',
+        action: 'CREATE_STUDY',
+        entityType: 'STUDY',
+        entityId: study.id,
+        studyId: study.id,
+        detailsAfter: { codeInternal: study.codeInternal, title: study.title, phase: study.phase },
+      }).catch(() => {}); // Don't fail study creation if audit fails
+    }
+
     return study;
   });
 }
@@ -301,13 +315,13 @@ function jsonValue(val: unknown) {
   return val === null ? Prisma.DbNull : val;
 }
 
-export async function updateStudy(id: string, data: Partial<CreateStudyInput>) {
+export async function updateStudy(id: string, data: Partial<CreateStudyInput>, userId?: string, userRole?: UserRole) {
   const existing = await prisma.study.findUnique({ where: { id } });
   if (!existing) {
     throw new Error('Not found');
   }
 
-  return prisma.study.update({
+  const study = await prisma.study.update({
     where: { id },
     data: {
       // Only update fields that are provided
@@ -353,9 +367,56 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>) {
       ...(data.blockComments !== undefined && { blockComments: jsonValue(data.blockComments) }),
     },
   });
+
+  // Audit trail — compare DB snapshots before and after update
+  if (userId) {
+    // Re-fetch the updated record so both snapshots have identical Prisma formatting
+    const updated = await prisma.study.findUnique({ where: { id } });
+
+    const trackableFields = [
+      'codeInternal', 'euCtNumber', 'nctNumber', 'title', 'sponsor', 'phase',
+      'therapeuticArea', 'siteActivationDate', 'expectedRecruitment', 'complexityLevel',
+      'contacts', 'protocolVersion', 'protocolVersionDate', 'amendments',
+      'euCtrApprovalReference', 'ethicsApprovalReference', 'insuranceReference', 'eudamedId',
+      'blinded', 'arms', 'cohorts', 'destructionPolicy', 'returnPolicy',
+      'requiresPatientForDispensation', 'allowsDispensationWithoutIwrs',
+      'temperatureTrackingEnabled', 'returnedMaterialReusable',
+      'dataQualityProfile', 'visitSchedule', 'treatmentCycles', 'patientConstraints',
+      'temperatureGovernance', 'excursionActionRequired', 'excursionTimeThreshold',
+      'iwrsGovernance', 'protocolRequiredEquipments', 'siteOverrides',
+      'startDate', 'expectedEndDate', 'blockComments',
+    ] as const;
+
+    const changedFields: string[] = [];
+    if (updated) {
+      for (const key of trackableFields) {
+        if (data[key as keyof typeof data] === undefined) continue;
+        const oldVal = existing[key as keyof typeof existing];
+        const newVal = updated[key as keyof typeof updated];
+        if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+          changedFields.push(key);
+        }
+      }
+    }
+
+    if (changedFields.length > 0) {
+      await createAuditEvent({
+        userId,
+        userRole: userRole || 'PHARMACIEN',
+        action: 'UPDATE_STUDY',
+        entityType: 'STUDY',
+        entityId: id,
+        studyId: id,
+        detailsBefore: { codeInternal: existing.codeInternal, title: existing.title },
+        detailsAfter: { changedFields, codeInternal: study.codeInternal, title: study.title },
+      }).catch(() => {});
+    }
+  }
+
+  return study;
 }
 
-export async function updateStudyStatus(id: string, status: StudyStatus) {
+export async function updateStudyStatus(id: string, status: StudyStatus, userId?: string, userRole?: UserRole) {
   const study = await prisma.study.findUnique({ where: { id } });
   if (!study) {
     throw new Error('Not found');
@@ -386,10 +447,36 @@ export async function updateStudyStatus(id: string, status: StudyStatus) {
     updateData['actualEndDate'] = new Date();
   }
 
-  return prisma.study.update({
+  const updated = await prisma.study.update({
     where: { id },
     data: updateData,
   });
+
+  // Audit trail
+  if (userId) {
+    const statusActionMap: Record<string, string> = {
+      ACTIVE: 'ACTIVATE_STUDY',
+      TEMPORARILY_SUSPENDED: 'SUSPEND_STUDY',
+      CLOSED_TO_ENROLLMENT: 'CLOSE_STUDY',
+      CLOSED_TO_TREATMENT: 'CLOSE_STUDY',
+      TERMINATED: 'CLOSE_STUDY',
+      ARCHIVED: 'ARCHIVE_STUDY',
+    };
+    const action = statusActionMap[status] || 'UPDATE_STUDY';
+
+    await createAuditEvent({
+      userId,
+      userRole: userRole || 'PHARMACIEN',
+      action: action as never,
+      entityType: 'STUDY',
+      entityId: id,
+      studyId: id,
+      detailsBefore: { status: study.protocolStatus },
+      detailsAfter: { status },
+    }).catch(() => {});
+  }
+
+  return updated;
 }
 
 export async function deleteStudy(id: string) {

@@ -15,6 +15,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { StudyStatus, StudyPhase, DestructionPolicy, BlindingType } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
+import AuditTrail from '@/components/features/AuditTrail';
 
 const statusLabels: Record<StudyStatus, string> = {
   DRAFT: 'Brouillon',
@@ -330,6 +331,9 @@ export default async function StudyDetailPage({ params }: Props) {
           </CardContent>
         </Card>
       )}
+
+      {/* Historique des modifications */}
+      <AuditTrail studyId={study.id} />
     </Box>
   );
 }

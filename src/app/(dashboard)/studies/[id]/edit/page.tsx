@@ -24,6 +24,7 @@ import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
 import Link from 'next/link';
 import { useToast } from '@/contexts/ToastContext';
 
@@ -1632,15 +1633,20 @@ export default function EditStudyPage() {
             <Button disabled={activeStep === 0} onClick={handleBack}>
               Precedent
             </Button>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
                 Etape {activeStep + 1} / {steps.length}
               </Typography>
-              {activeStep === steps.length - 1 ? (
-                <Button variant="contained" onClick={handleSubmit} disabled={loading || !isStepValid()}>
-                  {loading ? <CircularProgress size={24} /> : 'Enregistrer les modifications'}
-                </Button>
-              ) : (
+              <Button
+                variant="outlined"
+                color="success"
+                startIcon={loading ? <CircularProgress size={16} /> : <SaveIcon />}
+                onClick={handleSubmit}
+                disabled={loading || !isStepValid()}
+              >
+                Enregistrer
+              </Button>
+              {activeStep < steps.length - 1 && (
                 <Button variant="contained" onClick={handleNext} disabled={!isStepValid()}>
                   Suivant
                 </Button>
