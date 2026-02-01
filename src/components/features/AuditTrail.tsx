@@ -31,6 +31,7 @@ interface AuditEvent {
 }
 
 const actionLabels: Record<string, string> = {
+  // Studies
   CREATE_STUDY: 'Creation du protocole',
   UPDATE_STUDY: 'Modification du protocole',
   UPDATE_STUDY_CONFIG: 'Modification de la configuration',
@@ -38,6 +39,19 @@ const actionLabels: Record<string, string> = {
   SUSPEND_STUDY: 'Suspension du protocole',
   CLOSE_STUDY: 'Cloture du protocole',
   ARCHIVE_STUDY: 'Archivage du protocole',
+  // Medications
+  CREATE_MEDICATION: 'Creation du medicament',
+  UPDATE_MEDICATION: 'Modification du medicament',
+  DEACTIVATE_MEDICATION: 'Desactivation du medicament',
+  // Movements
+  CREATE_MOVEMENT_RECEPTION: 'Reception',
+  CREATE_MOVEMENT_DISPENSATION: 'Dispensation',
+  CREATE_MOVEMENT_RETOUR: 'Retour',
+  CREATE_MOVEMENT_DESTRUCTION: 'Destruction',
+  CREATE_MOVEMENT_TRANSFER: 'Transfert',
+  // Stock
+  QUARANTINE_STOCK_ITEM: 'Mise en quarantaine',
+  RELEASE_STOCK_ITEM: 'Levee de quarantaine',
 };
 
 const fieldLabels: Record<string, string> = {
@@ -84,6 +98,19 @@ const fieldLabels: Record<string, string> = {
   startDate: 'Date de debut',
   expectedEndDate: 'Date de fin prevue',
   blockComments: 'Commentaires',
+  // Medication fields
+  code: 'Code',
+  name: 'Nom',
+  type: 'Type',
+  storageCondition: 'Condition de stockage',
+  form: 'Forme',
+  dosage: 'Dosage',
+  // Stock fields
+  batchNumber: 'Numero de lot',
+  reason: 'Raison',
+  status: 'Statut',
+  // Movement fields
+  quantity: 'Quantite',
 };
 
 const actionColors: Record<string, 'success' | 'primary' | 'warning' | 'error' | 'info' | 'grey'> = {
@@ -94,23 +121,45 @@ const actionColors: Record<string, 'success' | 'primary' | 'warning' | 'error' |
   SUSPEND_STUDY: 'warning',
   CLOSE_STUDY: 'info',
   ARCHIVE_STUDY: 'grey',
+  CREATE_MEDICATION: 'success',
+  UPDATE_MEDICATION: 'primary',
+  DEACTIVATE_MEDICATION: 'error',
+  CREATE_MOVEMENT_RECEPTION: 'success',
+  CREATE_MOVEMENT_DISPENSATION: 'info',
+  CREATE_MOVEMENT_RETOUR: 'warning',
+  CREATE_MOVEMENT_DESTRUCTION: 'error',
+  CREATE_MOVEMENT_TRANSFER: 'primary',
+  QUARANTINE_STOCK_ITEM: 'warning',
+  RELEASE_STOCK_ITEM: 'success',
 };
 
 interface AuditTrailProps {
-  studyId: string;
+  studyId?: string;
+  entityType?: string;
+  entityId?: string;
 }
 
-export default function AuditTrail({ studyId }: AuditTrailProps) {
+export default function AuditTrail({ studyId, entityType, entityId }: AuditTrailProps) {
   const [events, setEvents] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/studies/${studyId}/audit`)
+    let url: string;
+    if (entityType && entityId) {
+      url = `/api/audit?entityType=${entityType}&entityId=${entityId}`;
+    } else if (studyId) {
+      url = `/api/studies/${studyId}/audit`;
+    } else {
+      setLoading(false);
+      return;
+    }
+
+    fetch(url)
       .then((res) => res.json())
       .then((result) => setEvents(result.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [studyId]);
+  }, [studyId, entityType, entityId]);
 
   if (loading) {
     return (
@@ -165,12 +214,12 @@ export default function AuditTrail({ studyId }: AuditTrailProps) {
                 </Typography>
                 {event.detailsAfter && (
                   <Box sx={{ mt: 0.5 }}>
-                    {event.action === 'UPDATE_STUDY' && (event.detailsAfter as { changedFields?: string[] }).changedFields && (
+                    {(event.detailsAfter as { changedFields?: string[] }).changedFields && (
                       <Typography variant="caption" color="text.secondary">
                         Champs modifies : {((event.detailsAfter as { changedFields: string[] }).changedFields).map((f) => fieldLabels[f] || f).join(', ')}
                       </Typography>
                     )}
-                    {event.action !== 'UPDATE_STUDY' && (event.detailsAfter as { status?: string }).status && (
+                    {!(event.detailsAfter as { changedFields?: string[] }).changedFields && (event.detailsAfter as { status?: string }).status && (
                       <Typography variant="caption" color="text.secondary">
                         Statut : {(event.detailsAfter as { status: string }).status}
                       </Typography>

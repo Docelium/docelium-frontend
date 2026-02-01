@@ -14,6 +14,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import { MedicationType, DosageForm, StorageCondition, CountingUnit } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
+import AuditTrail from '@/components/features/AuditTrail';
 
 const typeLabels: Record<MedicationType, string> = {
   IMP: 'Medicament experimental (IMP)',
@@ -275,6 +276,8 @@ export default async function MedicationDetailPage({ params }: Props) {
           )}
         </Grid>
       </Grid>
+
+      <AuditTrail entityType="MEDICATION" entityId={medId} />
     </Box>
   );
 }

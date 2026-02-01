@@ -15,7 +15,16 @@ import {
   createDestructionSchema,
   createTransferSchema,
 } from '@/lib/validators/movement';
-import { MovementType } from '@prisma/client';
+import { createAuditEvent } from '@/lib/services/audit.service';
+import { AuditAction, MovementType } from '@prisma/client';
+
+const movementTypeToAuditAction: Record<MovementType, AuditAction> = {
+  RECEPTION: 'CREATE_MOVEMENT_RECEPTION',
+  DISPENSATION: 'CREATE_MOVEMENT_DISPENSATION',
+  RETOUR: 'CREATE_MOVEMENT_RETOUR',
+  DESTRUCTION: 'CREATE_MOVEMENT_DESTRUCTION',
+  TRANSFER: 'CREATE_MOVEMENT_TRANSFER',
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -74,6 +83,22 @@ export async function POST(request: NextRequest) {
       default:
         throw new Error('Type de mouvement invalide');
     }
+
+    const movementType = movement.type as MovementType;
+    await createAuditEvent({
+      userId: user.id,
+      userRole: user.role,
+      action: movementTypeToAuditAction[movementType],
+      entityType: 'MOVEMENT',
+      entityId: movement.id,
+      studyId: movement.studyId,
+      detailsAfter: {
+        type: movement.type,
+        quantity: movement.quantity,
+        medicationId: movement.medicationId,
+        stockItemId: movement.stockItemId,
+      },
+    }).catch(() => {});
 
     return successResponse(movement, 201);
   } catch (error) {

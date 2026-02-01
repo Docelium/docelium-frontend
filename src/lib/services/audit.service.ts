@@ -73,3 +73,19 @@ export async function getAuditEventsForStudy(studyId: string) {
     take: 100,
   });
 }
+
+export async function getAuditEventsForEntity(entityType: AuditEntityType, entityId: string) {
+  return prisma.auditEvent.findMany({
+    where: {
+      entityType,
+      entityId,
+    },
+    include: {
+      user: {
+        select: { id: true, firstName: true, lastName: true, role: true },
+      },
+    },
+    orderBy: { timestamp: 'desc' },
+    take: 100,
+  });
+}

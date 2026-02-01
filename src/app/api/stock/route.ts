@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requirePermission, handleApiError, successResponse } from '@/lib/auth-utils';
 import { getStock, quarantineStock, releaseFromQuarantine } from '@/lib/services/stock.service';
+import { createAuditEvent } from '@/lib/services/audit.service';
 import { StockItemStatus } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
@@ -31,12 +32,34 @@ export async function PATCH(request: NextRequest) {
     const { id, action, reason } = body;
 
     if (action === 'quarantine') {
-      await requirePermission('STOCK_QUARANTINE');
+      const user = await requirePermission('STOCK_QUARANTINE');
       const stockItem = await quarantineStock(id, reason);
+
+      await createAuditEvent({
+        userId: user.id,
+        userRole: user.role,
+        action: 'QUARANTINE_STOCK_ITEM',
+        entityType: 'STOCK_ITEM',
+        entityId: stockItem.id,
+        studyId: stockItem.studyId,
+        detailsAfter: { batchNumber: stockItem.batchNumber, reason, status: stockItem.status },
+      }).catch(() => {});
+
       return successResponse(stockItem);
     } else if (action === 'release') {
-      await requirePermission('STOCK_QUARANTINE');
+      const user = await requirePermission('STOCK_QUARANTINE');
       const stockItem = await releaseFromQuarantine(id);
+
+      await createAuditEvent({
+        userId: user.id,
+        userRole: user.role,
+        action: 'RELEASE_STOCK_ITEM',
+        entityType: 'STOCK_ITEM',
+        entityId: stockItem.id,
+        studyId: stockItem.studyId,
+        detailsAfter: { batchNumber: stockItem.batchNumber, status: stockItem.status },
+      }).catch(() => {});
+
       return successResponse(stockItem);
     }
 
