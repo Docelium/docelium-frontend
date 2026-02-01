@@ -41,12 +41,6 @@ enum StudyPhase {
   OTHER
 }
 
-enum ComplexityLevel {
-  LOW
-  MEDIUM
-  HIGH
-}
-
 enum BlindingType {
   NONE
   SINGLE
@@ -337,7 +331,6 @@ model Study {
   therapeuticArea      String?         @map("therapeutic_area")
   siteActivationDate   DateTime?       @map("site_activation_date")
   expectedRecruitment  Int?            @map("expected_recruitment")
-  complexityLevel      ComplexityLevel @default(LOW) @map("complexity_level")
 
   // === BLOC B : Contacts (JSON array) ===
   contacts Json? // Array of {role: 'PI'|'SC'|'CRA'|'PM', name, email, phone?}

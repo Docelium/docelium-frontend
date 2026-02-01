@@ -101,7 +101,6 @@ export interface CreateStudyInput {
   therapeuticArea?: string | null;
   siteActivationDate?: Date | null;
   expectedRecruitment?: number | null;
-  complexityLevel?: string;
 
   // Bloc B - Contacts
   contacts?: Array<{
@@ -224,7 +223,6 @@ export async function createStudy(data: CreateStudyInput) {
         therapeuticArea: data.therapeuticArea,
         siteActivationDate: data.siteActivationDate,
         expectedRecruitment: data.expectedRecruitment,
-        complexityLevel: (data.complexityLevel || 'LOW') as never,
         protocolStatus: 'DRAFT',
 
         // Bloc B
@@ -340,7 +338,6 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.therapeuticArea !== undefined && { therapeuticArea: data.therapeuticArea }),
       ...(data.siteActivationDate !== undefined && { siteActivationDate: data.siteActivationDate }),
       ...(data.expectedRecruitment !== undefined && { expectedRecruitment: data.expectedRecruitment }),
-      ...(data.complexityLevel !== undefined && { complexityLevel: data.complexityLevel as never }),
       ...(data.contacts !== undefined && { contacts: jsonValue(data.contacts) }),
       ...(data.protocolVersion !== undefined && { protocolVersion: data.protocolVersion }),
       ...(data.protocolVersionDate !== undefined && { protocolVersionDate: data.protocolVersionDate }),
@@ -384,7 +381,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
 
     const trackableFields = [
       'codeInternal', 'euCtNumber', 'nctNumber', 'title', 'sponsor', 'phase',
-      'therapeuticArea', 'siteActivationDate', 'expectedRecruitment', 'complexityLevel',
+      'therapeuticArea', 'siteActivationDate', 'expectedRecruitment',
       'contacts', 'protocolVersion', 'protocolVersionDate', 'amendments', 'pharmacyManualVersion', 'pharmacyManualVersionDate',
       'euCtrApprovalReference', 'ethicsApprovalReference', 'insuranceReference', 'eudamedId',
       'blinded', 'arms', 'cohorts', 'destructionPolicy', 'destructionPolicyDetails', 'returnPolicy',

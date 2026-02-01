@@ -53,12 +53,6 @@ const phases = [
   { value: 'OTHER', label: 'Autre' },
 ];
 
-const complexityLevels = [
-  { value: 'LOW', label: 'Faible' },
-  { value: 'MEDIUM', label: 'Moyen' },
-  { value: 'HIGH', label: 'Eleve' },
-];
-
 const blindingTypes = [
   { value: 'NONE', label: 'Ouvert' },
   { value: 'SINGLE', label: 'Simple aveugle' },
@@ -135,7 +129,6 @@ interface FormData {
   therapeuticArea: string;
   siteActivationDate: string;
   expectedRecruitment: string;
-  complexityLevel: string;
 
   // BLOC B - Contacts
   contacts: Contact[];
@@ -220,7 +213,6 @@ const initialFormData: FormData = {
   therapeuticArea: '',
   siteActivationDate: '',
   expectedRecruitment: '',
-  complexityLevel: 'LOW',
   contacts: [],
   protocolVersion: '',
   protocolVersionDate: '',
@@ -312,7 +304,6 @@ export default function EditStudyPage() {
           therapeuticArea: study.therapeuticArea || '',
           siteActivationDate: formatDateForInput(study.siteActivationDate),
           expectedRecruitment: study.expectedRecruitment?.toString() || '',
-          complexityLevel: study.complexityLevel || 'LOW',
           contacts: study.contacts || [],
           protocolVersion: study.protocolVersion || '',
           protocolVersionDate: formatDateForInput(study.protocolVersionDate),
@@ -569,7 +560,6 @@ export default function EditStudyPage() {
         therapeuticArea: formData.therapeuticArea || null,
         siteActivationDate: formData.siteActivationDate ? new Date(formData.siteActivationDate) : null,
         expectedRecruitment: formData.expectedRecruitment ? parseInt(formData.expectedRecruitment) : null,
-        complexityLevel: formData.complexityLevel,
 
         // BLOC B
         contacts: formData.contacts.length > 0 ? formData.contacts : null,
@@ -737,28 +727,13 @@ export default function EditStudyPage() {
                 </Select>
               </FormControl>
 
-              <FormControl required sx={{ flex: 1 }}>
-                <InputLabel>Complexite</InputLabel>
-                <Select
-                  value={formData.complexityLevel}
-                  label="Complexite"
-                  onChange={(e) => handleChange('complexityLevel')(e as { target: { value: unknown } })}
-                >
-                  {complexityLevels.map((c) => (
-                    <MenuItem key={c.value} value={c.value}>
-                      {c.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <TextField
+                label="Indication therapeutique"
+                value={formData.therapeuticArea}
+                onChange={handleChange('therapeuticArea')}
+                sx={{ flex: 1 }}
+              />
             </Box>
-
-            <TextField
-              label="Aire therapeutique"
-              value={formData.therapeuticArea}
-              onChange={handleChange('therapeuticArea')}
-              helperText="Ex: ONCOLOGY, CARDIOLOGY, etc."
-            />
 
             <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField

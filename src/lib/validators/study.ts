@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 // Enum values selon la SPEC
 const StudyPhaseValues = ['I', 'I_II', 'II', 'III', 'IV', 'OTHER'] as const;
-const ComplexityLevelValues = ['LOW', 'MEDIUM', 'HIGH'] as const;
 const BlindingTypeValues = ['NONE', 'SINGLE', 'DOUBLE', 'TRIPLE'] as const;
 const DestructionPolicyValues = ['LOCAL', 'SPONSOR', 'MIXED'] as const;
 const ReturnPolicyValues = ['LOCAL_STOCK', 'SPONSOR_RETURN'] as const;
@@ -33,7 +32,6 @@ export const blocASchema = z.object({
   therapeuticArea: z.string().nullable().optional(),
   siteActivationDate: z.coerce.date().nullable().optional(),
   expectedRecruitment: z.number().int().positive().nullable().optional(),
-  complexityLevel: z.enum(ComplexityLevelValues).default('LOW'),
 });
 
 // BLOC B - Organisation & Contacts
@@ -221,7 +219,6 @@ export type UpdateStudyData = z.infer<typeof updateStudySchema>;
 // Export enum values
 export {
   StudyPhaseValues,
-  ComplexityLevelValues,
   BlindingTypeValues,
   DestructionPolicyValues,
   ReturnPolicyValues,

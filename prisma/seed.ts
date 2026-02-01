@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, StudyPhase, MedicationType, DosageForm, StorageCondition, CountingUnit, DestructionPolicy, ComplexityLevel, BlindingType } from '@prisma/client';
+import { PrismaClient, UserRole, StudyPhase, MedicationType, DosageForm, StorageCondition, CountingUnit, DestructionPolicy, BlindingType } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
@@ -108,7 +108,6 @@ async function main() {
       therapeuticArea: 'ONCOLOGY',
       siteActivationDate: new Date('2025-01-15'),
       expectedRecruitment: 150,
-      complexityLevel: ComplexityLevel.HIGH,
 
       // === BLOC B : Contacts ===
       contacts: [
