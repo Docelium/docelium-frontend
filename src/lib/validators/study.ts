@@ -7,7 +7,7 @@ const DestructionPolicyValues = ['LOCAL', 'SPONSOR', 'MIXED'] as const;
 const ReturnPolicyValues = ['LOCAL_STOCK', 'SPONSOR_RETURN'] as const;
 const TemperatureGovernanceValues = ['BASIC', 'FULL'] as const;
 const IwrsIntegrationModeValues = ['MANUAL', 'CSV', 'API'] as const;
-const ContactRoleValues = ['PI', 'SC', 'CRA', 'PM'] as const;
+const ContactRoleValues = ['PI', 'SC', 'CRA', 'PM', 'PHARMA'] as const;
 const WeightReferenceValues = ['BASELINE', 'CURRENT'] as const;
 
 // BLOC A - Identification du Protocole

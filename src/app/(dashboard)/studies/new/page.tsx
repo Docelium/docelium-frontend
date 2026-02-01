@@ -87,6 +87,7 @@ const contactRoles = [
   { value: 'SC', label: 'Coordinateur d\'etude (SC)' },
   { value: 'CRA', label: 'CRA Promoteur' },
   { value: 'PM', label: 'Project Manager' },
+  { value: 'PHARMA', label: 'Pharmacien' },
 ];
 
 const weightReferences = [

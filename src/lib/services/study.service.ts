@@ -104,7 +104,7 @@ export interface CreateStudyInput {
 
   // Bloc B - Contacts
   contacts?: Array<{
-    role: 'PI' | 'SC' | 'CRA' | 'PM';
+    role: 'PI' | 'SC' | 'CRA' | 'PM' | 'PHARMA';
     name: string;
     email: string;
     phone?: string;
