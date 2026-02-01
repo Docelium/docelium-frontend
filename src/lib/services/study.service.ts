@@ -146,6 +146,7 @@ export interface CreateStudyInput {
     visit_code: string;
     day: number;
     requires_dispense: boolean;
+    arm?: string | null;
   }> | null;
   treatmentCycles?: {
     cycle_length?: number | null;

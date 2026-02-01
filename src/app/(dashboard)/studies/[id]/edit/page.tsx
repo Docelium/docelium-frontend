@@ -105,6 +105,7 @@ interface VisitScheduleItem {
   visit_code: string;
   day: number;
   requires_dispense: boolean;
+  arm: string | null;
 }
 
 interface LocalProcedure {
@@ -448,11 +449,11 @@ export default function EditStudyPage() {
   const addVisit = () => {
     setFormData((prev) => ({
       ...prev,
-      visitSchedule: [...prev.visitSchedule, { visit_code: '', day: 1, requires_dispense: false }],
+      visitSchedule: [...prev.visitSchedule, { visit_code: '', day: 1, requires_dispense: false, arm: null }],
     }));
   };
 
-  const updateVisit = (index: number, field: keyof VisitScheduleItem, value: string | number | boolean) => {
+  const updateVisit = (index: number, field: keyof VisitScheduleItem, value: string | number | boolean | null) => {
     setFormData((prev) => ({
       ...prev,
       visitSchedule: prev.visitSchedule.map((v, i) => (i === index ? { ...v, [field]: value } : v)),
@@ -1125,6 +1126,21 @@ export default function EditStudyPage() {
               Definissez le calendrier des visites et le schema de traitement.
             </Typography>
 
+            {formData.arms.length > 0 ? (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>Bras de traitement (Bloc D)</Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {formData.arms.map((arm, i) => (
+                    <Chip key={i} label={arm} size="small" color="primary" variant="outlined" />
+                  ))}
+                </Box>
+              </Box>
+            ) : (
+              <Alert severity="info" sx={{ mb: 2 }}>
+                Aucun bras de traitement defini. Ajoutez des bras dans le Bloc D (Parametres operationnels) pour pouvoir associer les visites a un bras.
+              </Alert>
+            )}
+
             <Typography variant="subtitle2">Cycles de traitement</Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
@@ -1165,6 +1181,25 @@ export default function EditStudyPage() {
                     onChange={(e) => updateVisit(index, 'day', Number.parseInt(e.target.value) || 1)}
                     sx={{ width: 100 }}
                   />
+                  {formData.arms.length > 0 && (
+                    <FormControl sx={{ minWidth: 180 }}>
+                      <InputLabel>Bras</InputLabel>
+                      <Select
+                        value={visit.arm || ''}
+                        label="Bras"
+                        onChange={(e) => updateVisit(index, 'arm', e.target.value || null)}
+                      >
+                        <MenuItem value="">
+                          <em>Tous les bras</em>
+                        </MenuItem>
+                        {formData.arms.map((arm) => (
+                          <MenuItem key={arm} value={arm}>
+                            {arm}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
                   <FormControlLabel
                     control={
                       <Switch

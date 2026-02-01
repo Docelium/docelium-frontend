@@ -36,6 +36,15 @@ interface StockItem {
   expiryDate: string | null;
 }
 
+interface GeneratedVisit {
+  code: string;
+  cycle: number;
+  day: number;
+  absoluteDay: number;
+  requiresDispense: boolean;
+  arm: string | null;
+}
+
 export default function DispensationPage() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -45,6 +54,7 @@ export default function DispensationPage() {
   const [studies, setStudies] = useState<Study[]>([]);
   const [medications, setMedications] = useState<Medication[]>([]);
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [visits, setVisits] = useState<GeneratedVisit[]>([]);
   const [formData, setFormData] = useState({
     studyId: '',
     medicationId: '',
@@ -70,9 +80,15 @@ export default function DispensationPage() {
         .then((res) => res.json())
         .then((result) => setMedications(result.data || []))
         .catch(console.error);
+      fetch(`/api/studies/${formData.studyId}/visits?dispensationOnly=true`)
+        .then((res) => res.json())
+        .then((result) => setVisits(result.data || []))
+        .catch(console.error);
     } else {
       setMedications([]);
+      setVisits([]);
     }
+    setFormData((prev) => ({ ...prev, visitNumber: '', medicationId: '', stockItemId: '' }));
   }, [formData.studyId]);
 
   useEffect(() => {
@@ -225,12 +241,30 @@ export default function DispensationPage() {
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
-                <TextField
-                  fullWidth
-                  label="Numero de visite"
-                  value={formData.visitNumber}
-                  onChange={handleChange('visitNumber')}
-                />
+                {visits.length > 0 ? (
+                  <FormControl fullWidth disabled={!formData.studyId}>
+                    <InputLabel>Visite</InputLabel>
+                    <Select
+                      value={formData.visitNumber}
+                      label="Visite"
+                      onChange={(e) => handleChange('visitNumber')(e as { target: { value: unknown } })}
+                    >
+                      {visits.map((v) => (
+                        <MenuItem key={v.code} value={v.code}>
+                          {v.code} (J{v.absoluteDay}){v.arm ? ` — ${v.arm}` : ''}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                ) : (
+                  <TextField
+                    fullWidth
+                    label="Numero de visite"
+                    value={formData.visitNumber}
+                    onChange={handleChange('visitNumber')}
+                    helperText={formData.studyId ? 'Aucun calendrier de visites configure' : ''}
+                  />
+                )}
               </Grid>
               <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
                 <TextField

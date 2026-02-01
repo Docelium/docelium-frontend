@@ -95,6 +95,7 @@ const visitScheduleItemSchema = z.object({
   visit_code: z.string(),
   day: z.number().int().positive(),
   requires_dispense: z.boolean(),
+  arm: z.string().nullable().optional(),
 });
 
 const treatmentCyclesSchema = z.object({
