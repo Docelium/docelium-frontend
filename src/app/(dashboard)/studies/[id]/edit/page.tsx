@@ -37,7 +37,6 @@ const steps = [
   { id: 'E', label: 'Qualite donnees' },
   { id: 'G', label: 'Calendrier visites' },
   { id: 'H', label: 'Contraintes patient' },
-  { id: 'I', label: 'Temperature' },
   { id: 'L', label: 'IWRS' },
   { id: 'M', label: 'Equipements' },
   { id: 'N', label: 'Site local' },
@@ -69,12 +68,6 @@ const destructionPolicies = [
 const returnPolicies = [
   { value: 'LOCAL_STOCK', label: 'Retour en stock local' },
   { value: 'SPONSOR_RETURN', label: 'Retour au sponsor' },
-];
-
-const temperatureGovernances = [
-  { value: '', label: 'Non defini' },
-  { value: 'BASIC', label: 'Basique' },
-  { value: 'FULL', label: 'Complet avec alertes' },
 ];
 
 const iwrsIntegrationModes = [
@@ -176,11 +169,6 @@ interface FormData {
   weightVariationThreshold: string;
   weightReference: string;
 
-  // BLOC I - Temperature
-  temperatureGovernance: string;
-  excursionActionRequired: boolean;
-  excursionTimeThreshold: string;
-
   // BLOC L - IWRS
   iwrsIntegration: boolean;
   iwrsIntegrationMode: string;
@@ -247,9 +235,6 @@ const initialFormData: FormData = {
   requiresRecentWeightDays: '',
   weightVariationThreshold: '',
   weightReference: 'CURRENT',
-  temperatureGovernance: '',
-  excursionActionRequired: false,
-  excursionTimeThreshold: '',
   iwrsIntegration: false,
   iwrsIntegrationMode: 'MANUAL',
   iwrsAllowsPartialData: false,
@@ -338,9 +323,6 @@ export default function EditStudyPage() {
           requiresRecentWeightDays: study.patientConstraints?.requires_recent_weight_days?.toString() || '',
           weightVariationThreshold: study.patientConstraints?.weight_variation_threshold?.toString() || '',
           weightReference: study.patientConstraints?.weight_reference || 'CURRENT',
-          temperatureGovernance: study.temperatureGovernance || '',
-          excursionActionRequired: study.excursionActionRequired ?? false,
-          excursionTimeThreshold: study.excursionTimeThreshold || '',
           iwrsIntegration: study.iwrsGovernance?.iwrs_integration ?? false,
           iwrsIntegrationMode: study.iwrsGovernance?.iwrs_integration_mode || 'MANUAL',
           iwrsAllowsPartialData: study.iwrsGovernance?.iwrs_allows_partial_data ?? false,
@@ -621,11 +603,6 @@ export default function EditStudyPage() {
             : null,
           weight_reference: formData.weightReference,
         },
-
-        // BLOC I
-        temperatureGovernance: formData.temperatureGovernance || null,
-        excursionActionRequired: formData.excursionActionRequired,
-        excursionTimeThreshold: formData.excursionTimeThreshold || null,
 
         // BLOC L
         iwrsGovernance: formData.iwrsIntegration
@@ -1279,60 +1256,8 @@ export default function EditStudyPage() {
           </Box>
         );
 
-      // BLOC I - Temperature
-      case 7:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Bloc I - Gouvernance Temperature
-            </Typography>
-
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Politique de gestion de la chaine du froid.
-            </Typography>
-
-            <FormControl>
-              <InputLabel>Niveau de gouvernance temperature</InputLabel>
-              <Select
-                value={formData.temperatureGovernance}
-                label="Niveau de gouvernance temperature"
-                onChange={(e) => handleChange('temperatureGovernance')(e as { target: { value: unknown } })}
-              >
-                {temperatureGovernances.map((t) => (
-                  <MenuItem key={t.value} value={t.value}>
-                    {t.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.excursionActionRequired}
-                  onChange={handleSwitchChange('excursionActionRequired')}
-                />
-              }
-              label="Action requise sur excursion temperature"
-            />
-
-            <TextField
-              label="Seuil temps excursion"
-              value={formData.excursionTimeThreshold}
-              onChange={handleChange('excursionTimeThreshold')}
-              helperText="Ex: 30m, 2h"
-            />
-
-            {formData.temperatureTrackingEnabled && !formData.temperatureGovernance && (
-              <Alert severity="warning">
-                Le suivi temperature est active mais aucun niveau de gouvernance n&apos;est defini.
-              </Alert>
-            )}
-          </Box>
-        );
-
       // BLOC L - IWRS
-      case 8:
+      case 7:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -1403,7 +1328,7 @@ export default function EditStudyPage() {
         );
 
       // BLOC M - Equipment
-      case 9:
+      case 8:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -1446,7 +1371,7 @@ export default function EditStudyPage() {
         );
 
       // BLOC N - Site Overrides
-      case 10:
+      case 9:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -1586,10 +1511,12 @@ export default function EditStudyPage() {
       <Card sx={{ mt: 3 }}>
         <CardContent>
           <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4, overflowX: 'auto' }}>
-            {steps.map((step) => (
-              <Step key={step.id}>
+            {steps.map((step, index) => (
+              <Step key={step.id} completed={index < activeStep}>
                 <StepLabel
+                  onClick={() => setActiveStep(index)}
                   sx={{
+                    cursor: 'pointer',
                     '& .MuiStepLabel-label': {
                       fontSize: '0.75rem',
                     },
