@@ -143,6 +143,8 @@ interface FormData {
   protocolVersion: string;
   protocolVersionDate: string;
   amendments: Amendment[];
+  pharmacyManualVersion: string;
+  pharmacyManualVersionDate: string;
   euCtrApprovalReference: string;
   ethicsApprovalReference: string;
   insuranceReference: string;
@@ -153,6 +155,7 @@ interface FormData {
   arms: string[];
   cohorts: string[];
   destructionPolicy: string;
+  destructionPolicyDetails: string;
   returnPolicy: string;
   requiresPatientForDispensation: boolean;
   allowsDispensationWithoutIwrs: boolean;
@@ -234,6 +237,8 @@ const testFormData: FormData = {
     { version: '2.0', date: '2023-06-01' },
     { version: '2.1', date: '2023-09-15' },
   ],
+  pharmacyManualVersion: 'V1.0',
+  pharmacyManualVersionDate: '2024-01-15',
   euCtrApprovalReference: '2024-02-01',
   ethicsApprovalReference: 'CPP-IDF-VI-2024-0123',
   insuranceReference: 'ASS-2024-456789',
@@ -244,6 +249,7 @@ const testFormData: FormData = {
   arms: ['Bras A - Traitement actif', 'Bras B - Placebo'],
   cohorts: ['Cohorte 1 - Dose faible', 'Cohorte 2 - Dose standard'],
   destructionPolicy: 'LOCAL',
+  destructionPolicyDetails: '',
   returnPolicy: 'LOCAL_STOCK',
   requiresPatientForDispensation: true,
   allowsDispensationWithoutIwrs: false,
@@ -325,6 +331,8 @@ const initialFormData: FormData = {
   protocolVersion: '',
   protocolVersionDate: '',
   amendments: [],
+  pharmacyManualVersion: '',
+  pharmacyManualVersionDate: '',
   euCtrApprovalReference: '',
   ethicsApprovalReference: '',
   insuranceReference: '',
@@ -335,6 +343,7 @@ const initialFormData: FormData = {
   arms: [],
   cohorts: [],
   destructionPolicy: 'LOCAL',
+  destructionPolicyDetails: '',
   returnPolicy: 'LOCAL_STOCK',
   requiresPatientForDispensation: true,
   allowsDispensationWithoutIwrs: false,
@@ -611,6 +620,8 @@ export default function NewStudyPage() {
         protocolVersion: formData.protocolVersion || null,
         protocolVersionDate: formData.protocolVersionDate ? new Date(formData.protocolVersionDate) : null,
         amendments: formData.amendments.length > 0 ? formData.amendments : null,
+        pharmacyManualVersion: formData.pharmacyManualVersion || null,
+        pharmacyManualVersionDate: formData.pharmacyManualVersionDate ? new Date(formData.pharmacyManualVersionDate) : null,
         euCtrApprovalReference: formData.euCtrApprovalReference ? new Date(formData.euCtrApprovalReference) : null,
         ethicsApprovalReference: formData.ethicsApprovalReference || null,
         insuranceReference: formData.insuranceReference || null,
@@ -621,6 +632,7 @@ export default function NewStudyPage() {
         arms: formData.arms.length > 0 ? formData.arms : null,
         cohorts: formData.cohorts.length > 0 ? formData.cohorts : null,
         destructionPolicy: formData.destructionPolicy,
+        destructionPolicyDetails: formData.destructionPolicyDetails || null,
         returnPolicy: formData.returnPolicy,
         requiresPatientForDispensation: formData.requiresPatientForDispensation,
         allowsDispensationWithoutIwrs: formData.allowsDispensationWithoutIwrs,
@@ -924,6 +936,25 @@ export default function NewStudyPage() {
               />
             </Box>
 
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Version du manuel pharmacie"
+                value={formData.pharmacyManualVersion}
+                onChange={handleChange('pharmacyManualVersion')}
+                helperText="Ex: V1.0"
+                sx={{ flex: 1 }}
+              />
+
+              <TextField
+                label="Date de la version du manuel"
+                type="date"
+                value={formData.pharmacyManualVersionDate}
+                onChange={handleChange('pharmacyManualVersionDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ flex: 1 }}
+              />
+            </Box>
+
             <TextField
               label="Reference approbation ethique (CPP)"
               value={formData.ethicsApprovalReference}
@@ -1044,37 +1075,32 @@ export default function NewStudyPage() {
               </Button>
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <FormControl sx={{ flex: 1 }}>
-                <InputLabel>Politique de destruction</InputLabel>
-                <Select
-                  value={formData.destructionPolicy}
-                  label="Politique de destruction"
-                  onChange={(e) => handleChange('destructionPolicy')(e as { target: { value: unknown } })}
-                >
-                  {destructionPolicies.map((d) => (
-                    <MenuItem key={d.value} value={d.value}>
-                      {d.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+            <FormControl>
+              <InputLabel>Politique de destruction</InputLabel>
+              <Select
+                value={formData.destructionPolicy}
+                label="Politique de destruction"
+                onChange={(e) => handleChange('destructionPolicy')(e as { target: { value: unknown } })}
+              >
+                {destructionPolicies.map((d) => (
+                  <MenuItem key={d.value} value={d.value}>
+                    {d.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-              <FormControl sx={{ flex: 1 }}>
-                <InputLabel>Politique de retour</InputLabel>
-                <Select
-                  value={formData.returnPolicy}
-                  label="Politique de retour"
-                  onChange={(e) => handleChange('returnPolicy')(e as { target: { value: unknown } })}
-                >
-                  {returnPolicies.map((r) => (
-                    <MenuItem key={r.value} value={r.value}>
-                      {r.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
+            {formData.destructionPolicy === 'MIXED' && (
+              <TextField
+                label="Details de la politique mixte"
+                value={formData.destructionPolicyDetails}
+                onChange={handleChange('destructionPolicyDetails')}
+                multiline
+                rows={3}
+                placeholder="Decrivez les conditions de destruction locale et de retour au promoteur..."
+                helperText="Precisez quand la destruction est locale et quand les produits sont retournes au promoteur"
+              />
+            )}
 
             <FormControlLabel
               control={

@@ -347,6 +347,8 @@ model Study {
   protocolVersionDate      DateTime? @map("protocol_version_date")
   amendments               Json?     // Array of {version, date}
   euCtrApprovalReference   DateTime? @map("eu_ctr_approval_reference")
+  pharmacyManualVersion     String?   @map("pharmacy_manual_version")
+  pharmacyManualVersionDate DateTime? @map("pharmacy_manual_version_date")
   ethicsApprovalReference  String?   @map("ethics_approval_reference")
   insuranceReference       String?   @map("insurance_reference")
   eudamedId                String?   @map("eudamed_id")
@@ -356,6 +358,7 @@ model Study {
   arms                             Json?             // String[]
   cohorts                          Json?             // String[]
   destructionPolicy                DestructionPolicy @default(LOCAL) @map("destruction_policy")
+  destructionPolicyDetails         String?           @map("destruction_policy_details")
   returnPolicy                     ReturnPolicy      @default(LOCAL_STOCK) @map("return_policy")
   requiresPatientForDispensation   Boolean           @default(true) @map("requires_patient_for_dispensation")
   allowsDispensationWithoutIwrs    Boolean           @default(false) @map("allows_dispensation_without_iwrs")

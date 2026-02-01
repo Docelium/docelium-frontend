@@ -39,13 +39,14 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError('Email ou mot de passe incorrect');
+        setLoading(false);
       } else {
+        // Keep loading state active during redirect
         router.push('/dashboard');
         router.refresh();
       }
     } catch {
       setError('Une erreur est survenue');
-    } finally {
       setLoading(false);
     }
   };

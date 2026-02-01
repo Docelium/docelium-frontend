@@ -115,6 +115,8 @@ export interface CreateStudyInput {
   protocolVersion?: string | null;
   protocolVersionDate?: Date | null;
   amendments?: Array<{ version: string; date: string }> | null;
+  pharmacyManualVersion?: string | null;
+  pharmacyManualVersionDate?: Date | null;
   euCtrApprovalReference?: Date | null;
   ethicsApprovalReference?: string | null;
   insuranceReference?: string | null;
@@ -125,6 +127,7 @@ export interface CreateStudyInput {
   arms?: string[] | null;
   cohorts?: string[] | null;
   destructionPolicy?: string;
+  destructionPolicyDetails?: string | null;
   returnPolicy?: string;
   requiresPatientForDispensation?: boolean;
   allowsDispensationWithoutIwrs?: boolean;
@@ -231,6 +234,8 @@ export async function createStudy(data: CreateStudyInput) {
         protocolVersion: data.protocolVersion,
         protocolVersionDate: data.protocolVersionDate,
         amendments: data.amendments ?? undefined,
+        pharmacyManualVersion: data.pharmacyManualVersion,
+        pharmacyManualVersionDate: data.pharmacyManualVersionDate,
         euCtrApprovalReference: data.euCtrApprovalReference,
         ethicsApprovalReference: data.ethicsApprovalReference,
         insuranceReference: data.insuranceReference,
@@ -241,6 +246,7 @@ export async function createStudy(data: CreateStudyInput) {
         arms: data.arms ?? undefined,
         cohorts: data.cohorts ?? undefined,
         destructionPolicy: (data.destructionPolicy || 'LOCAL') as never,
+        destructionPolicyDetails: data.destructionPolicyDetails ?? null,
         returnPolicy: (data.returnPolicy || 'LOCAL_STOCK') as never,
         requiresPatientForDispensation: data.requiresPatientForDispensation ?? true,
         allowsDispensationWithoutIwrs: data.allowsDispensationWithoutIwrs ?? false,
@@ -339,6 +345,8 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.protocolVersion !== undefined && { protocolVersion: data.protocolVersion }),
       ...(data.protocolVersionDate !== undefined && { protocolVersionDate: data.protocolVersionDate }),
       ...(data.amendments !== undefined && { amendments: jsonValue(data.amendments) }),
+      ...(data.pharmacyManualVersion !== undefined && { pharmacyManualVersion: data.pharmacyManualVersion }),
+      ...(data.pharmacyManualVersionDate !== undefined && { pharmacyManualVersionDate: data.pharmacyManualVersionDate }),
       ...(data.euCtrApprovalReference !== undefined && { euCtrApprovalReference: data.euCtrApprovalReference }),
       ...(data.ethicsApprovalReference !== undefined && { ethicsApprovalReference: data.ethicsApprovalReference }),
       ...(data.insuranceReference !== undefined && { insuranceReference: data.insuranceReference }),
@@ -347,6 +355,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.arms !== undefined && { arms: jsonValue(data.arms) }),
       ...(data.cohorts !== undefined && { cohorts: jsonValue(data.cohorts) }),
       ...(data.destructionPolicy !== undefined && { destructionPolicy: data.destructionPolicy as never }),
+      ...(data.destructionPolicyDetails !== undefined && { destructionPolicyDetails: data.destructionPolicyDetails }),
       ...(data.returnPolicy !== undefined && { returnPolicy: data.returnPolicy as never }),
       ...(data.requiresPatientForDispensation !== undefined && { requiresPatientForDispensation: data.requiresPatientForDispensation }),
       ...(data.allowsDispensationWithoutIwrs !== undefined && { allowsDispensationWithoutIwrs: data.allowsDispensationWithoutIwrs }),
@@ -376,9 +385,9 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
     const trackableFields = [
       'codeInternal', 'euCtNumber', 'nctNumber', 'title', 'sponsor', 'phase',
       'therapeuticArea', 'siteActivationDate', 'expectedRecruitment', 'complexityLevel',
-      'contacts', 'protocolVersion', 'protocolVersionDate', 'amendments',
+      'contacts', 'protocolVersion', 'protocolVersionDate', 'amendments', 'pharmacyManualVersion', 'pharmacyManualVersionDate',
       'euCtrApprovalReference', 'ethicsApprovalReference', 'insuranceReference', 'eudamedId',
-      'blinded', 'arms', 'cohorts', 'destructionPolicy', 'returnPolicy',
+      'blinded', 'arms', 'cohorts', 'destructionPolicy', 'destructionPolicyDetails', 'returnPolicy',
       'requiresPatientForDispensation', 'allowsDispensationWithoutIwrs',
       'temperatureTrackingEnabled', 'returnedMaterialReusable',
       'dataQualityProfile', 'visitSchedule', 'treatmentCycles', 'patientConstraints',

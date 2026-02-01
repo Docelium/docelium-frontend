@@ -143,6 +143,11 @@ export default async function StudyDetailPage({ params }: Props) {
                   <Typography variant="body2">
                     {destructionPolicyLabels[study.destructionPolicy]}
                   </Typography>
+                  {study.destructionPolicy === 'MIXED' && study.destructionPolicyDetails && (
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                      {study.destructionPolicyDetails}
+                    </Typography>
+                  )}
                 </Grid>
               </Grid>
             </CardContent>
