@@ -56,6 +56,7 @@ const actionLabels: Record<string, string> = {
 
 const fieldLabels: Record<string, string> = {
   codeInternal: 'Code interne',
+  acronym: 'Acronyme',
   euCtNumber: 'Numero EU-CT',
   nctNumber: 'Numero NCT',
   title: 'Titre',

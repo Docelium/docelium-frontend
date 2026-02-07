@@ -100,6 +100,7 @@ async function main() {
     create: {
       // === BLOC A : Identification ===
       codeInternal: 'ONC-2025-TRIAL-01',
+      acronym: 'LUNG-A-001',
       euCtNumber: '2025-000567-29',
       nctNumber: 'NCT05687266',
       title: 'Etude clinique randomisee en double aveugle evaluant le medicament A versus placebo dans le traitement du cancer du poumon non a petites cellules',

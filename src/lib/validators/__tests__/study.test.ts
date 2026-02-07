@@ -6,6 +6,7 @@ describe('Study Validators', () => {
     it('should validate a valid block A', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
+        acronym: 'TEST-01',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['III'],
@@ -18,6 +19,7 @@ describe('Study Validators', () => {
     it('should reject empty codeInternal', () => {
       const data = {
         codeInternal: '',
+        acronym: 'TEST-01',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['III'],
@@ -30,6 +32,7 @@ describe('Study Validators', () => {
     it('should reject invalid phase', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
+        acronym: 'TEST-01',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['INVALID_PHASE'],
@@ -42,6 +45,7 @@ describe('Study Validators', () => {
     it('should accept multiple phases', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
+        acronym: 'TEST-01',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['I', 'Ia', 'III'],
@@ -54,6 +58,7 @@ describe('Study Validators', () => {
     it('should reject empty phases array', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
+        acronym: 'TEST-01',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: [],
@@ -68,6 +73,7 @@ describe('Study Validators', () => {
     it('should validate a complete study', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
+        acronym: 'TEST-01',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['III'],
@@ -82,6 +88,7 @@ describe('Study Validators', () => {
     it('should validate with optional fields', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
+        acronym: 'TEST-01',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['III'],

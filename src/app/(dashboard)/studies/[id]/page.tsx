@@ -107,6 +107,11 @@ export default async function StudyDetailPage({ params }: Props) {
           <Typography variant="h4" gutterBottom>
             {study.codeInternal}
           </Typography>
+          {study.acronym && (
+            <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+              {study.acronym}
+            </Typography>
+          )}
           <Typography variant="h6" color="text.secondary">
             {study.title}
           </Typography>

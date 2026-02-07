@@ -93,6 +93,7 @@ export async function getStudyById(id: string, userId: string, role: UserRole) {
 export interface CreateStudyInput {
   // Bloc A - Identification
   codeInternal: string;
+  acronym: string;
   euCtNumber?: string | null;
   nctNumber?: string | null;
   title: string;
@@ -216,6 +217,7 @@ export async function createStudy(data: CreateStudyInput) {
       data: {
         // Bloc A
         codeInternal: data.codeInternal,
+        acronym: data.acronym,
         euCtNumber: data.euCtNumber,
         nctNumber: data.nctNumber,
         title: data.title,
@@ -329,6 +331,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
     data: {
       // Only update fields that are provided
       ...(data.codeInternal !== undefined && { codeInternal: data.codeInternal }),
+      ...(data.acronym !== undefined && { acronym: data.acronym }),
       ...(data.euCtNumber !== undefined && { euCtNumber: data.euCtNumber }),
       ...(data.nctNumber !== undefined && { nctNumber: data.nctNumber }),
       ...(data.title !== undefined && { title: data.title }),
@@ -377,7 +380,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
     const updated = await prisma.study.findUnique({ where: { id } });
 
     const trackableFields = [
-      'codeInternal', 'euCtNumber', 'nctNumber', 'title', 'sponsor', 'phase',
+      'codeInternal', 'acronym', 'euCtNumber', 'nctNumber', 'title', 'sponsor', 'phase',
       'therapeuticArea', 'siteActivationDate', 'expectedRecruitment',
       'contacts', 'protocolVersion', 'protocolVersionDate', 'amendments', 'pharmacyManualVersion', 'pharmacyManualVersionDate',
       'euCtrApprovalReference', 'ethicsApprovalReference', 'insuranceReference', 'eudamedId',

@@ -123,6 +123,7 @@ interface LocalProcedure {
 interface FormData {
   // BLOC A - Identification
   codeInternal: string;
+  acronym: string;
   euCtNumber: string;
   nctNumber: string;
   title: string;
@@ -202,6 +203,7 @@ interface FormData {
 
 const initialFormData: FormData = {
   codeInternal: '',
+  acronym: '',
   euCtNumber: '',
   nctNumber: '',
   title: '',
@@ -290,6 +292,7 @@ export default function EditStudyPage() {
         // Map study data to form data
         setFormData({
           codeInternal: study.codeInternal || '',
+          acronym: study.acronym || '',
           euCtNumber: study.euCtNumber || '',
           nctNumber: study.nctNumber || '',
           title: study.title || '',
@@ -543,6 +546,7 @@ export default function EditStudyPage() {
       const payload = {
         // BLOC A
         codeInternal: formData.codeInternal,
+        acronym: formData.acronym,
         euCtNumber: formData.euCtNumber || null,
         nctNumber: formData.nctNumber || null,
         title: formData.title,
@@ -675,6 +679,14 @@ export default function EditStudyPage() {
               onChange={handleChange('codeInternal')}
               required
               helperText="Ex: ONC-2024-TRIAL-01 (majuscules, chiffres, tirets)"
+            />
+
+            <TextField
+              label="Acronyme de l'etude *"
+              value={formData.acronym}
+              onChange={handleChange('acronym')}
+              required
+              helperText="Ex: KEYNOTE-001, CHECKMATE-214"
             />
 
             <TextField
@@ -1527,8 +1539,8 @@ export default function EditStudyPage() {
 
   const isStepValid = () => {
     switch (activeStep) {
-      case 0: // BLOC A - obligatoire: codeInternal, title, sponsor, phase
-        return formData.codeInternal && formData.title && formData.sponsor && formData.phases.length > 0;
+      case 0: // BLOC A - obligatoire: codeInternal, acronym, title, sponsor, phases
+        return formData.codeInternal && formData.acronym && formData.title && formData.sponsor && formData.phases.length > 0;
       default:
         return true;
     }

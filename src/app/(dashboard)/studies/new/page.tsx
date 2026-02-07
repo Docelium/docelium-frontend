@@ -122,6 +122,7 @@ interface LocalProcedure {
 interface FormData {
   // BLOC A - Identification
   codeInternal: string;
+  acronym: string;
   euCtNumber: string;
   nctNumber: string;
   title: string;
@@ -203,6 +204,7 @@ interface FormData {
 const testFormData: FormData = {
   // BLOC A - Identification
   codeInternal: 'ONC-2024-TEST-01',
+  acronym: 'ONCO-XYZ',
   euCtNumber: '2024-000123-45',
   nctNumber: 'NCT05123456',
   title: 'Etude de phase III randomisee en double aveugle evaluant le medicament XYZ versus placebo chez des patients atteints de cancer du poumon',
@@ -298,6 +300,7 @@ const testFormData: FormData = {
 const initialFormData: FormData = {
   // BLOC A
   codeInternal: '',
+  acronym: '',
   euCtNumber: '',
   nctNumber: '',
   title: '',
@@ -581,6 +584,7 @@ export default function NewStudyPage() {
       const payload = {
         // BLOC A
         codeInternal: formData.codeInternal,
+        acronym: formData.acronym,
         euCtNumber: formData.euCtNumber || null,
         nctNumber: formData.nctNumber || null,
         title: formData.title,
@@ -717,6 +721,14 @@ export default function NewStudyPage() {
               required
               helperText="Ex: ONC-2024-TRIAL-01 (majuscules, chiffres, tirets)"
               inputProps={{ style: { textTransform: 'uppercase' } }}
+            />
+
+            <TextField
+              label="Acronyme de l'etude *"
+              value={formData.acronym}
+              onChange={handleChange('acronym')}
+              required
+              helperText="Ex: KEYNOTE-001, CHECKMATE-214"
             />
 
             <TextField
@@ -1549,8 +1561,8 @@ export default function NewStudyPage() {
 
   const isStepValid = () => {
     switch (activeStep) {
-      case 0: // BLOC A - obligatoire: codeInternal, title, sponsor, phase
-        return formData.codeInternal && formData.title && formData.sponsor && formData.phases.length > 0;
+      case 0: // BLOC A - obligatoire: codeInternal, acronym, title, sponsor, phases
+        return formData.codeInternal && formData.acronym && formData.title && formData.sponsor && formData.phases.length > 0;
       default:
         return true;
     }
