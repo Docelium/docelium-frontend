@@ -34,9 +34,16 @@ const statusLabels: Record<StudyStatus, string> = {
 
 const phaseLabels: Record<StudyPhase, string> = {
   I: 'Phase I',
+  Ia: 'Phase Ia',
+  Ib: 'Phase Ib',
   I_II: 'Phase I/II',
   II: 'Phase II',
+  IIa: 'Phase IIa',
+  IIb: 'Phase IIb',
   III: 'Phase III',
+  IIIa: 'Phase IIIa',
+  IIIb: 'Phase IIIb',
+  IIIc: 'Phase IIIc',
   IV: 'Phase IV',
   OTHER: 'Autre',
 };
@@ -100,7 +107,9 @@ export default async function StudiesPage() {
                     {study.title}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
-                    <Chip label={phaseLabels[study.phase]} size="small" variant="outlined" />
+                    {(study.phases || []).map((p: StudyPhase) => (
+                      <Chip key={p} label={phaseLabels[p]} size="small" variant="outlined" />
+                    ))}
                     <Chip label={study.sponsor} size="small" variant="outlined" />
                     <Chip label={blindingLabels[study.blinded]} size="small" variant="outlined" />
                   </Box>

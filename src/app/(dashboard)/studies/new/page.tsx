@@ -47,11 +47,15 @@ const steps = [
 // Enumerations selon la SPEC
 const phases = [
   { value: 'I', label: 'Phase I' },
-  { value: 'I_II', label: 'Phase I/II' },
+  { value: 'Ia', label: 'Phase Ia' },
+  { value: 'Ib', label: 'Phase Ib' },
   { value: 'II', label: 'Phase II' },
+  { value: 'IIa', label: 'Phase IIa' },
+  { value: 'IIb', label: 'Phase IIb' },
   { value: 'III', label: 'Phase III' },
-  { value: 'IV', label: 'Phase IV' },
-  { value: 'OTHER', label: 'Autre' },
+  { value: 'IIIa', label: 'Phase IIIa' },
+  { value: 'IIIb', label: 'Phase IIIb' },
+  { value: 'IIIc', label: 'Phase IIIc' },
 ];
 
 const blindingTypes = [
@@ -122,7 +126,7 @@ interface FormData {
   nctNumber: string;
   title: string;
   sponsor: string;
-  phase: string;
+  phases: string[];
   therapeuticArea: string;
   siteActivationDate: string;
   expectedRecruitment: string;
@@ -205,7 +209,7 @@ const testFormData: FormData = {
   nctNumber: 'NCT05123456',
   title: 'Etude de phase III randomisee en double aveugle evaluant le medicament XYZ versus placebo chez des patients atteints de cancer du poumon',
   sponsor: 'Pharma International SA',
-  phase: 'III',
+  phases: ['III'],
   therapeuticArea: 'Oncologie',
   siteActivationDate: new Date().toISOString().slice(0, 10),
   expectedRecruitment: '120',
@@ -302,7 +306,7 @@ const initialFormData: FormData = {
   nctNumber: '',
   title: '',
   sponsor: '',
-  phase: 'III',
+  phases: [],
   therapeuticArea: '',
   siteActivationDate: '',
   expectedRecruitment: '',
@@ -587,7 +591,7 @@ export default function NewStudyPage() {
         nctNumber: formData.nctNumber || null,
         title: formData.title,
         sponsor: formData.sponsor,
-        phase: formData.phase,
+        phases: formData.phases,
         therapeuticArea: formData.therapeuticArea || null,
         siteActivationDate: formData.siteActivationDate ? new Date(formData.siteActivationDate) : null,
         expectedRecruitment: formData.expectedRecruitment ? parseInt(formData.expectedRecruitment) : null,
@@ -742,11 +746,19 @@ export default function NewStudyPage() {
 
             <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl required sx={{ flex: 1 }}>
-                <InputLabel>Phase</InputLabel>
+                <InputLabel>Phase(s)</InputLabel>
                 <Select
-                  value={formData.phase}
-                  label="Phase"
-                  onChange={(e) => handleChange('phase')(e as { target: { value: unknown } })}
+                  multiple
+                  value={formData.phases}
+                  label="Phase(s)"
+                  onChange={(e) => setFormData((prev) => ({ ...prev, phases: e.target.value as string[] }))}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {(selected as string[]).map((value) => (
+                        <Chip key={value} label={phases.find((p) => p.value === value)?.label || value} size="small" />
+                      ))}
+                    </Box>
+                  )}
                 >
                   {phases.map((p) => (
                     <MenuItem key={p.value} value={p.value}>
@@ -1572,7 +1584,7 @@ export default function NewStudyPage() {
   const isStepValid = () => {
     switch (activeStep) {
       case 0: // BLOC A - obligatoire: codeInternal, title, sponsor, phase
-        return formData.codeInternal && formData.title && formData.sponsor && formData.phase;
+        return formData.codeInternal && formData.title && formData.sponsor && formData.phases.length > 0;
       default:
         return true;
     }

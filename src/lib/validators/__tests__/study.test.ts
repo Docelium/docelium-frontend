@@ -8,7 +8,7 @@ describe('Study Validators', () => {
         codeInternal: 'PROTO-2025-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
-        phase: 'III',
+        phases: ['III'],
       };
 
       const result = blocASchema.safeParse(data);
@@ -20,7 +20,7 @@ describe('Study Validators', () => {
         codeInternal: '',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
-        phase: 'III',
+        phases: ['III'],
       };
 
       const result = blocASchema.safeParse(data);
@@ -32,7 +32,31 @@ describe('Study Validators', () => {
         codeInternal: 'PROTO-2025-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
-        phase: 'INVALID_PHASE',
+        phases: ['INVALID_PHASE'],
+      };
+
+      const result = blocASchema.safeParse(data);
+      expect(result.success).toBe(false);
+    });
+
+    it('should accept multiple phases', () => {
+      const data = {
+        codeInternal: 'PROTO-2025-001',
+        title: 'Test Study',
+        sponsor: 'Test Sponsor',
+        phases: ['I', 'Ia', 'III'],
+      };
+
+      const result = blocASchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject empty phases array', () => {
+      const data = {
+        codeInternal: 'PROTO-2025-001',
+        title: 'Test Study',
+        sponsor: 'Test Sponsor',
+        phases: [],
       };
 
       const result = blocASchema.safeParse(data);
@@ -46,7 +70,7 @@ describe('Study Validators', () => {
         codeInternal: 'PROTO-2025-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
-        phase: 'III',
+        phases: ['III'],
         destructionPolicy: 'LOCAL',
         blinded: 'NONE',
       };
@@ -60,7 +84,7 @@ describe('Study Validators', () => {
         codeInternal: 'PROTO-2025-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
-        phase: 'III',
+        phases: ['III'],
         therapeuticArea: 'Oncology',
         euCtNumber: '2025-123456-12',
         startDate: new Date('2025-01-01'),

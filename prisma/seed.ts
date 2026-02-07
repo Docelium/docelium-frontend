@@ -104,7 +104,7 @@ async function main() {
       nctNumber: 'NCT05687266',
       title: 'Etude clinique randomisee en double aveugle evaluant le medicament A versus placebo dans le traitement du cancer du poumon non a petites cellules',
       sponsor: 'Pharma Corp International',
-      phase: StudyPhase.III,
+      phases: [StudyPhase.III],
       therapeuticArea: 'ONCOLOGY',
       siteActivationDate: new Date('2025-01-15'),
       expectedRecruitment: 150,

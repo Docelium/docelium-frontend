@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Enum values selon la SPEC
-const StudyPhaseValues = ['I', 'I_II', 'II', 'III', 'IV', 'OTHER'] as const;
+const StudyPhaseValues = ['I', 'Ia', 'Ib', 'II', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IIIc'] as const;
 const BlindingTypeValues = ['NONE', 'SINGLE', 'DOUBLE', 'TRIPLE'] as const;
 const DestructionPolicyValues = ['LOCAL', 'SPONSOR', 'MIXED'] as const;
 const ReturnPolicyValues = ['LOCAL_STOCK', 'SPONSOR_RETURN'] as const;
@@ -27,9 +27,7 @@ export const blocASchema = z.object({
     .string()
     .min(1, 'Le sponsor est requis')
     .max(255, 'Le nom du sponsor ne peut pas depasser 255 caracteres'),
-  phase: z.enum(StudyPhaseValues, {
-    message: 'La phase de l\'etude est requise',
-  }),
+  phases: z.array(z.enum(StudyPhaseValues)).min(1, 'Au moins une phase est requise'),
   therapeuticArea: z.string().nullable().optional(),
   siteActivationDate: z.coerce.date().nullable().optional(),
   expectedRecruitment: z.number().int().positive().nullable().optional(),

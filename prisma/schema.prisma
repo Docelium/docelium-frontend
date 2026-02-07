@@ -34,11 +34,18 @@ enum StudyStatus {
 
 enum StudyPhase {
   I
-  I_II
+  Ia
+  Ib
+  I_II  // legacy, kept for backward compatibility
   II
+  IIa
+  IIb
   III
-  IV
-  OTHER
+  IIIa
+  IIIb
+  IIIc
+  IV    // legacy, kept for backward compatibility
+  OTHER // legacy, kept for backward compatibility
 }
 
 enum BlindingType {
@@ -327,7 +334,7 @@ model Study {
   nctNumber            String?         @map("nct_number")
   title                String
   sponsor              String
-  phase                StudyPhase
+  phases               StudyPhase[]
   therapeuticArea      String?         @map("therapeutic_area")
   siteActivationDate   DateTime?       @map("site_activation_date")
   expectedRecruitment  Int?            @map("expected_recruitment")

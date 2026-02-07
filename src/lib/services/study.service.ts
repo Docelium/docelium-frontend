@@ -21,7 +21,7 @@ export async function getStudies(userId: string, role: UserRole, filters?: Study
     where['protocolStatus'] = filters.status;
   }
   if (filters?.phase) {
-    where['phase'] = filters.phase;
+    where['phases'] = { has: filters.phase };
   }
   if (filters?.search) {
     where['OR'] = [
@@ -97,7 +97,7 @@ export interface CreateStudyInput {
   nctNumber?: string | null;
   title: string;
   sponsor: string;
-  phase: string;
+  phases: string[];
   therapeuticArea?: string | null;
   siteActivationDate?: Date | null;
   expectedRecruitment?: number | null;
@@ -222,7 +222,7 @@ export async function createStudy(data: CreateStudyInput) {
         nctNumber: data.nctNumber,
         title: data.title,
         sponsor: data.sponsor,
-        phase: data.phase as never,
+        phases: data.phases as never,
         therapeuticArea: data.therapeuticArea,
         siteActivationDate: data.siteActivationDate,
         expectedRecruitment: data.expectedRecruitment,
@@ -309,7 +309,7 @@ export async function createStudy(data: CreateStudyInput) {
         entityType: 'STUDY',
         entityId: study.id,
         studyId: study.id,
-        detailsAfter: { codeInternal: study.codeInternal, title: study.title, phase: study.phase },
+        detailsAfter: { codeInternal: study.codeInternal, title: study.title, phases: study.phases },
       }).catch(() => {}); // Don't fail study creation if audit fails
     }
 
@@ -337,7 +337,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.nctNumber !== undefined && { nctNumber: data.nctNumber }),
       ...(data.title !== undefined && { title: data.title }),
       ...(data.sponsor !== undefined && { sponsor: data.sponsor }),
-      ...(data.phase !== undefined && { phase: data.phase as never }),
+      ...(data.phases !== undefined && { phases: data.phases as never }),
       ...(data.therapeuticArea !== undefined && { therapeuticArea: data.therapeuticArea }),
       ...(data.siteActivationDate !== undefined && { siteActivationDate: data.siteActivationDate }),
       ...(data.expectedRecruitment !== undefined && { expectedRecruitment: data.expectedRecruitment }),

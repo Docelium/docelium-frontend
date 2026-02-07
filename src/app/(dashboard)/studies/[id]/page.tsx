@@ -39,9 +39,16 @@ const statusColors: Record<StudyStatus, 'default' | 'success' | 'warning' | 'err
 
 const phaseLabels: Record<StudyPhase, string> = {
   I: 'Phase I',
+  Ia: 'Phase Ia',
+  Ib: 'Phase Ib',
   I_II: 'Phase I/II',
   II: 'Phase II',
+  IIa: 'Phase IIa',
+  IIb: 'Phase IIb',
   III: 'Phase III',
+  IIIa: 'Phase IIIa',
+  IIIb: 'Phase IIIb',
+  IIIc: 'Phase IIIc',
   IV: 'Phase IV',
   OTHER: 'Autre',
 };
@@ -128,7 +135,11 @@ export default async function StudyDetailPage({ params }: Props) {
                   <Typography variant="caption" color="text.secondary">
                     Phase
                   </Typography>
-                  <Typography variant="body2">{phaseLabels[study.phase]}</Typography>
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                    {(study.phases || []).map((p: StudyPhase) => (
+                      <Chip key={p} label={phaseLabels[p]} size="small" />
+                    ))}
+                  </Box>
                 </Grid>
                 <Grid size={{ xs: 6, md: 3 }}>
                   <Typography variant="caption" color="text.secondary">
