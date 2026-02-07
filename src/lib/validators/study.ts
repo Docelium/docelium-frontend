@@ -71,10 +71,8 @@ export const blocDSchema = z.object({
   destructionPolicy: z.enum(DestructionPolicyValues).default('LOCAL'),
   destructionPolicyDetails: z.string().nullable().optional(),
   returnPolicy: z.enum(ReturnPolicyValues).default('LOCAL_STOCK'),
-  requiresPatientForDispensation: z.boolean().default(true),
-  allowsDispensationWithoutIwrs: z.boolean().default(false),
-  temperatureTrackingEnabled: z.boolean().default(false),
-  returnedMaterialReusable: z.boolean().default(false),
+  hasIrtSystem: z.boolean().default(false),
+  irtSystemName: z.string().nullable().optional(),
 });
 
 // BLOC E - Data Quality Profile

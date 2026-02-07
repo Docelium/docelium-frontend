@@ -153,10 +153,8 @@ interface FormData {
   destructionPolicy: string;
   destructionPolicyDetails: string;
   returnPolicy: string;
-  requiresPatientForDispensation: boolean;
-  allowsDispensationWithoutIwrs: boolean;
-  temperatureTrackingEnabled: boolean;
-  returnedMaterialReusable: boolean;
+  hasIrtSystem: boolean;
+  irtSystemName: string;
 
   // BLOC E - Data Quality Profile
   requiresDoubleSignature: boolean;
@@ -228,10 +226,8 @@ const initialFormData: FormData = {
   destructionPolicy: 'LOCAL',
   destructionPolicyDetails: '',
   returnPolicy: 'LOCAL_STOCK',
-  requiresPatientForDispensation: true,
-  allowsDispensationWithoutIwrs: false,
-  temperatureTrackingEnabled: false,
-  returnedMaterialReusable: false,
+  hasIrtSystem: false,
+  irtSystemName: '',
   requiresDoubleSignature: false,
   requiresPharmacistSignature: true,
   requiresWeightRecencyDays: '',
@@ -318,10 +314,8 @@ export default function EditStudyPage() {
           destructionPolicy: study.destructionPolicy || 'LOCAL',
           destructionPolicyDetails: study.destructionPolicyDetails || '',
           returnPolicy: study.returnPolicy || 'LOCAL_STOCK',
-          requiresPatientForDispensation: study.requiresPatientForDispensation ?? true,
-          allowsDispensationWithoutIwrs: study.allowsDispensationWithoutIwrs ?? false,
-          temperatureTrackingEnabled: study.temperatureTrackingEnabled ?? false,
-          returnedMaterialReusable: study.returnedMaterialReusable ?? false,
+          hasIrtSystem: study.hasIrtSystem ?? false,
+          irtSystemName: study.irtSystemName || '',
           requiresDoubleSignature: study.dataQualityProfile?.requires_double_signature ?? false,
           requiresPharmacistSignature: study.dataQualityProfile?.requires_pharmacist_signature ?? true,
           requiresWeightRecencyDays: study.dataQualityProfile?.requires_weight_recency_days?.toString() || '',
@@ -579,10 +573,8 @@ export default function EditStudyPage() {
         destructionPolicy: formData.destructionPolicy,
         destructionPolicyDetails: formData.destructionPolicyDetails || null,
         returnPolicy: formData.returnPolicy,
-        requiresPatientForDispensation: formData.requiresPatientForDispensation,
-        allowsDispensationWithoutIwrs: formData.allowsDispensationWithoutIwrs,
-        temperatureTrackingEnabled: formData.temperatureTrackingEnabled,
-        returnedMaterialReusable: formData.returnedMaterialReusable,
+        hasIrtSystem: formData.hasIrtSystem,
+        irtSystemName: formData.hasIrtSystem ? formData.irtSystemName || null : null,
 
         // BLOC E
         dataQualityProfile: {
@@ -1043,42 +1035,21 @@ export default function EditStudyPage() {
             <FormControlLabel
               control={
                 <Switch
-                  checked={formData.requiresPatientForDispensation}
-                  onChange={handleSwitchChange('requiresPatientForDispensation')}
+                  checked={!!formData.hasIrtSystem}
+                  onChange={handleSwitchChange('hasIrtSystem')}
                 />
               }
-              label="Patient obligatoire pour dispensation"
+              label="Etude avec systeme d'IRT"
             />
 
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.allowsDispensationWithoutIwrs}
-                  onChange={handleSwitchChange('allowsDispensationWithoutIwrs')}
-                />
-              }
-              label="Dispensation sans IWRS autorisee"
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.temperatureTrackingEnabled}
-                  onChange={handleSwitchChange('temperatureTrackingEnabled')}
-                />
-              }
-              label="Suivi temperature active"
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.returnedMaterialReusable}
-                  onChange={handleSwitchChange('returnedMaterialReusable')}
-                />
-              }
-              label="Materiel retourne reutilisable"
-            />
+            {!!formData.hasIrtSystem && (
+              <TextField
+                label="Nom de l'IRT"
+                value={formData.irtSystemName ?? ''}
+                onChange={handleChange('irtSystemName')}
+                helperText="Ex: Medidata Rave RTSM"
+              />
+            )}
           </Box>
         );
 
@@ -1401,11 +1372,6 @@ export default function EditStudyPage() {
                   />
                 )}
 
-                {formData.iwrsIntegrationMode === 'MANUAL' && !formData.allowsDispensationWithoutIwrs && (
-                  <Alert severity="info">
-                    En mode MANUAL, il est recommande d&apos;autoriser la dispensation sans IWRS.
-                  </Alert>
-                )}
               </>
             )}
           </Box>

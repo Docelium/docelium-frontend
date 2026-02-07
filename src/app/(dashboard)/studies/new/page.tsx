@@ -152,10 +152,8 @@ interface FormData {
   destructionPolicy: string;
   destructionPolicyDetails: string;
   returnPolicy: string;
-  requiresPatientForDispensation: boolean;
-  allowsDispensationWithoutIwrs: boolean;
-  temperatureTrackingEnabled: boolean;
-  returnedMaterialReusable: boolean;
+  hasIrtSystem: boolean;
+  irtSystemName: string;
 
   // BLOC E - Data Quality Profile
   requiresDoubleSignature: boolean;
@@ -242,10 +240,8 @@ const testFormData: FormData = {
   destructionPolicy: 'LOCAL',
   destructionPolicyDetails: '',
   returnPolicy: 'LOCAL_STOCK',
-  requiresPatientForDispensation: true,
-  allowsDispensationWithoutIwrs: false,
-  temperatureTrackingEnabled: true,
-  returnedMaterialReusable: false,
+  hasIrtSystem: true,
+  irtSystemName: 'Medidata Rave RTSM',
 
   // BLOC E - Data Quality Profile
   requiresDoubleSignature: true,
@@ -332,10 +328,8 @@ const initialFormData: FormData = {
   destructionPolicy: 'LOCAL',
   destructionPolicyDetails: '',
   returnPolicy: 'LOCAL_STOCK',
-  requiresPatientForDispensation: true,
-  allowsDispensationWithoutIwrs: false,
-  temperatureTrackingEnabled: false,
-  returnedMaterialReusable: false,
+  hasIrtSystem: false,
+  irtSystemName: '',
 
   // BLOC E
   requiresDoubleSignature: false,
@@ -617,10 +611,8 @@ export default function NewStudyPage() {
         destructionPolicy: formData.destructionPolicy,
         destructionPolicyDetails: formData.destructionPolicyDetails || null,
         returnPolicy: formData.returnPolicy,
-        requiresPatientForDispensation: formData.requiresPatientForDispensation,
-        allowsDispensationWithoutIwrs: formData.allowsDispensationWithoutIwrs,
-        temperatureTrackingEnabled: formData.temperatureTrackingEnabled,
-        returnedMaterialReusable: formData.returnedMaterialReusable,
+        hasIrtSystem: formData.hasIrtSystem,
+        irtSystemName: formData.hasIrtSystem ? formData.irtSystemName || null : null,
 
         // BLOC E
         dataQualityProfile: {
@@ -1075,42 +1067,21 @@ export default function NewStudyPage() {
             <FormControlLabel
               control={
                 <Switch
-                  checked={formData.requiresPatientForDispensation}
-                  onChange={handleSwitchChange('requiresPatientForDispensation')}
+                  checked={!!formData.hasIrtSystem}
+                  onChange={handleSwitchChange('hasIrtSystem')}
                 />
               }
-              label="Patient obligatoire pour dispensation"
+              label="Etude avec systeme d'IRT"
             />
 
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.allowsDispensationWithoutIwrs}
-                  onChange={handleSwitchChange('allowsDispensationWithoutIwrs')}
-                />
-              }
-              label="Dispensation sans IWRS autorisee"
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.temperatureTrackingEnabled}
-                  onChange={handleSwitchChange('temperatureTrackingEnabled')}
-                />
-              }
-              label="Suivi temperature active"
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.returnedMaterialReusable}
-                  onChange={handleSwitchChange('returnedMaterialReusable')}
-                />
-              }
-              label="Materiel retourne reutilisable"
-            />
+            {!!formData.hasIrtSystem && (
+              <TextField
+                label="Nom de l'IRT"
+                value={formData.irtSystemName ?? ''}
+                onChange={handleChange('irtSystemName')}
+                helperText="Ex: Medidata Rave RTSM"
+              />
+            )}
           </Box>
         );
 
@@ -1323,17 +1294,17 @@ export default function NewStudyPage() {
             <FormControlLabel
               control={
                 <Switch
-                  checked={formData.cappedDose}
+                  checked={!!formData.cappedDose}
                   onChange={handleSwitchChange('cappedDose')}
                 />
               }
               label="Dose maximale (cappee)"
             />
 
-            {formData.cappedDose && (
+            {!!formData.cappedDose && (
               <TextField
                 label="Condition"
-                value={formData.cappedDoseCondition}
+                value={formData.cappedDoseCondition ?? ''}
                 onChange={handleChange('cappedDoseCondition')}
                 helperText="Ex: Poids > 100 kg"
               />
@@ -1433,11 +1404,6 @@ export default function NewStudyPage() {
                   />
                 )}
 
-                {formData.iwrsIntegrationMode === 'MANUAL' && !formData.allowsDispensationWithoutIwrs && (
-                  <Alert severity="info">
-                    En mode MANUAL, il est recommande d&apos;autoriser la dispensation sans IWRS.
-                  </Alert>
-                )}
               </>
             )}
           </Box>

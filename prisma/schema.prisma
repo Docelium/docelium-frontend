@@ -360,10 +360,12 @@ model Study {
   destructionPolicy                DestructionPolicy @default(LOCAL) @map("destruction_policy")
   destructionPolicyDetails         String?           @map("destruction_policy_details")
   returnPolicy                     ReturnPolicy      @default(LOCAL_STOCK) @map("return_policy")
-  requiresPatientForDispensation   Boolean           @default(true) @map("requires_patient_for_dispensation")
-  allowsDispensationWithoutIwrs    Boolean           @default(false) @map("allows_dispensation_without_iwrs")
-  temperatureTrackingEnabled       Boolean           @default(false) @map("temperature_tracking_enabled")
-  returnedMaterialReusable         Boolean           @default(false) @map("returned_material_reusable")
+  requiresPatientForDispensation   Boolean           @default(true) @map("requires_patient_for_dispensation")   // legacy
+  allowsDispensationWithoutIwrs    Boolean           @default(false) @map("allows_dispensation_without_iwrs")  // legacy
+  temperatureTrackingEnabled       Boolean           @default(false) @map("temperature_tracking_enabled")      // legacy
+  returnedMaterialReusable         Boolean           @default(false) @map("returned_material_reusable")        // legacy
+  hasIrtSystem                     Boolean           @default(false) @map("has_irt_system")
+  irtSystemName                    String?           @map("irt_system_name")
 
   // === BLOC E : Data Quality Profile (JSON) ===
   dataQualityProfile Json? @map("data_quality_profile")

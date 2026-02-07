@@ -179,18 +179,10 @@ export default async function StudyDetailPage({ params }: Props) {
                 </Grid>
                 <Grid size={{ xs: 6, md: 4 }}>
                   <Typography variant="caption" color="text.secondary">
-                    Patient requis dispensation
+                    Systeme d&apos;IRT
                   </Typography>
                   <Typography variant="body2">
-                    {study.requiresPatientForDispensation ? 'Oui' : 'Non'}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 6, md: 4 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    Suivi temperature
-                  </Typography>
-                  <Typography variant="body2">
-                    {study.temperatureTrackingEnabled ? 'Active' : 'Inactif'}
+                    {study.hasIrtSystem ? (study.irtSystemName || 'Oui') : 'Non'}
                   </Typography>
                 </Grid>
               </Grid>

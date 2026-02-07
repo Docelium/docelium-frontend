@@ -128,10 +128,8 @@ export interface CreateStudyInput {
   destructionPolicy?: string;
   destructionPolicyDetails?: string | null;
   returnPolicy?: string;
-  requiresPatientForDispensation?: boolean;
-  allowsDispensationWithoutIwrs?: boolean;
-  temperatureTrackingEnabled?: boolean;
-  returnedMaterialReusable?: boolean;
+  hasIrtSystem?: boolean;
+  irtSystemName?: string | null;
 
   // Bloc E - Data Quality
   dataQualityProfile?: {
@@ -249,10 +247,8 @@ export async function createStudy(data: CreateStudyInput) {
         destructionPolicy: (data.destructionPolicy || 'LOCAL') as never,
         destructionPolicyDetails: data.destructionPolicyDetails ?? null,
         returnPolicy: (data.returnPolicy || 'LOCAL_STOCK') as never,
-        requiresPatientForDispensation: data.requiresPatientForDispensation ?? true,
-        allowsDispensationWithoutIwrs: data.allowsDispensationWithoutIwrs ?? false,
-        temperatureTrackingEnabled: data.temperatureTrackingEnabled ?? false,
-        returnedMaterialReusable: data.returnedMaterialReusable ?? false,
+        hasIrtSystem: data.hasIrtSystem ?? false,
+        irtSystemName: data.irtSystemName,
 
         // Bloc E
         dataQualityProfile: data.dataQualityProfile ?? undefined,
@@ -357,10 +353,8 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.destructionPolicy !== undefined && { destructionPolicy: data.destructionPolicy as never }),
       ...(data.destructionPolicyDetails !== undefined && { destructionPolicyDetails: data.destructionPolicyDetails }),
       ...(data.returnPolicy !== undefined && { returnPolicy: data.returnPolicy as never }),
-      ...(data.requiresPatientForDispensation !== undefined && { requiresPatientForDispensation: data.requiresPatientForDispensation }),
-      ...(data.allowsDispensationWithoutIwrs !== undefined && { allowsDispensationWithoutIwrs: data.allowsDispensationWithoutIwrs }),
-      ...(data.temperatureTrackingEnabled !== undefined && { temperatureTrackingEnabled: data.temperatureTrackingEnabled }),
-      ...(data.returnedMaterialReusable !== undefined && { returnedMaterialReusable: data.returnedMaterialReusable }),
+      ...(data.hasIrtSystem !== undefined && { hasIrtSystem: data.hasIrtSystem }),
+      ...(data.irtSystemName !== undefined && { irtSystemName: data.irtSystemName }),
       ...(data.dataQualityProfile !== undefined && { dataQualityProfile: jsonValue(data.dataQualityProfile) }),
       ...(data.visitSchedule !== undefined && { visitSchedule: jsonValue(data.visitSchedule) }),
       ...(data.treatmentCycles !== undefined && { treatmentCycles: jsonValue(data.treatmentCycles) }),
@@ -388,8 +382,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       'contacts', 'protocolVersion', 'protocolVersionDate', 'amendments', 'pharmacyManualVersion', 'pharmacyManualVersionDate',
       'euCtrApprovalReference', 'ethicsApprovalReference', 'insuranceReference', 'eudamedId',
       'blinded', 'arms', 'cohorts', 'destructionPolicy', 'destructionPolicyDetails', 'returnPolicy',
-      'requiresPatientForDispensation', 'allowsDispensationWithoutIwrs',
-      'temperatureTrackingEnabled', 'returnedMaterialReusable',
+      'hasIrtSystem', 'irtSystemName',
       'dataQualityProfile', 'visitSchedule', 'treatmentCycles', 'patientConstraints',
       'temperatureGovernance', 'excursionActionRequired', 'excursionTimeThreshold',
       'iwrsGovernance', 'protocolRequiredEquipments', 'siteOverrides',
