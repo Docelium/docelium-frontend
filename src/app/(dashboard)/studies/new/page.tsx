@@ -396,6 +396,7 @@ export default function NewStudyPage() {
   const [newCohort, setNewCohort] = useState('');
   const [newEquipment, setNewEquipment] = useState('');
   const [newExtraField, setNewExtraField] = useState('');
+  const [selectedArmFilter, setSelectedArmFilter] = useState('');
 
   const handleChange = (field: keyof FormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { value: unknown } }
@@ -493,7 +494,7 @@ export default function NewStudyPage() {
   const addVisit = () => {
     setFormData((prev) => ({
       ...prev,
-      visitSchedule: [...prev.visitSchedule, { visit_code: '', day: 1, requires_dispense: false, arm: null }],
+      visitSchedule: [...prev.visitSchedule, { visit_code: '', day: 1, requires_dispense: false, arm: selectedArmFilter || null }],
     }));
   };
 
@@ -1200,14 +1201,23 @@ export default function NewStudyPage() {
             </Typography>
 
             {formData.arms.length > 0 ? (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>Bras de traitement (Bloc D)</Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {formData.arms.map((arm, i) => (
-                    <Chip key={i} label={arm} size="small" color="primary" variant="outlined" />
+              <FormControl sx={{ mb: 2 }}>
+                <InputLabel>Bras de traitement</InputLabel>
+                <Select
+                  value={selectedArmFilter}
+                  label="Bras de traitement"
+                  onChange={(e) => setSelectedArmFilter(e.target.value as string)}
+                >
+                  <MenuItem value="">
+                    <em>Tous les bras</em>
+                  </MenuItem>
+                  {formData.arms.map((arm) => (
+                    <MenuItem key={arm} value={arm}>
+                      {arm}
+                    </MenuItem>
                   ))}
-                </Box>
-              </Box>
+                </Select>
+              </FormControl>
             ) : (
               <Alert severity="info" sx={{ mb: 2 }}>
                 Aucun bras de traitement defini. Ajoutez des bras dans le Bloc D (Parametres operationnels) pour pouvoir associer les visites a un bras.
@@ -1255,7 +1265,9 @@ export default function NewStudyPage() {
 
             <Typography variant="subtitle2">Calendrier des visites</Typography>
 
-            {formData.visitSchedule.map((visit, index) => (
+            {formData.visitSchedule.map((visit, index) => {
+              if (selectedArmFilter && visit.arm !== selectedArmFilter && visit.arm !== null) return null;
+              return (
               <Card key={index} variant="outlined" sx={{ p: 2 }}>
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                   <TextField
@@ -1305,7 +1317,8 @@ export default function NewStudyPage() {
                   </IconButton>
                 </Box>
               </Card>
-            ))}
+              );
+            })}
 
             <Button startIcon={<AddIcon />} onClick={addVisit} variant="outlined">
               Ajouter une visite
