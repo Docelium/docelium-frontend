@@ -174,8 +174,6 @@ export interface CreateStudyInput {
   iwrsGovernance?: {
     iwrs_integration?: boolean;
     iwrs_integration_mode?: 'MANUAL' | 'CSV' | 'API';
-    iwrs_allows_partial_data?: boolean;
-    iwrs_requires_visit_code?: boolean;
     iwrs_endpoint?: string | null;
   } | null;
 

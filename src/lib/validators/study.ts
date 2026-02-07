@@ -71,6 +71,13 @@ export const blocCSchema = z.object({
   eudamedId: z.string().nullable().optional(),
 });
 
+// IWRS Governance (integre dans BLOC D)
+const iwrsGovernanceSchema = z.object({
+  iwrs_integration: z.boolean(),
+  iwrs_integration_mode: z.enum(IwrsIntegrationModeValues),
+  iwrs_endpoint: z.string().nullable().optional(),
+});
+
 // BLOC D - Parametres Operationnels
 export const blocDSchema = z.object({
   blinded: z.enum(BlindingTypeValues).default('NONE'),
@@ -81,6 +88,7 @@ export const blocDSchema = z.object({
   returnPolicy: z.enum(ReturnPolicyValues).default('LOCAL_STOCK'),
   hasIrtSystem: z.boolean().default(false),
   irtSystemName: z.string().nullable().optional(),
+  iwrsGovernance: iwrsGovernanceSchema.nullable().optional(),
 });
 
 // BLOC E - Data Quality Profile
@@ -136,19 +144,6 @@ export const blocISchema = z.object({
   excursionTimeThreshold: z.string().nullable().optional(),
 });
 
-// BLOC L - IWRS Governance
-const iwrsGovernanceSchema = z.object({
-  iwrs_integration: z.boolean(),
-  iwrs_integration_mode: z.enum(IwrsIntegrationModeValues),
-  iwrs_allows_partial_data: z.boolean().default(false),
-  iwrs_requires_visit_code: z.boolean().default(false),
-  iwrs_endpoint: z.string().nullable().optional(),
-});
-
-export const blocLSchema = z.object({
-  iwrsGovernance: iwrsGovernanceSchema.nullable().optional(),
-});
-
 // BLOC M - Equipment Requirements
 export const blocMSchema = z.object({
   protocolRequiredEquipments: z.array(z.string()).default([]),
@@ -194,8 +189,6 @@ export const createStudySchema = z.object({
   ...blocHSchema.shape,
   // BLOC I - Temperature
   ...blocISchema.shape,
-  // BLOC L - IWRS
-  ...blocLSchema.shape,
   // BLOC M - Equipment
   ...blocMSchema.shape,
   // BLOC N - Site Overrides
@@ -217,7 +210,6 @@ export type BlocEData = z.infer<typeof blocESchema>;
 export type BlocGData = z.infer<typeof blocGSchema>;
 export type BlocHData = z.infer<typeof blocHSchema>;
 export type BlocIData = z.infer<typeof blocISchema>;
-export type BlocLData = z.infer<typeof blocLSchema>;
 export type BlocMData = z.infer<typeof blocMSchema>;
 export type BlocNData = z.infer<typeof blocNSchema>;
 export type DatesData = z.infer<typeof datesSchema>;
@@ -247,7 +239,6 @@ export const STUDY_BLOCKS = [
   { id: 'G', label: 'Calendrier visites', schema: blocGSchema, required: false },
   { id: 'H', label: 'Contraintes patient', schema: blocHSchema, required: false },
   { id: 'I', label: 'Temperature', schema: blocISchema, required: false },
-  { id: 'L', label: 'IWRS', schema: blocLSchema, required: false },
   { id: 'M', label: 'Equipements', schema: blocMSchema, required: false },
   { id: 'N', label: 'Site local', schema: blocNSchema, required: false },
 ] as const;

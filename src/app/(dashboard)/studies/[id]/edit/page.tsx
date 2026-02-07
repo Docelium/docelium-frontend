@@ -40,7 +40,6 @@ const steps = [
   { id: 'E', label: 'Qualite donnees' },
   { id: 'G', label: 'Calendrier visites' },
   { id: 'H', label: 'Contraintes patient' },
-  { id: 'L', label: 'IWRS' },
   { id: 'M', label: 'Equipements' },
   { id: 'N', label: 'Site local' },
 ];
@@ -179,11 +178,9 @@ interface FormData {
   weightVariationThreshold: string;
   weightReference: string;
 
-  // BLOC L - IWRS
+  // IWRS (integre dans BLOC D)
   iwrsIntegration: boolean;
   iwrsIntegrationMode: string;
-  iwrsAllowsPartialData: boolean;
-  iwrsRequiresVisitCode: boolean;
   iwrsEndpoint: string;
 
   // BLOC M - Equipment
@@ -249,8 +246,6 @@ const initialFormData: FormData = {
   weightReference: 'CURRENT',
   iwrsIntegration: false,
   iwrsIntegrationMode: 'MANUAL',
-  iwrsAllowsPartialData: false,
-  iwrsRequiresVisitCode: false,
   iwrsEndpoint: '',
   protocolRequiredEquipments: [],
   requiresLocalQuarantineStep: false,
@@ -339,8 +334,6 @@ export default function EditStudyPage() {
           weightReference: study.patientConstraints?.weight_reference || 'CURRENT',
           iwrsIntegration: study.iwrsGovernance?.iwrs_integration ?? false,
           iwrsIntegrationMode: study.iwrsGovernance?.iwrs_integration_mode || 'MANUAL',
-          iwrsAllowsPartialData: study.iwrsGovernance?.iwrs_allows_partial_data ?? false,
-          iwrsRequiresVisitCode: study.iwrsGovernance?.iwrs_requires_visit_code ?? false,
           iwrsEndpoint: study.iwrsGovernance?.iwrs_endpoint || '',
           protocolRequiredEquipments: study.protocolRequiredEquipments || [],
           requiresLocalQuarantineStep: study.siteOverrides?.requires_local_quarantine_step ?? false,
@@ -617,13 +610,11 @@ export default function EditStudyPage() {
           weight_reference: formData.weightReference,
         },
 
-        // BLOC L
+        // IWRS
         iwrsGovernance: formData.iwrsIntegration
           ? {
               iwrs_integration: formData.iwrsIntegration,
               iwrs_integration_mode: formData.iwrsIntegrationMode,
-              iwrs_allows_partial_data: formData.iwrsAllowsPartialData,
-              iwrs_requires_visit_code: formData.iwrsRequiresVisitCode,
               iwrs_endpoint: formData.iwrsEndpoint || null,
             }
           : null,
@@ -1074,6 +1065,41 @@ export default function EditStudyPage() {
                 helperText="Ex: Medidata Rave RTSM"
               />
             )}
+
+            <FormControlLabel
+              control={
+                <Switch checked={!!formData.iwrsIntegration} onChange={handleSwitchChange('iwrsIntegration')} />
+              }
+              label="Integration IWRS activee"
+            />
+
+            {!!formData.iwrsIntegration && (
+              <>
+                <FormControl>
+                  <InputLabel>Mode d&apos;integration IWRS</InputLabel>
+                  <Select
+                    value={formData.iwrsIntegrationMode}
+                    label="Mode d'integration IWRS"
+                    onChange={(e) => handleChange('iwrsIntegrationMode')(e as { target: { value: unknown } })}
+                  >
+                    {iwrsIntegrationModes.map((m) => (
+                      <MenuItem key={m.value} value={m.value}>
+                        {m.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {formData.iwrsIntegrationMode === 'API' && (
+                  <TextField
+                    label="URL endpoint IWRS"
+                    value={formData.iwrsEndpoint}
+                    onChange={handleChange('iwrsEndpoint')}
+                    placeholder="https://iwrs.example.com/api"
+                  />
+                )}
+              </>
+            )}
           </Box>
         );
 
@@ -1335,74 +1361,8 @@ export default function EditStudyPage() {
           </Box>
         );
 
-      // BLOC L - IWRS
-      case 7:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Bloc L - Gouvernance IWRS
-            </Typography>
-
-            <FormControlLabel
-              control={
-                <Switch checked={formData.iwrsIntegration} onChange={handleSwitchChange('iwrsIntegration')} />
-              }
-              label="Integration IWRS activee"
-            />
-
-            {formData.iwrsIntegration && (
-              <>
-                <FormControl>
-                  <InputLabel>Mode d&apos;integration</InputLabel>
-                  <Select
-                    value={formData.iwrsIntegrationMode}
-                    label="Mode d'integration"
-                    onChange={(e) => handleChange('iwrsIntegrationMode')(e as { target: { value: unknown } })}
-                  >
-                    {iwrsIntegrationModes.map((m) => (
-                      <MenuItem key={m.value} value={m.value}>
-                        {m.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.iwrsAllowsPartialData}
-                      onChange={handleSwitchChange('iwrsAllowsPartialData')}
-                    />
-                  }
-                  label="Donnees partielles acceptees"
-                />
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.iwrsRequiresVisitCode}
-                      onChange={handleSwitchChange('iwrsRequiresVisitCode')}
-                    />
-                  }
-                  label="Code visite requis"
-                />
-
-                {formData.iwrsIntegrationMode === 'API' && (
-                  <TextField
-                    label="URL endpoint IWRS"
-                    value={formData.iwrsEndpoint}
-                    onChange={handleChange('iwrsEndpoint')}
-                    placeholder="https://iwrs.example.com/api"
-                  />
-                )}
-
-              </>
-            )}
-          </Box>
-        );
-
       // BLOC M - Equipment
-      case 8:
+      case 7:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -1445,7 +1405,7 @@ export default function EditStudyPage() {
         );
 
       // BLOC N - Site Overrides
-      case 9:
+      case 8:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>
