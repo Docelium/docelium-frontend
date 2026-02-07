@@ -149,6 +149,7 @@ export interface CreateStudyInput {
     arm?: string | null;
   }> | null;
   treatmentCycles?: {
+    treatment_schema_type?: 'CYCLE' | 'OTHER';
     cycle_length?: number | null;
     max_cycles?: number | null;
   } | null;

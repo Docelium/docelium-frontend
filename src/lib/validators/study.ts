@@ -8,6 +8,7 @@ const ReturnPolicyValues = ['LOCAL_STOCK', 'SPONSOR_RETURN'] as const;
 const TemperatureGovernanceValues = ['BASIC', 'FULL'] as const;
 const IwrsIntegrationModeValues = ['MANUAL', 'CSV', 'API'] as const;
 const ContactRoleValues = ['PI', 'SC', 'CRA', 'PM', 'PHARMA'] as const;
+const TreatmentSchemaTypeValues = ['CYCLE', 'OTHER'] as const;
 const WeightReferenceValues = ['BASELINE', 'CURRENT'] as const;
 
 // BLOC A - Identification du Protocole
@@ -99,6 +100,7 @@ const visitScheduleItemSchema = z.object({
 });
 
 const treatmentCyclesSchema = z.object({
+  treatment_schema_type: z.enum(TreatmentSchemaTypeValues).default('CYCLE'),
   cycle_length: z.number().int().positive().nullable().optional(),
   max_cycles: z.number().int().positive().nullable().optional(),
 });
@@ -226,6 +228,7 @@ export {
   TemperatureGovernanceValues,
   IwrsIntegrationModeValues,
   ContactRoleValues,
+  TreatmentSchemaTypeValues,
   WeightReferenceValues,
 };
 

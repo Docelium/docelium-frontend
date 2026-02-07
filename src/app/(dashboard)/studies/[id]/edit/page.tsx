@@ -24,6 +24,9 @@ import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormLabel from '@mui/material/FormLabel';
 import SaveIcon from '@mui/icons-material/Save';
 import Link from 'next/link';
 import { useToast } from '@/contexts/ToastContext';
@@ -158,6 +161,7 @@ interface FormData {
   commentRequiredOnOverride: boolean;
 
   // BLOC G - Visit Schedule
+  treatmentSchemaType: 'CYCLE' | 'OTHER';
   visitSchedule: VisitScheduleItem[];
   cycleLength: string;
   maxCycles: string;
@@ -227,6 +231,7 @@ const initialFormData: FormData = {
   requiresPharmacistSignature: true,
   requiresWeightRecencyDays: '',
   commentRequiredOnOverride: true,
+  treatmentSchemaType: 'CYCLE',
   visitSchedule: [],
   cycleLength: '',
   maxCycles: '',
@@ -315,6 +320,7 @@ export default function EditStudyPage() {
           requiresPharmacistSignature: study.dataQualityProfile?.requires_pharmacist_signature ?? true,
           requiresWeightRecencyDays: study.dataQualityProfile?.requires_weight_recency_days?.toString() || '',
           commentRequiredOnOverride: study.dataQualityProfile?.comment_required_on_override ?? true,
+          treatmentSchemaType: study.treatmentCycles?.treatment_schema_type || 'CYCLE',
           visitSchedule: study.visitSchedule || [],
           cycleLength: study.treatmentCycles?.cycle_length?.toString() || '',
           maxCycles: study.treatmentCycles?.max_cycles?.toString() || '',
@@ -583,13 +589,11 @@ export default function EditStudyPage() {
 
         // BLOC G
         visitSchedule: formData.visitSchedule.length > 0 ? formData.visitSchedule : null,
-        treatmentCycles:
-          formData.cycleLength || formData.maxCycles
-            ? {
-                cycle_length: formData.cycleLength ? parseInt(formData.cycleLength) : null,
-                max_cycles: formData.maxCycles ? parseInt(formData.maxCycles) : null,
-              }
-            : null,
+        treatmentCycles: {
+          treatment_schema_type: formData.treatmentSchemaType,
+          cycle_length: formData.treatmentSchemaType === 'CYCLE' && formData.cycleLength ? parseInt(formData.cycleLength) : null,
+          max_cycles: formData.treatmentSchemaType === 'CYCLE' && formData.maxCycles ? parseInt(formData.maxCycles) : null,
+        },
 
         // BLOC H
         patientConstraints: {
@@ -1141,26 +1145,44 @@ export default function EditStudyPage() {
               </Alert>
             )}
 
-            <Typography variant="subtitle2">Cycles de traitement</Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label="Duree d'un cycle (jours)"
-                type="number"
-                value={formData.cycleLength}
-                onChange={handleChange('cycleLength')}
-                helperText="Ex: 21"
-                sx={{ flex: 1 }}
-              />
+            <FormControl>
+              <FormLabel>Schema de traitement</FormLabel>
+              <RadioGroup
+                row
+                value={formData.treatmentSchemaType}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, treatmentSchemaType: e.target.value as 'CYCLE' | 'OTHER' }))
+                }
+              >
+                <FormControlLabel value="CYCLE" control={<Radio />} label="Cycles de traitement" />
+                <FormControlLabel value="OTHER" control={<Radio />} label="Autre (visites manuelles)" />
+              </RadioGroup>
+            </FormControl>
 
-              <TextField
-                label="Nombre max de cycles"
-                type="number"
-                value={formData.maxCycles}
-                onChange={handleChange('maxCycles')}
-                helperText="Ex: 6"
-                sx={{ flex: 1 }}
-              />
-            </Box>
+            {formData.treatmentSchemaType === 'CYCLE' && (
+              <>
+                <Typography variant="subtitle2">Cycles de traitement</Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <TextField
+                    label="Duree d'un cycle (jours)"
+                    type="number"
+                    value={formData.cycleLength}
+                    onChange={handleChange('cycleLength')}
+                    helperText="Ex: 21"
+                    sx={{ flex: 1 }}
+                  />
+
+                  <TextField
+                    label="Nombre max de cycles"
+                    type="number"
+                    value={formData.maxCycles}
+                    onChange={handleChange('maxCycles')}
+                    helperText="Ex: 6"
+                    sx={{ flex: 1 }}
+                  />
+                </Box>
+              </>
+            )}
 
             <Typography variant="subtitle2">Calendrier des visites</Typography>
 
