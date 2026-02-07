@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { authOptions, checkPermission, PermissionKey } from './auth';
 import { NextResponse } from 'next/server';
-import { UserRole } from '@prisma/client';
+import { UserRole, Prisma } from '@prisma/client';
 
 export async function getSession() {
   return await getServerSession(authOptions);
@@ -31,8 +31,24 @@ export async function requirePermission(permission: PermissionKey) {
   return user;
 }
 
+const uniqueFieldLabels: Record<string, string> = {
+  code_internal: 'code interne',
+  email: 'adresse email',
+  batch_number: 'numero de lot',
+};
+
 export function handleApiError(error: unknown): NextResponse {
   console.error('API Error:', error);
+
+  // Prisma unique constraint violation
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    const fields = (error.meta?.target as string[]) || [];
+    const fieldLabel = fields.map((f) => uniqueFieldLabels[f] || f).join(', ');
+    return NextResponse.json(
+      { error: `Un enregistrement avec ce ${fieldLabel} existe deja.` },
+      { status: 409 },
+    );
+  }
 
   if (error instanceof Error) {
     if (error.message === 'Unauthorized') {

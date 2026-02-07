@@ -55,6 +55,17 @@ const blindingLabels: Record<BlindingType, string> = {
   TRIPLE: 'Triple aveugle',
 };
 
+function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Date | string | null): StudyStatus {
+  if (protocolStatus === 'DRAFT' && siteActivationDate) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (new Date(siteActivationDate) <= today) {
+      return 'ACTIVE';
+    }
+  }
+  return protocolStatus;
+}
+
 export default async function StudiesPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return null;
@@ -98,8 +109,8 @@ export default async function StudiesPage() {
                       {study.codeInternal}
                     </Typography>
                     <Chip
-                      label={statusLabels[study.protocolStatus]}
-                      color={statusColors[study.protocolStatus]}
+                      label={statusLabels[getEffectiveStatus(study.protocolStatus, study.siteActivationDate)]}
+                      color={statusColors[getEffectiveStatus(study.protocolStatus, study.siteActivationDate)]}
                       size="small"
                     />
                   </Box>

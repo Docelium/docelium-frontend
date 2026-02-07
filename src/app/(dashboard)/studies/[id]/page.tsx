@@ -17,6 +17,17 @@ import { StudyStatus, StudyPhase, DestructionPolicy, BlindingType } from '@prism
 import LinkButton from '@/components/ui/LinkButton';
 import AuditTrail from '@/components/features/AuditTrail';
 
+function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Date | string | null): StudyStatus {
+  if (protocolStatus === 'DRAFT' && siteActivationDate) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (new Date(siteActivationDate) <= today) {
+      return 'ACTIVE';
+    }
+  }
+  return protocolStatus;
+}
+
 const statusLabels: Record<StudyStatus, string> = {
   DRAFT: 'Brouillon',
   ACTIVE: 'Actif',
@@ -80,7 +91,8 @@ export default async function StudyDetailPage({ params }: Props) {
     notFound();
   }
 
-  const canEdit = ['ADMIN', 'PHARMACIEN'].includes(session.user.role) && study.protocolStatus !== 'ARCHIVED';
+  const effectiveStatus = getEffectiveStatus(study.protocolStatus, study.siteActivationDate);
+  const canEdit = ['ADMIN', 'PHARMACIEN'].includes(session.user.role) && effectiveStatus !== 'ARCHIVED';
 
   return (
     <Box>
@@ -125,8 +137,8 @@ export default async function StudyDetailPage({ params }: Props) {
                   </Typography>
                   <Box sx={{ mt: 0.5 }}>
                     <Chip
-                      label={statusLabels[study.protocolStatus]}
-                      color={statusColors[study.protocolStatus]}
+                      label={statusLabels[effectiveStatus]}
+                      color={statusColors[effectiveStatus]}
                       size="small"
                     />
                   </Box>

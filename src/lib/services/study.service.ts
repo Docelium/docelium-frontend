@@ -413,6 +413,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
         detailsAfter: { changedFields, codeInternal: study.codeInternal, title: study.title },
       }).catch(() => {});
     }
+
   }
 
   return study;
