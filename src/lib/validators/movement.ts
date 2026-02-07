@@ -33,6 +33,7 @@ export const createDispensationSchema = baseMovementSchema.extend({
   type: z.literal('DISPENSATION'),
   patientId: z.string().min(1, 'L\'identifiant patient est requis'),
   visitNumber: z.string().optional(),
+  arm: z.string().optional(),
   iwrsConfirmationNumber: z.string().optional(),
 });
 

@@ -21,6 +21,7 @@ interface Study {
   id: string;
   codeInternal: string;
   title: string;
+  arms: string[] | null;
 }
 
 interface Medication {
@@ -62,6 +63,7 @@ export default function DispensationPage() {
     quantity: '',
     movementDate: new Date().toISOString().split('T')[0],
     patientId: '',
+    arm: '',
     visitNumber: '',
     iwrsConfirmationNumber: '',
     notes: '',
@@ -88,7 +90,7 @@ export default function DispensationPage() {
       setMedications([]);
       setVisits([]);
     }
-    setFormData((prev) => ({ ...prev, visitNumber: '', medicationId: '', stockItemId: '' }));
+    setFormData((prev) => ({ ...prev, visitNumber: '', arm: '', medicationId: '', stockItemId: '' }));
   }, [formData.studyId]);
 
   useEffect(() => {
@@ -123,6 +125,7 @@ export default function DispensationPage() {
         body: JSON.stringify({
           type: 'DISPENSATION',
           ...formData,
+          arm: formData.arm || undefined,
           quantity: parseInt(formData.quantity, 10),
           movementDate: formData.movementDate ? new Date(formData.movementDate) : new Date(),
         }),
@@ -142,6 +145,8 @@ export default function DispensationPage() {
   };
 
   const selectedStock = stockItems.find((s) => s.id === formData.stockItemId);
+  const selectedStudy = studies.find((s) => s.id === formData.studyId);
+  const studyArms = selectedStudy?.arms || [];
 
   if (!canCreate) {
     return (
@@ -240,6 +245,24 @@ export default function DispensationPage() {
                   required
                 />
               </Grid>
+              {studyArms.length > 0 && (
+                <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Bras de traitement</InputLabel>
+                    <Select
+                      value={formData.arm}
+                      label="Bras de traitement"
+                      onChange={(e) => handleChange('arm')(e as { target: { value: unknown } })}
+                    >
+                      {studyArms.map((arm) => (
+                        <MenuItem key={arm} value={arm}>
+                          {arm}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              )}
               <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
                 {visits.length > 0 ? (
                   <FormControl fullWidth disabled={!formData.studyId}>

@@ -108,6 +108,7 @@ const fieldLabels: Record<string, string> = {
   status: 'Statut',
   // Movement fields
   quantity: 'Quantite',
+  arm: 'Bras de traitement',
 };
 
 const actionColors: Record<string, 'success' | 'primary' | 'warning' | 'error' | 'info' | 'grey'> = {

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Enum values selon la SPEC
-const StudyPhaseValues = ['I', 'Ia', 'Ib', 'II', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IIIc'] as const;
+const StudyPhaseValues = ['I', 'Ia', 'Ib', 'I_II', 'II', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IIIc', 'IV', 'OTHER'] as const;
 const BlindingTypeValues = ['NONE', 'SINGLE', 'DOUBLE', 'TRIPLE'] as const;
 const DestructionPolicyValues = ['LOCAL', 'SPONSOR', 'MIXED'] as const;
 const ReturnPolicyValues = ['LOCAL_STOCK', 'SPONSOR_RETURN'] as const;
