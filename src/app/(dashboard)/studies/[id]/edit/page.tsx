@@ -124,6 +124,7 @@ interface FormData {
   // BLOC A - Identification
   codeInternal: string;
   acronym: string;
+  siteNumber: string;
   euCtNumber: string;
   nctNumber: string;
   title: string;
@@ -204,6 +205,7 @@ interface FormData {
 const initialFormData: FormData = {
   codeInternal: '',
   acronym: '',
+  siteNumber: '',
   euCtNumber: '',
   nctNumber: '',
   title: '',
@@ -293,6 +295,7 @@ export default function EditStudyPage() {
         setFormData({
           codeInternal: study.codeInternal || '',
           acronym: study.acronym || '',
+          siteNumber: study.siteNumber || '',
           euCtNumber: study.euCtNumber || '',
           nctNumber: study.nctNumber || '',
           title: study.title || '',
@@ -547,6 +550,7 @@ export default function EditStudyPage() {
         // BLOC A
         codeInternal: formData.codeInternal,
         acronym: formData.acronym,
+        siteNumber: formData.siteNumber,
         euCtNumber: formData.euCtNumber || null,
         nctNumber: formData.nctNumber || null,
         title: formData.title,
@@ -687,6 +691,14 @@ export default function EditStudyPage() {
               onChange={handleChange('acronym')}
               required
               helperText="Ex: KEYNOTE-001, CHECKMATE-214"
+            />
+
+            <TextField
+              label="Numero de centre *"
+              value={formData.siteNumber}
+              onChange={handleChange('siteNumber')}
+              required
+              helperText="Ex: CENTRE-001, 75-PARIS-01"
             />
 
             <TextField
@@ -1539,8 +1551,8 @@ export default function EditStudyPage() {
 
   const isStepValid = () => {
     switch (activeStep) {
-      case 0: // BLOC A - obligatoire: codeInternal, acronym, title, sponsor, phases
-        return formData.codeInternal && formData.acronym && formData.title && formData.sponsor && formData.phases.length > 0;
+      case 0: // BLOC A - obligatoire: codeInternal, acronym, siteNumber, title, sponsor, phases
+        return formData.codeInternal && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0;
       default:
         return true;
     }

@@ -7,6 +7,7 @@ describe('Study Validators', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
         acronym: 'TEST-01',
+        siteNumber: 'CENTRE-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['III'],
@@ -20,6 +21,7 @@ describe('Study Validators', () => {
       const data = {
         codeInternal: '',
         acronym: 'TEST-01',
+        siteNumber: 'CENTRE-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['III'],
@@ -33,6 +35,7 @@ describe('Study Validators', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
         acronym: 'TEST-01',
+        siteNumber: 'CENTRE-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['INVALID_PHASE'],
@@ -46,6 +49,7 @@ describe('Study Validators', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
         acronym: 'TEST-01',
+        siteNumber: 'CENTRE-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['I', 'Ia', 'III'],
@@ -59,6 +63,7 @@ describe('Study Validators', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
         acronym: 'TEST-01',
+        siteNumber: 'CENTRE-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: [],
@@ -74,6 +79,7 @@ describe('Study Validators', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
         acronym: 'TEST-01',
+        siteNumber: 'CENTRE-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['III'],
@@ -89,6 +95,7 @@ describe('Study Validators', () => {
       const data = {
         codeInternal: 'PROTO-2025-001',
         acronym: 'TEST-01',
+        siteNumber: 'CENTRE-001',
         title: 'Test Study',
         sponsor: 'Test Sponsor',
         phases: ['III'],

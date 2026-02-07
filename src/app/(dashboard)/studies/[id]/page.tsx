@@ -112,6 +112,11 @@ export default async function StudyDetailPage({ params }: Props) {
               {study.acronym}
             </Typography>
           )}
+          {study.siteNumber && (
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Centre : {study.siteNumber}
+            </Typography>
+          )}
           <Typography variant="h6" color="text.secondary">
             {study.title}
           </Typography>

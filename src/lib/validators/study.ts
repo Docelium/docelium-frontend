@@ -21,6 +21,10 @@ export const blocASchema = z.object({
     .string()
     .min(1, 'L\'acronyme est requis')
     .max(100, 'L\'acronyme ne peut pas depasser 100 caracteres'),
+  siteNumber: z
+    .string()
+    .min(1, 'Le numero de centre est requis')
+    .max(50, 'Le numero de centre ne peut pas depasser 50 caracteres'),
   euCtNumber: z.string().nullable().optional(),
   nctNumber: z.string().nullable().optional(),
   title: z
