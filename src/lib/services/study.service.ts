@@ -158,7 +158,8 @@ export interface CreateStudyInput {
   patientConstraints?: {
     min_age?: number | null;
     max_age?: number | null;
-    min_weight?: number | null;
+    capped_dose?: boolean;
+    capped_dose_condition?: string | null;
     requires_recent_weight_days?: number | null;
     weight_variation_threshold?: number | null;
     weight_reference?: 'BASELINE' | 'CURRENT';

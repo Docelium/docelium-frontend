@@ -168,7 +168,8 @@ interface FormData {
   // BLOC H - Patient Constraints
   minAge: string;
   maxAge: string;
-  minWeight: string;
+  cappedDose: boolean;
+  cappedDoseCondition: string;
   requiresRecentWeightDays: string;
   weightVariationThreshold: string;
   weightReference: string;
@@ -262,7 +263,8 @@ const testFormData: FormData = {
   // BLOC H - Patient Constraints
   minAge: '18',
   maxAge: '75',
-  minWeight: '45',
+  cappedDose: true,
+  cappedDoseCondition: 'Poids > 100 kg',
   requiresRecentWeightDays: '30',
   weightVariationThreshold: '10',
   weightReference: 'BASELINE',
@@ -346,7 +348,8 @@ const initialFormData: FormData = {
   // BLOC H
   minAge: '18',
   maxAge: '',
-  minWeight: '',
+  cappedDose: false,
+  cappedDoseCondition: '',
   requiresRecentWeightDays: '',
   weightVariationThreshold: '',
   weightReference: 'CURRENT',
@@ -637,7 +640,8 @@ export default function NewStudyPage() {
         patientConstraints: {
           min_age: formData.minAge ? parseInt(formData.minAge) : null,
           max_age: formData.maxAge ? parseInt(formData.maxAge) : null,
-          min_weight: formData.minWeight ? parseFloat(formData.minWeight) : null,
+          capped_dose: formData.cappedDose,
+          capped_dose_condition: formData.cappedDose ? formData.cappedDoseCondition || null : null,
           requires_recent_weight_days: formData.requiresRecentWeightDays
             ? parseInt(formData.requiresRecentWeightDays)
             : null,
@@ -1304,13 +1308,24 @@ export default function NewStudyPage() {
               />
             </Box>
 
-            <TextField
-              label="Poids minimum (kg)"
-              type="number"
-              value={formData.minWeight}
-              onChange={handleChange('minWeight')}
-              helperText="Optionnel"
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={formData.cappedDose}
+                  onChange={handleSwitchChange('cappedDose')}
+                />
+              }
+              label="Dose maximale (cappee)"
             />
+
+            {formData.cappedDose && (
+              <TextField
+                label="Condition"
+                value={formData.cappedDoseCondition}
+                onChange={handleChange('cappedDoseCondition')}
+                helperText="Ex: Poids > 100 kg"
+              />
+            )}
 
             <TextField
               label="Poids recent requis (jours)"

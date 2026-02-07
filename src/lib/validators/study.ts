@@ -114,7 +114,8 @@ export const blocGSchema = z.object({
 const patientConstraintsSchema = z.object({
   min_age: z.number().int().min(0).nullable().optional(),
   max_age: z.number().int().positive().nullable().optional(),
-  min_weight: z.number().positive().nullable().optional(),
+  capped_dose: z.boolean().default(false),
+  capped_dose_condition: z.string().nullable().optional(),
   requires_recent_weight_days: z.number().int().positive().nullable().optional(),
   weight_variation_threshold: z.number().positive().nullable().optional(),
   weight_reference: z.enum(WeightReferenceValues).default('CURRENT'),

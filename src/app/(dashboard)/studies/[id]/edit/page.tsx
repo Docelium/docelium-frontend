@@ -169,7 +169,8 @@ interface FormData {
   // BLOC H - Patient Constraints
   minAge: string;
   maxAge: string;
-  minWeight: string;
+  cappedDose: boolean;
+  cappedDoseCondition: string;
   requiresRecentWeightDays: string;
   weightVariationThreshold: string;
   weightReference: string;
@@ -237,7 +238,8 @@ const initialFormData: FormData = {
   maxCycles: '',
   minAge: '18',
   maxAge: '',
-  minWeight: '',
+  cappedDose: false,
+  cappedDoseCondition: '',
   requiresRecentWeightDays: '',
   weightVariationThreshold: '',
   weightReference: 'CURRENT',
@@ -326,7 +328,8 @@ export default function EditStudyPage() {
           maxCycles: study.treatmentCycles?.max_cycles?.toString() || '',
           minAge: study.patientConstraints?.min_age?.toString() || '18',
           maxAge: study.patientConstraints?.max_age?.toString() || '',
-          minWeight: study.patientConstraints?.min_weight?.toString() || '',
+          cappedDose: study.patientConstraints?.capped_dose ?? false,
+          cappedDoseCondition: study.patientConstraints?.capped_dose_condition || '',
           requiresRecentWeightDays: study.patientConstraints?.requires_recent_weight_days?.toString() || '',
           weightVariationThreshold: study.patientConstraints?.weight_variation_threshold?.toString() || '',
           weightReference: study.patientConstraints?.weight_reference || 'CURRENT',
@@ -599,7 +602,8 @@ export default function EditStudyPage() {
         patientConstraints: {
           min_age: formData.minAge ? parseInt(formData.minAge) : null,
           max_age: formData.maxAge ? parseInt(formData.maxAge) : null,
-          min_weight: formData.minWeight ? parseFloat(formData.minWeight) : null,
+          capped_dose: formData.cappedDose,
+          capped_dose_condition: formData.cappedDose ? formData.cappedDoseCondition || null : null,
           requires_recent_weight_days: formData.requiresRecentWeightDays
             ? parseInt(formData.requiresRecentWeightDays)
             : null,
@@ -1272,13 +1276,24 @@ export default function EditStudyPage() {
               />
             </Box>
 
-            <TextField
-              label="Poids minimum (kg)"
-              type="number"
-              value={formData.minWeight}
-              onChange={handleChange('minWeight')}
-              helperText="Optionnel"
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={!!formData.cappedDose}
+                  onChange={handleSwitchChange('cappedDose')}
+                />
+              }
+              label="Dose maximale (cappee)"
             />
+
+            {!!formData.cappedDose && (
+              <TextField
+                label="Condition"
+                value={formData.cappedDoseCondition ?? ''}
+                onChange={handleChange('cappedDoseCondition')}
+                helperText="Ex: Poids > 100 kg"
+              />
+            )}
 
             <TextField
               label="Poids recent requis (jours)"
