@@ -31,21 +31,21 @@ export async function requirePermission(permission: PermissionKey) {
   return user;
 }
 
-const uniqueFieldLabels: Record<string, string> = {
-  code_internal: 'code interne',
-  email: 'adresse email',
-  batch_number: 'numero de lot',
-};
-
 export function handleApiError(error: unknown): NextResponse {
   console.error('API Error:', error);
 
   // Prisma unique constraint violation
   if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-    const fields = (error.meta?.target as string[]) || [];
-    const fieldLabel = fields.map((f) => uniqueFieldLabels[f] || f).join(', ');
     return NextResponse.json(
-      { error: `Un enregistrement avec ce ${fieldLabel} existe deja.` },
+      { error: `Un enregistrement avec ce code existe deja.` },
+      { status: 409 },
+    );
+  }
+
+  // Fallback: detect unique constraint from error message (e.g. inside $transaction)
+  if (error instanceof Error && error.message.includes('Unique constraint failed')) {
+    return NextResponse.json(
+      { error: 'Un enregistrement avec cette valeur existe deja. Veuillez utiliser un identifiant unique.' },
       { status: 409 },
     );
   }
