@@ -24,6 +24,7 @@ import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
@@ -1611,6 +1612,11 @@ export default function NewStudyPage() {
     }
   };
 
+  // Validation globale pour le bouton "Creer" (verifie tous les champs obligatoires)
+  const isFormValidForSubmit = () => {
+    return !!(formData.codeInternal && formData.studyCode && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0 && formData.setupDate);
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
@@ -1703,15 +1709,20 @@ export default function NewStudyPage() {
             <Button disabled={activeStep === 0} onClick={handleBack}>
               Precedent
             </Button>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
                 Etape {activeStep + 1} / {steps.length}
               </Typography>
-              {activeStep === steps.length - 1 ? (
-                <Button variant="contained" onClick={handleSubmit} disabled={loading || !isStepValid()}>
-                  {loading ? <CircularProgress size={24} /> : 'Creer le protocole'}
-                </Button>
-              ) : (
+              <Button
+                variant="outlined"
+                color="success"
+                startIcon={loading ? <CircularProgress size={16} /> : <SaveIcon />}
+                onClick={handleSubmit}
+                disabled={loading || !isFormValidForSubmit()}
+              >
+                Creer le protocole
+              </Button>
+              {activeStep < steps.length - 1 && (
                 <Button variant="contained" onClick={handleNext} disabled={!isStepValid()}>
                   Suivant
                 </Button>
