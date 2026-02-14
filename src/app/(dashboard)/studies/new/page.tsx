@@ -190,10 +190,6 @@ interface FormData {
   requiresExtraReceptionFields: string[];
   localProcedureReferences: LocalProcedure[];
 
-  // Dates
-  startDate: string;
-  expectedEndDate: string;
-
   // Commentaires par bloc
   blockComments: Record<string, string>;
 }
@@ -286,10 +282,6 @@ const testFormData: FormData = {
     { name: 'Procedure de dispensation', reference: 'PUI-ONC-2024-02' },
   ],
 
-  // Dates
-  startDate: new Date().toISOString().slice(0, 10),
-  expectedEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-
   // Commentaires
   blockComments: {},
 };
@@ -365,10 +357,6 @@ const initialFormData: FormData = {
   // BLOC N
   requiresExtraReceptionFields: [],
   localProcedureReferences: [],
-
-  // Dates
-  startDate: '',
-  expectedEndDate: '',
 
   // Commentaires
   blockComments: {},
@@ -689,10 +677,6 @@ export default function NewStudyPage() {
           requires_extra_reception_fields: formData.requiresExtraReceptionFields,
           local_procedure_references: formData.localProcedureReferences,
         },
-
-        // Dates
-        startDate: formData.startDate ? new Date(formData.startDate) : null,
-        expectedEndDate: formData.expectedEndDate ? new Date(formData.expectedEndDate) : null,
 
         // Commentaires
         blockComments: Object.keys(formData.blockComments).length > 0 ? formData.blockComments : null,
@@ -1573,28 +1557,6 @@ export default function NewStudyPage() {
             <Button startIcon={<AddIcon />} onClick={addLocalProcedure} variant="outlined" size="small">
               Ajouter une procedure
             </Button>
-
-            <Typography variant="subtitle2" sx={{ mt: 3 }}>
-              Dates du protocole
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label="Date de debut"
-                type="date"
-                value={formData.startDate}
-                onChange={handleChange('startDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
-                sx={{ flex: 1 }}
-              />
-              <TextField
-                label="Date de fin prevue"
-                type="date"
-                value={formData.expectedEndDate}
-                onChange={handleChange('expectedEndDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
-                sx={{ flex: 1 }}
-              />
-            </Box>
           </Box>
         );
 

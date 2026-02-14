@@ -190,10 +190,6 @@ interface FormData {
   requiresExtraReceptionFields: string[];
   localProcedureReferences: LocalProcedure[];
 
-  // Dates
-  startDate: string;
-  expectedEndDate: string;
-
   // Commentaires par bloc
   blockComments: Record<string, string>;
 }
@@ -252,8 +248,6 @@ const initialFormData: FormData = {
   protocolRequiredEquipments: [],
   requiresExtraReceptionFields: [],
   localProcedureReferences: [],
-  startDate: '',
-  expectedEndDate: '',
   blockComments: {},
 };
 
@@ -342,8 +336,6 @@ export default function EditStudyPage() {
           protocolRequiredEquipments: study.protocolRequiredEquipments || [],
           requiresExtraReceptionFields: study.siteOverrides?.requires_extra_reception_fields || [],
           localProcedureReferences: study.siteOverrides?.local_procedure_references || [],
-          startDate: formatDateForInput(study.startDate),
-          expectedEndDate: formatDateForInput(study.expectedEndDate),
           blockComments: study.blockComments || {},
         });
       } catch (err) {
@@ -654,10 +646,6 @@ export default function EditStudyPage() {
           requires_extra_reception_fields: formData.requiresExtraReceptionFields,
           local_procedure_references: formData.localProcedureReferences,
         },
-
-        // Dates
-        startDate: formData.startDate ? new Date(formData.startDate) : null,
-        expectedEndDate: formData.expectedEndDate ? new Date(formData.expectedEndDate) : null,
 
         blockComments: Object.keys(formData.blockComments).length > 0 ? formData.blockComments : null,
       };
@@ -1554,28 +1542,6 @@ export default function EditStudyPage() {
             <Button startIcon={<AddIcon />} onClick={addLocalProcedure} variant="outlined" size="small">
               Ajouter une procedure
             </Button>
-
-            <Typography variant="subtitle2" sx={{ mt: 3 }}>
-              Dates du protocole
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label="Date de debut"
-                type="date"
-                value={formData.startDate}
-                onChange={handleChange('startDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
-                sx={{ flex: 1 }}
-              />
-              <TextField
-                label="Date de fin prevue"
-                type="date"
-                value={formData.expectedEndDate}
-                onChange={handleChange('expectedEndDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
-                sx={{ flex: 1 }}
-              />
-            </Box>
           </Box>
         );
 
