@@ -330,6 +330,7 @@ model Study {
   // === BLOC A : Identification ===
   protocolStatus       StudyStatus     @default(DRAFT) @map("protocol_status")
   codeInternal         String          @unique @map("code_internal")
+  studyCode            String          @default("") @map("study_code")
   acronym              String          @default("")
   siteNumber           String          @default("") @map("site_number")
   euCtNumber           String?         @map("eu_ct_number")

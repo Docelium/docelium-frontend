@@ -121,6 +121,7 @@ interface LocalProcedure {
 interface FormData {
   // BLOC A - Identification
   codeInternal: string;
+  studyCode: string;
   acronym: string;
   siteNumber: string;
   euCtNumber: string;
@@ -194,6 +195,7 @@ interface FormData {
 
 const initialFormData: FormData = {
   codeInternal: '',
+  studyCode: '',
   acronym: '',
   siteNumber: '',
   euCtNumber: '',
@@ -278,6 +280,7 @@ export default function EditStudyPage() {
         // Map study data to form data
         setFormData({
           codeInternal: study.codeInternal || '',
+          studyCode: study.studyCode || '',
           acronym: study.acronym || '',
           siteNumber: study.siteNumber || '',
           euCtNumber: study.euCtNumber || '',
@@ -528,6 +531,7 @@ export default function EditStudyPage() {
       const payload = {
         // BLOC A
         codeInternal: formData.codeInternal,
+        studyCode: formData.studyCode,
         acronym: formData.acronym,
         siteNumber: formData.siteNumber,
         euCtNumber: formData.euCtNumber || null,
@@ -650,6 +654,14 @@ export default function EditStudyPage() {
               onChange={handleChange('codeInternal')}
               required
               helperText="Ex: ONC-2024-TRIAL-01 (majuscules, chiffres, tirets)"
+            />
+
+            <TextField
+              label="Code de l'etude *"
+              value={formData.studyCode}
+              onChange={handleChange('studyCode')}
+              required
+              helperText="Code du protocole attribue par le promoteur"
             />
 
             <TextField
@@ -1448,7 +1460,7 @@ export default function EditStudyPage() {
   const isStepValid = () => {
     switch (activeStep) {
       case 0: // BLOC A - obligatoire: codeInternal, acronym, siteNumber, title, sponsor, phases
-        return formData.codeInternal && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0;
+        return formData.codeInternal && formData.studyCode && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0;
       default:
         return true;
     }

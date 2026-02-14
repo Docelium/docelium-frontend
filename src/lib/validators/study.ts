@@ -17,6 +17,10 @@ export const blocASchema = z.object({
     .string()
     .min(1, 'Le code interne est requis')
     .max(50, 'Le code ne peut pas depasser 50 caracteres'),
+  studyCode: z
+    .string()
+    .min(1, 'Le code de l\'etude est requis')
+    .max(100, 'Le code de l\'etude ne peut pas depasser 100 caracteres'),
   acronym: z
     .string()
     .min(1, 'L\'acronyme est requis')

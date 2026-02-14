@@ -120,6 +120,7 @@ interface LocalProcedure {
 interface FormData {
   // BLOC A - Identification
   codeInternal: string;
+  studyCode: string;
   acronym: string;
   siteNumber: string;
   euCtNumber: string;
@@ -195,6 +196,7 @@ interface FormData {
 const testFormData: FormData = {
   // BLOC A - Identification
   codeInternal: 'ONC-2024-TEST-01',
+  studyCode: 'MK-3475-789',
   acronym: 'ONCO-XYZ',
   siteNumber: 'CENTRE-001',
   euCtNumber: '2024-000123-45',
@@ -284,6 +286,7 @@ const testFormData: FormData = {
 const initialFormData: FormData = {
   // BLOC A
   codeInternal: '',
+  studyCode: '',
   acronym: '',
   siteNumber: '',
   euCtNumber: '',
@@ -562,6 +565,7 @@ export default function NewStudyPage() {
       const payload = {
         // BLOC A
         codeInternal: formData.codeInternal,
+        studyCode: formData.studyCode,
         acronym: formData.acronym,
         siteNumber: formData.siteNumber,
         euCtNumber: formData.euCtNumber || null,
@@ -688,6 +692,14 @@ export default function NewStudyPage() {
               required
               helperText="Ex: ONC-2024-TRIAL-01 (majuscules, chiffres, tirets)"
               inputProps={{ style: { textTransform: 'uppercase' } }}
+            />
+
+            <TextField
+              label="Code de l'etude *"
+              value={formData.studyCode}
+              onChange={handleChange('studyCode')}
+              required
+              helperText="Code du protocole attribue par le promoteur"
             />
 
             <TextField
@@ -1466,7 +1478,7 @@ export default function NewStudyPage() {
   const isStepValid = () => {
     switch (activeStep) {
       case 0: // BLOC A - obligatoire: codeInternal, acronym, siteNumber, title, sponsor, phases
-        return formData.codeInternal && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0;
+        return formData.codeInternal && formData.studyCode && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0;
       default:
         return true;
     }

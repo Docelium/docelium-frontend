@@ -100,6 +100,7 @@ async function main() {
     create: {
       // === BLOC A : Identification ===
       codeInternal: 'ONC-2025-TRIAL-01',
+      studyCode: 'PC-2025-LUNG-A',
       acronym: 'LUNG-A-001',
       siteNumber: 'CENTRE-PARIS-01',
       euCtNumber: '2025-000567-29',
