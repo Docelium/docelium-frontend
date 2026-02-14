@@ -91,18 +91,6 @@ export const blocDSchema = z.object({
   iwrsGovernance: iwrsGovernanceSchema.nullable().optional(),
 });
 
-// BLOC E - Data Quality Profile
-const dataQualityProfileSchema = z.object({
-  requires_double_signature: z.boolean().default(false),
-  requires_pharmacist_signature: z.boolean().default(true),
-  requires_weight_recency_days: z.number().int().positive().nullable().optional(),
-  comment_required_on_override: z.boolean().default(true),
-});
-
-export const blocESchema = z.object({
-  dataQualityProfile: dataQualityProfileSchema.nullable().optional(),
-});
-
 // BLOC G - Visit Schedule / Treatment Schema
 const visitScheduleItemSchema = z.object({
   visit_code: z.string(),
@@ -181,8 +169,6 @@ export const createStudySchema = z.object({
   ...blocCSchema.shape,
   // BLOC D - Parametres operationnels
   ...blocDSchema.shape,
-  // BLOC E - Data Quality Profile
-  ...blocESchema.shape,
   // BLOC G - Visit Schedule
   ...blocGSchema.shape,
   // BLOC H - Patient Constraints
@@ -206,7 +192,6 @@ export type BlocAData = z.infer<typeof blocASchema>;
 export type BlocBData = z.infer<typeof blocBSchema>;
 export type BlocCData = z.infer<typeof blocCSchema>;
 export type BlocDData = z.infer<typeof blocDSchema>;
-export type BlocEData = z.infer<typeof blocESchema>;
 export type BlocGData = z.infer<typeof blocGSchema>;
 export type BlocHData = z.infer<typeof blocHSchema>;
 export type BlocIData = z.infer<typeof blocISchema>;
@@ -235,10 +220,8 @@ export const STUDY_BLOCKS = [
   { id: 'B', label: 'Contacts', schema: blocBSchema, required: false },
   { id: 'C', label: 'Reglementaire', schema: blocCSchema, required: false },
   { id: 'D', label: 'Parametres operationnels', schema: blocDSchema, required: false },
-  { id: 'E', label: 'Qualite donnees', schema: blocESchema, required: false },
-  { id: 'G', label: 'Calendrier visites', schema: blocGSchema, required: false },
-  { id: 'H', label: 'Contraintes patient', schema: blocHSchema, required: false },
-  { id: 'I', label: 'Temperature', schema: blocISchema, required: false },
-  { id: 'M', label: 'Equipements', schema: blocMSchema, required: false },
-  { id: 'N', label: 'Site local', schema: blocNSchema, required: false },
+  { id: 'E', label: 'Calendrier visites', schema: blocGSchema, required: false },
+  { id: 'F', label: 'Contraintes patient', schema: blocHSchema, required: false },
+  { id: 'G', label: 'Equipements', schema: blocMSchema, required: false },
+  { id: 'H', label: 'Site local', schema: blocNSchema, required: false },
 ] as const;

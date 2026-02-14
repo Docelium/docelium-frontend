@@ -140,14 +140,6 @@ async function main() {
       temperatureTrackingEnabled: true,
       returnedMaterialReusable: false,
 
-      // === BLOC E : Data Quality Profile ===
-      dataQualityProfile: {
-        requires_double_signature: true,
-        requires_pharmacist_signature: true,
-        requires_weight_recency_days: 7,
-        comment_required_on_override: true,
-      },
-
       // === BLOC G : Visit Schedule ===
       visitSchedule: [
         { visit_code: 'C1D1', day: 1, requires_dispense: true },

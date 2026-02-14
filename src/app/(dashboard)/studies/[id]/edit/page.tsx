@@ -37,11 +37,10 @@ const steps = [
   { id: 'B', label: 'Contacts' },
   { id: 'C', label: 'Reglementaire' },
   { id: 'D', label: 'Parametres operationnels' },
-  { id: 'E', label: 'Qualite donnees' },
-  { id: 'G', label: 'Calendrier visites' },
-  { id: 'H', label: 'Contraintes patient' },
-  { id: 'M', label: 'Equipements' },
-  { id: 'N', label: 'Site local' },
+  { id: 'E', label: 'Calendrier visites' },
+  { id: 'F', label: 'Contraintes patient' },
+  { id: 'G', label: 'Equipements' },
+  { id: 'H', label: 'Site local' },
 ];
 
 // Enumerations selon la SPEC
@@ -157,12 +156,6 @@ interface FormData {
   hasIrtSystem: boolean;
   irtSystemName: string;
 
-  // BLOC E - Data Quality Profile
-  requiresDoubleSignature: boolean;
-  requiresPharmacistSignature: boolean;
-  requiresWeightRecencyDays: string;
-  commentRequiredOnOverride: boolean;
-
   // BLOC G - Visit Schedule
   treatmentSchemaType: 'CYCLE' | 'OTHER';
   visitSchedule: VisitScheduleItem[];
@@ -229,10 +222,6 @@ const initialFormData: FormData = {
   returnPolicy: 'LOCAL_STOCK',
   hasIrtSystem: false,
   irtSystemName: '',
-  requiresDoubleSignature: false,
-  requiresPharmacistSignature: true,
-  requiresWeightRecencyDays: '',
-  commentRequiredOnOverride: true,
   treatmentSchemaType: 'CYCLE',
   visitSchedule: [],
   cycleLength: '',
@@ -317,10 +306,6 @@ export default function EditStudyPage() {
           returnPolicy: study.returnPolicy || 'LOCAL_STOCK',
           hasIrtSystem: study.hasIrtSystem ?? false,
           irtSystemName: study.irtSystemName || '',
-          requiresDoubleSignature: study.dataQualityProfile?.requires_double_signature ?? false,
-          requiresPharmacistSignature: study.dataQualityProfile?.requires_pharmacist_signature ?? true,
-          requiresWeightRecencyDays: study.dataQualityProfile?.requires_weight_recency_days?.toString() || '',
-          commentRequiredOnOverride: study.dataQualityProfile?.comment_required_on_override ?? true,
           treatmentSchemaType: study.treatmentCycles?.treatment_schema_type || 'CYCLE',
           visitSchedule: study.visitSchedule || [],
           cycleLength: study.treatmentCycles?.cycle_length?.toString() || '',
@@ -577,16 +562,6 @@ export default function EditStudyPage() {
         returnPolicy: formData.returnPolicy,
         hasIrtSystem: formData.hasIrtSystem,
         irtSystemName: formData.hasIrtSystem ? formData.irtSystemName || null : null,
-
-        // BLOC E
-        dataQualityProfile: {
-          requires_double_signature: formData.requiresDoubleSignature,
-          requires_pharmacist_signature: formData.requiresPharmacistSignature,
-          requires_weight_recency_days: formData.requiresWeightRecencyDays
-            ? parseInt(formData.requiresWeightRecencyDays)
-            : null,
-          comment_required_on_override: formData.commentRequiredOnOverride,
-        },
 
         // BLOC G
         visitSchedule: formData.visitSchedule.length > 0 ? formData.visitSchedule : null,
@@ -1104,60 +1079,8 @@ export default function EditStudyPage() {
           </Box>
         );
 
-      // BLOC E - Data Quality Profile
-      case 4:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Bloc E - Profil Qualite des Donnees
-            </Typography>
-
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Parametrage de la rigueur documentaire du protocole.
-            </Typography>
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.requiresDoubleSignature}
-                  onChange={handleSwitchChange('requiresDoubleSignature')}
-                />
-              }
-              label="Double signature requise"
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.requiresPharmacistSignature}
-                  onChange={handleSwitchChange('requiresPharmacistSignature')}
-                />
-              }
-              label="Signature pharmacien requise"
-            />
-
-            <TextField
-              label="Poids patient recent requis (jours)"
-              type="number"
-              value={formData.requiresWeightRecencyDays}
-              onChange={handleChange('requiresWeightRecencyDays')}
-              helperText="Ex: 7 (laisser vide si non requis)"
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.commentRequiredOnOverride}
-                  onChange={handleSwitchChange('commentRequiredOnOverride')}
-                />
-              }
-              label="Commentaire obligatoire sur derogation"
-            />
-          </Box>
-        );
-
       // BLOC G - Visit Schedule
-      case 5:
+      case 4:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -1295,7 +1218,7 @@ export default function EditStudyPage() {
         );
 
       // BLOC H - Patient Constraints
-      case 6:
+      case 5:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -1375,7 +1298,7 @@ export default function EditStudyPage() {
         );
 
       // BLOC M - Equipment
-      case 7:
+      case 6:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -1418,7 +1341,7 @@ export default function EditStudyPage() {
         );
 
       // BLOC N - Site Overrides
-      case 8:
+      case 7:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6" gutterBottom>

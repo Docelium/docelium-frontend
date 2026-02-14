@@ -84,7 +84,6 @@ const fieldLabels: Record<string, string> = {
   returnPolicy: 'Politique de retour',
   hasIrtSystem: 'Systeme IRT',
   irtSystemName: 'Nom du systeme IRT',
-  dataQualityProfile: 'Profil qualite donnees',
   visitSchedule: 'Calendrier des visites',
   treatmentCycles: 'Cycles de traitement',
   patientConstraints: 'Contraintes patient',

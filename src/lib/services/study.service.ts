@@ -133,14 +133,6 @@ export interface CreateStudyInput {
   hasIrtSystem?: boolean;
   irtSystemName?: string | null;
 
-  // Bloc E - Data Quality
-  dataQualityProfile?: {
-    requires_double_signature?: boolean;
-    requires_pharmacist_signature?: boolean;
-    requires_weight_recency_days?: number | null;
-    comment_required_on_override?: boolean;
-  } | null;
-
   // Bloc G - Visit Schedule
   visitSchedule?: Array<{
     visit_code: string;
@@ -252,9 +244,6 @@ export async function createStudy(data: CreateStudyInput) {
         hasIrtSystem: data.hasIrtSystem ?? false,
         irtSystemName: data.irtSystemName,
 
-        // Bloc E
-        dataQualityProfile: data.dataQualityProfile ?? undefined,
-
         // Bloc G
         visitSchedule: data.visitSchedule ?? undefined,
         treatmentCycles: data.treatmentCycles ?? undefined,
@@ -359,7 +348,6 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.returnPolicy !== undefined && { returnPolicy: data.returnPolicy as never }),
       ...(data.hasIrtSystem !== undefined && { hasIrtSystem: data.hasIrtSystem }),
       ...(data.irtSystemName !== undefined && { irtSystemName: data.irtSystemName }),
-      ...(data.dataQualityProfile !== undefined && { dataQualityProfile: jsonValue(data.dataQualityProfile) }),
       ...(data.visitSchedule !== undefined && { visitSchedule: jsonValue(data.visitSchedule) }),
       ...(data.treatmentCycles !== undefined && { treatmentCycles: jsonValue(data.treatmentCycles) }),
       ...(data.patientConstraints !== undefined && { patientConstraints: jsonValue(data.patientConstraints) }),
@@ -387,7 +375,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       'euCtrApprovalReference', 'ethicsApprovalReference', 'insuranceReference', 'eudamedId',
       'blinded', 'arms', 'cohorts', 'destructionPolicy', 'destructionPolicyDetails', 'returnPolicy',
       'hasIrtSystem', 'irtSystemName',
-      'dataQualityProfile', 'visitSchedule', 'treatmentCycles', 'patientConstraints',
+      'visitSchedule', 'treatmentCycles', 'patientConstraints',
       'temperatureGovernance', 'excursionActionRequired', 'excursionTimeThreshold',
       'iwrsGovernance', 'protocolRequiredEquipments', 'siteOverrides',
       'startDate', 'expectedEndDate', 'blockComments',
