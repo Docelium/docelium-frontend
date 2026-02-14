@@ -424,10 +424,13 @@ export default function NewStudyPage() {
   };
 
   // Gestion des contacts (BLOC B)
+  const hasPiContact = formData.contacts.some((c) => c.role === 'PI');
+
   const addContact = () => {
+    const defaultRole = hasPiContact ? 'SC' : 'PI';
     setFormData((prev) => ({
       ...prev,
-      contacts: [...prev.contacts, { role: 'PI', name: '', email: '', phone: '' }],
+      contacts: [...prev.contacts, { role: defaultRole, name: '', email: '', phone: '' }],
     }));
   };
 
@@ -930,7 +933,11 @@ export default function NewStudyPage() {
                       onChange={(e) => updateContact(index, 'role', e.target.value as string)}
                     >
                       {contactRoles.map((r) => (
-                        <MenuItem key={r.value} value={r.value}>
+                        <MenuItem
+                          key={r.value}
+                          value={r.value}
+                          disabled={r.value === 'PI' && contact.role !== 'PI' && formData.contacts.some((c) => c.role === 'PI')}
+                        >
                           {r.label}
                         </MenuItem>
                       ))}
