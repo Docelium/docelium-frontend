@@ -30,6 +30,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
 import Link from 'next/link';
 import { useToast } from '@/contexts/ToastContext';
+import DateField from '@/components/DateField';
 
 // 11 étapes selon la SPEC
 const steps = [
@@ -817,12 +818,10 @@ export default function NewStudyPage() {
             </Box>
 
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
+              <DateField
                 label="Date d'activation site"
-                type="date"
                 value={formData.siteActivationDate}
                 onChange={handleChange('siteActivationDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
 
@@ -840,23 +839,19 @@ export default function NewStudyPage() {
               Dates du centre
             </Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
+              <DateField
                 label="Date de mise en place *"
-                type="date"
                 value={formData.setupDate}
                 onChange={handleChange('setupDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 inputProps={{ max: new Date().toISOString().slice(0, 10) }}
                 required
                 sx={{ flex: 1 }}
               />
 
-              <TextField
+              <DateField
                 label="Date de fermeture du centre"
-                type="date"
                 value={formData.siteCenterClosureDate}
                 onChange={handleChange('siteCenterClosureDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
             </Box>
@@ -865,30 +860,24 @@ export default function NewStudyPage() {
               Recrutement
             </Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
+              <DateField
                 label="Debut du recrutement"
-                type="date"
                 value={formData.recruitmentStartDate}
                 onChange={handleChange('recruitmentStartDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
 
-              <TextField
+              <DateField
                 label="Suspension du recrutement"
-                type="date"
                 value={formData.recruitmentSuspensionDate}
                 onChange={handleChange('recruitmentSuspensionDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
 
-              <TextField
+              <DateField
                 label="Fin du recrutement"
-                type="date"
                 value={formData.recruitmentEndDate}
                 onChange={handleChange('recruitmentEndDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
             </Box>
@@ -979,12 +968,10 @@ export default function NewStudyPage() {
                 sx={{ flex: 1 }}
               />
 
-              <TextField
+              <DateField
                 label="Date de la version"
-                type="date"
                 value={formData.protocolVersionDate}
                 onChange={handleChange('protocolVersionDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
             </Box>
@@ -998,42 +985,34 @@ export default function NewStudyPage() {
                 sx={{ flex: 1 }}
               />
 
-              <TextField
+              <DateField
                 label="Date de la version du manuel"
-                type="date"
                 value={formData.pharmacyManualVersionDate}
                 onChange={handleChange('pharmacyManualVersionDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
             </Box>
 
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
+              <DateField
                 label="Date d'approbation CPP"
-                type="date"
                 value={formData.ethicsApprovalDate}
                 onChange={handleChange('ethicsApprovalDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
 
-              <TextField
+              <DateField
                 label="Date d'approbation ANSM"
-                type="date"
                 value={formData.ansmApprovalDate}
                 onChange={handleChange('ansmApprovalDate')}
-                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
             </Box>
 
-            <TextField
+            <DateField
               label="Date approbation EU-CTR"
-              type="date"
               value={formData.euCtrApprovalReference}
               onChange={handleChange('euCtrApprovalReference')}
-              slotProps={{ inputLabel: { shrink: true } }}
             />
 
             <TextField
@@ -1061,12 +1040,10 @@ export default function NewStudyPage() {
                   onChange={(e) => updateAmendment(index, 'version', e.target.value)}
                   sx={{ flex: 1 }}
                 />
-                <TextField
+                <DateField
                   label="Date"
-                  type="date"
                   value={amendment.date}
                   onChange={(e) => updateAmendment(index, 'date', e.target.value)}
-                  slotProps={{ inputLabel: { shrink: true } }}
                   sx={{ flex: 1 }}
                 />
                 <IconButton onClick={() => removeAmendment(index)} color="error">

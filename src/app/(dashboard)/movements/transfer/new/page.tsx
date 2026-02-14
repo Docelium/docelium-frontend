@@ -16,6 +16,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
+import DateField from '@/components/DateField';
 
 interface Study {
   id: string;
@@ -236,14 +237,12 @@ export default function TransferPage() {
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
-                <TextField
+                <DateField
                   fullWidth
                   label="Date du transfert"
-                  type="date"
                   value={formData.movementDate}
                   onChange={handleChange('movementDate')}
                   required
-                  slotProps={{ inputLabel: { shrink: true } }}
                 />
               </Grid>
               <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
