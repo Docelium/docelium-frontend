@@ -186,7 +186,6 @@ interface FormData {
   protocolRequiredEquipments: string[];
 
   // BLOC N - Site Overrides
-  requiresLocalQuarantineStep: boolean;
   requiresExtraReceptionFields: string[];
   localProcedureReferences: LocalProcedure[];
 
@@ -280,7 +279,6 @@ const testFormData: FormData = {
   protocolRequiredEquipments: ['Balance calibree', 'Thermometre', 'Conteneur isotherme'],
 
   // BLOC N - Site Overrides
-  requiresLocalQuarantineStep: true,
   requiresExtraReceptionFields: ['Conditionnement secondaire', 'Numero colis'],
   localProcedureReferences: [
     { name: 'Procedure de reception', reference: 'PUI-ONC-2024-01' },
@@ -364,7 +362,6 @@ const initialFormData: FormData = {
   protocolRequiredEquipments: [],
 
   // BLOC N
-  requiresLocalQuarantineStep: false,
   requiresExtraReceptionFields: [],
   localProcedureReferences: [],
 
@@ -662,7 +659,6 @@ export default function NewStudyPage() {
 
         // BLOC N
         siteOverrides: {
-          requires_local_quarantine_step: formData.requiresLocalQuarantineStep,
           requires_extra_reception_fields: formData.requiresExtraReceptionFields,
           local_procedure_references: formData.localProcedureReferences,
         },
@@ -1481,16 +1477,6 @@ export default function NewStudyPage() {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Personnalisations specifiques au centre/PUI.
             </Typography>
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.requiresLocalQuarantineStep}
-                  onChange={handleSwitchChange('requiresLocalQuarantineStep')}
-                />
-              }
-              label="Etape quarantaine locale requise"
-            />
 
             <Typography variant="subtitle2">Champs supplementaires reception</Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>

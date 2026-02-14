@@ -187,7 +187,6 @@ interface FormData {
   protocolRequiredEquipments: string[];
 
   // BLOC N - Site Overrides
-  requiresLocalQuarantineStep: boolean;
   requiresExtraReceptionFields: string[];
   localProcedureReferences: LocalProcedure[];
 
@@ -251,7 +250,6 @@ const initialFormData: FormData = {
   iwrsIntegrationMode: 'MANUAL',
   iwrsEndpoint: '',
   protocolRequiredEquipments: [],
-  requiresLocalQuarantineStep: false,
   requiresExtraReceptionFields: [],
   localProcedureReferences: [],
   startDate: '',
@@ -342,7 +340,6 @@ export default function EditStudyPage() {
           iwrsIntegrationMode: study.iwrsGovernance?.iwrs_integration_mode || 'MANUAL',
           iwrsEndpoint: study.iwrsGovernance?.iwrs_endpoint || '',
           protocolRequiredEquipments: study.protocolRequiredEquipments || [],
-          requiresLocalQuarantineStep: study.siteOverrides?.requires_local_quarantine_step ?? false,
           requiresExtraReceptionFields: study.siteOverrides?.requires_extra_reception_fields || [],
           localProcedureReferences: study.siteOverrides?.local_procedure_references || [],
           startDate: formatDateForInput(study.startDate),
@@ -628,7 +625,6 @@ export default function EditStudyPage() {
 
         // BLOC N
         siteOverrides: {
-          requires_local_quarantine_step: formData.requiresLocalQuarantineStep,
           requires_extra_reception_fields: formData.requiresExtraReceptionFields,
           local_procedure_references: formData.localProcedureReferences,
         },
@@ -1458,16 +1454,6 @@ export default function EditStudyPage() {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Personnalisations specifiques au centre/PUI.
             </Typography>
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.requiresLocalQuarantineStep}
-                  onChange={handleSwitchChange('requiresLocalQuarantineStep')}
-                />
-              }
-              label="Etape quarantaine locale requise"
-            />
 
             <Typography variant="subtitle2">Champs supplementaires reception</Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
