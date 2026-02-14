@@ -55,6 +55,30 @@ const blindingLabels: Record<BlindingType, string> = {
   TRIPLE: 'Triple aveugle',
 };
 
+function isPast(date: Date | null): boolean {
+  if (!date) return false;
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  return new Date(date) <= today;
+}
+
+function getSiteLifecycleTag(closureDate: Date | null, setupDate: Date | null): { label: string; color: 'default' | 'warning' } | null {
+  if (isPast(closureDate)) return { label: 'Archive', color: 'default' };
+  if (isPast(setupDate)) return { label: 'En attente', color: 'warning' };
+  return null;
+}
+
+function getRecruitmentTag(
+  endDate: Date | null,
+  suspensionDate: Date | null,
+  startDate: Date | null
+): { label: string; color: 'default' | 'success' | 'warning' } | null {
+  if (isPast(endDate)) return { label: 'Recrutement termine', color: 'default' };
+  if (isPast(suspensionDate)) return { label: 'Recrutement suspendu', color: 'warning' };
+  if (isPast(startDate)) return { label: 'Recrutement en cours', color: 'success' };
+  return null;
+}
+
 function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Date | string | null): StudyStatus {
   if (protocolStatus === 'DRAFT' && siteActivationDate) {
     const today = new Date();
@@ -108,11 +132,29 @@ export default async function StudiesPage() {
                     <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
                       {study.codeInternal}
                     </Typography>
-                    <Chip
-                      label={statusLabels[getEffectiveStatus(study.protocolStatus, study.siteActivationDate)]}
-                      color={statusColors[getEffectiveStatus(study.protocolStatus, study.siteActivationDate)]}
-                      size="small"
-                    />
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <Chip
+                        label={statusLabels[getEffectiveStatus(study.protocolStatus, study.siteActivationDate)]}
+                        color={statusColors[getEffectiveStatus(study.protocolStatus, study.siteActivationDate)]}
+                        size="small"
+                      />
+                      {getSiteLifecycleTag(study.siteCenterClosureDate, study.setupDate) && (
+                        <Chip
+                          label={getSiteLifecycleTag(study.siteCenterClosureDate, study.setupDate)!.label}
+                          color={getSiteLifecycleTag(study.siteCenterClosureDate, study.setupDate)!.color}
+                          variant="outlined"
+                          size="small"
+                        />
+                      )}
+                      {getRecruitmentTag(study.recruitmentEndDate, study.recruitmentSuspensionDate, study.recruitmentStartDate) && (
+                        <Chip
+                          label={getRecruitmentTag(study.recruitmentEndDate, study.recruitmentSuspensionDate, study.recruitmentStartDate)!.label}
+                          color={getRecruitmentTag(study.recruitmentEndDate, study.recruitmentSuspensionDate, study.recruitmentStartDate)!.color}
+                          variant="outlined"
+                          size="small"
+                        />
+                      )}
+                    </Box>
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     {study.title}

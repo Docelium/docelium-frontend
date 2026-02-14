@@ -42,6 +42,11 @@ export const blocASchema = z.object({
   phases: z.array(z.enum(StudyPhaseValues)).min(1, 'Au moins une phase est requise'),
   therapeuticArea: z.string().nullable().optional(),
   siteActivationDate: z.coerce.date().nullable().optional(),
+  setupDate: z.coerce.date().nullable().optional(),
+  siteCenterClosureDate: z.coerce.date().nullable().optional(),
+  recruitmentStartDate: z.coerce.date().nullable().optional(),
+  recruitmentSuspensionDate: z.coerce.date().nullable().optional(),
+  recruitmentEndDate: z.coerce.date().nullable().optional(),
   expectedRecruitment: z.number().int().positive().nullable().optional(),
 });
 

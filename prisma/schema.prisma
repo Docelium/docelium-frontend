@@ -339,7 +339,12 @@ model Study {
   sponsor              String
   phases               StudyPhase[]
   therapeuticArea      String?         @map("therapeutic_area")
-  siteActivationDate   DateTime?       @map("site_activation_date")
+  siteActivationDate           DateTime?       @map("site_activation_date")
+  setupDate                    DateTime?       @map("setup_date")
+  siteCenterClosureDate        DateTime?       @map("site_center_closure_date")
+  recruitmentStartDate         DateTime?       @map("recruitment_start_date")
+  recruitmentSuspensionDate    DateTime?       @map("recruitment_suspension_date")
+  recruitmentEndDate           DateTime?       @map("recruitment_end_date")
   expectedRecruitment  Int?            @map("expected_recruitment")
 
   // === BLOC B : Contacts (JSON array) ===

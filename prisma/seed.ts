@@ -110,6 +110,8 @@ async function main() {
       phases: [StudyPhase.III],
       therapeuticArea: 'ONCOLOGY',
       siteActivationDate: new Date('2025-01-15'),
+      setupDate: new Date('2024-12-01'),
+      recruitmentStartDate: new Date('2025-02-01'),
       expectedRecruitment: 150,
 
       // === BLOC B : Contacts ===

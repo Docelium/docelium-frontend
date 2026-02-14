@@ -131,6 +131,11 @@ interface FormData {
   phases: string[];
   therapeuticArea: string;
   siteActivationDate: string;
+  setupDate: string;
+  siteCenterClosureDate: string;
+  recruitmentStartDate: string;
+  recruitmentSuspensionDate: string;
+  recruitmentEndDate: string;
   expectedRecruitment: string;
 
   // BLOC B - Contacts
@@ -205,6 +210,11 @@ const initialFormData: FormData = {
   phases: [],
   therapeuticArea: '',
   siteActivationDate: '',
+  setupDate: '',
+  siteCenterClosureDate: '',
+  recruitmentStartDate: '',
+  recruitmentSuspensionDate: '',
+  recruitmentEndDate: '',
   expectedRecruitment: '',
   contacts: [],
   protocolVersion: '',
@@ -290,6 +300,11 @@ export default function EditStudyPage() {
           phases: study.phases || (study.phase ? [study.phase] : []),
           therapeuticArea: study.therapeuticArea || '',
           siteActivationDate: formatDateForInput(study.siteActivationDate),
+          setupDate: formatDateForInput(study.setupDate),
+          siteCenterClosureDate: formatDateForInput(study.siteCenterClosureDate),
+          recruitmentStartDate: formatDateForInput(study.recruitmentStartDate),
+          recruitmentSuspensionDate: formatDateForInput(study.recruitmentSuspensionDate),
+          recruitmentEndDate: formatDateForInput(study.recruitmentEndDate),
           expectedRecruitment: study.expectedRecruitment?.toString() || '',
           contacts: study.contacts || [],
           protocolVersion: study.protocolVersion || '',
@@ -541,6 +556,11 @@ export default function EditStudyPage() {
         phases: formData.phases,
         therapeuticArea: formData.therapeuticArea || null,
         siteActivationDate: formData.siteActivationDate ? new Date(formData.siteActivationDate) : null,
+        setupDate: formData.setupDate ? new Date(formData.setupDate) : null,
+        siteCenterClosureDate: formData.siteCenterClosureDate ? new Date(formData.siteCenterClosureDate) : null,
+        recruitmentStartDate: formData.recruitmentStartDate ? new Date(formData.recruitmentStartDate) : null,
+        recruitmentSuspensionDate: formData.recruitmentSuspensionDate ? new Date(formData.recruitmentSuspensionDate) : null,
+        recruitmentEndDate: formData.recruitmentEndDate ? new Date(formData.recruitmentEndDate) : null,
         expectedRecruitment: formData.expectedRecruitment ? parseInt(formData.expectedRecruitment) : null,
 
         // BLOC B
@@ -763,6 +783,63 @@ export default function EditStudyPage() {
                 value={formData.expectedRecruitment}
                 onChange={handleChange('expectedRecruitment')}
                 helperText="Nombre de patients"
+                sx={{ flex: 1 }}
+              />
+            </Box>
+
+            <Typography variant="subtitle2" sx={{ mt: 2 }}>
+              Dates du centre
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Date de mise en place *"
+                type="date"
+                value={formData.setupDate}
+                onChange={handleChange('setupDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                inputProps={{ max: new Date().toISOString().slice(0, 10) }}
+                required
+                sx={{ flex: 1 }}
+              />
+
+              <TextField
+                label="Date de fermeture du centre"
+                type="date"
+                value={formData.siteCenterClosureDate}
+                onChange={handleChange('siteCenterClosureDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ flex: 1 }}
+              />
+            </Box>
+
+            <Typography variant="subtitle2" sx={{ mt: 2 }}>
+              Recrutement
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Debut du recrutement"
+                type="date"
+                value={formData.recruitmentStartDate}
+                onChange={handleChange('recruitmentStartDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ flex: 1 }}
+              />
+
+              <TextField
+                label="Suspension du recrutement"
+                type="date"
+                value={formData.recruitmentSuspensionDate}
+                onChange={handleChange('recruitmentSuspensionDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ flex: 1 }}
+              />
+
+              <TextField
+                label="Fin du recrutement"
+                type="date"
+                value={formData.recruitmentEndDate}
+                onChange={handleChange('recruitmentEndDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
                 sx={{ flex: 1 }}
               />
             </Box>
@@ -1459,8 +1536,8 @@ export default function EditStudyPage() {
 
   const isStepValid = () => {
     switch (activeStep) {
-      case 0: // BLOC A - obligatoire: codeInternal, acronym, siteNumber, title, sponsor, phases
-        return formData.codeInternal && formData.studyCode && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0;
+      case 0: // BLOC A - obligatoire: codeInternal, acronym, siteNumber, title, sponsor, phases, setupDate
+        return formData.codeInternal && formData.studyCode && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0 && formData.setupDate;
       default:
         return true;
     }

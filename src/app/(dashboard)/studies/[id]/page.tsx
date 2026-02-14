@@ -77,6 +77,30 @@ const blindingLabels: Record<BlindingType, string> = {
   TRIPLE: 'Triple aveugle',
 };
 
+function isPast(date: Date | null): boolean {
+  if (!date) return false;
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  return new Date(date) <= today;
+}
+
+function getSiteLifecycleTag(closureDate: Date | null, setupDate: Date | null): { label: string; color: 'default' | 'warning' } | null {
+  if (isPast(closureDate)) return { label: 'Archive', color: 'default' };
+  if (isPast(setupDate)) return { label: 'En attente', color: 'warning' };
+  return null;
+}
+
+function getRecruitmentTag(
+  endDate: Date | null,
+  suspensionDate: Date | null,
+  startDate: Date | null
+): { label: string; color: 'default' | 'success' | 'warning' | 'info' } | null {
+  if (isPast(endDate)) return { label: 'Recrutement termine', color: 'default' };
+  if (isPast(suspensionDate)) return { label: 'Recrutement suspendu', color: 'warning' };
+  if (isPast(startDate)) return { label: 'Recrutement en cours', color: 'success' };
+  return null;
+}
+
 interface Props {
   params: Promise<{ id: string }>;
 }
@@ -93,6 +117,8 @@ export default async function StudyDetailPage({ params }: Props) {
 
   const effectiveStatus = getEffectiveStatus(study.protocolStatus, study.siteActivationDate);
   const canEdit = ['ADMIN', 'PHARMACIEN'].includes(session.user.role) && effectiveStatus !== 'ARCHIVED';
+  const siteTag = getSiteLifecycleTag(study.siteCenterClosureDate, study.setupDate);
+  const recruitmentTag = getRecruitmentTag(study.recruitmentEndDate, study.recruitmentSuspensionDate, study.recruitmentStartDate);
 
   return (
     <Box>
@@ -150,12 +176,28 @@ export default async function StudyDetailPage({ params }: Props) {
                   <Typography variant="caption" color="text.secondary">
                     Statut
                   </Typography>
-                  <Box sx={{ mt: 0.5 }}>
+                  <Box sx={{ mt: 0.5, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                     <Chip
                       label={statusLabels[effectiveStatus]}
                       color={statusColors[effectiveStatus]}
                       size="small"
                     />
+                    {siteTag && (
+                      <Chip
+                        label={siteTag.label}
+                        color={siteTag.color}
+                        variant="outlined"
+                        size="small"
+                      />
+                    )}
+                    {recruitmentTag && (
+                      <Chip
+                        label={recruitmentTag.label}
+                        color={recruitmentTag.color}
+                        variant="outlined"
+                        size="small"
+                      />
+                    )}
                   </Box>
                 </Grid>
                 <Grid size={{ xs: 6, md: 3 }}>
@@ -225,6 +267,26 @@ export default async function StudyDetailPage({ params }: Props) {
               <Grid container spacing={2}>
                 <Grid size={{ xs: 6, md: 4 }}>
                   <Typography variant="caption" color="text.secondary">
+                    Date de mise en place
+                  </Typography>
+                  <Typography variant="body2">
+                    {study.setupDate
+                      ? new Date(study.setupDate).toLocaleDateString('fr-FR')
+                      : 'Non definie'}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Date de fermeture du centre
+                  </Typography>
+                  <Typography variant="body2">
+                    {study.siteCenterClosureDate
+                      ? new Date(study.siteCenterClosureDate).toLocaleDateString('fr-FR')
+                      : '-'}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
                     Date de debut
                   </Typography>
                   <Typography variant="body2">
@@ -250,6 +312,42 @@ export default async function StudyDetailPage({ params }: Props) {
                   <Typography variant="body2">
                     {study.actualEndDate
                       ? new Date(study.actualEndDate).toLocaleDateString('fr-FR')
+                      : '-'}
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
+                Recrutement
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Debut du recrutement
+                  </Typography>
+                  <Typography variant="body2">
+                    {study.recruitmentStartDate
+                      ? new Date(study.recruitmentStartDate).toLocaleDateString('fr-FR')
+                      : '-'}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Suspension du recrutement
+                  </Typography>
+                  <Typography variant="body2">
+                    {study.recruitmentSuspensionDate
+                      ? new Date(study.recruitmentSuspensionDate).toLocaleDateString('fr-FR')
+                      : '-'}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Fin du recrutement
+                  </Typography>
+                  <Typography variant="body2">
+                    {study.recruitmentEndDate
+                      ? new Date(study.recruitmentEndDate).toLocaleDateString('fr-FR')
                       : '-'}
                   </Typography>
                 </Grid>

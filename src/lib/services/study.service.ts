@@ -103,6 +103,11 @@ export interface CreateStudyInput {
   phases: string[];
   therapeuticArea?: string | null;
   siteActivationDate?: Date | null;
+  setupDate?: Date | null;
+  siteCenterClosureDate?: Date | null;
+  recruitmentStartDate?: Date | null;
+  recruitmentSuspensionDate?: Date | null;
+  recruitmentEndDate?: Date | null;
   expectedRecruitment?: number | null;
 
   // Bloc B - Contacts
@@ -219,6 +224,11 @@ export async function createStudy(data: CreateStudyInput) {
         phases: data.phases as never,
         therapeuticArea: data.therapeuticArea,
         siteActivationDate: data.siteActivationDate,
+        setupDate: data.setupDate,
+        siteCenterClosureDate: data.siteCenterClosureDate,
+        recruitmentStartDate: data.recruitmentStartDate,
+        recruitmentSuspensionDate: data.recruitmentSuspensionDate,
+        recruitmentEndDate: data.recruitmentEndDate,
         expectedRecruitment: data.expectedRecruitment,
         protocolStatus: 'DRAFT',
 
@@ -332,6 +342,11 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.phases !== undefined && { phases: data.phases as never }),
       ...(data.therapeuticArea !== undefined && { therapeuticArea: data.therapeuticArea }),
       ...(data.siteActivationDate !== undefined && { siteActivationDate: data.siteActivationDate }),
+      ...(data.setupDate !== undefined && { setupDate: data.setupDate }),
+      ...(data.siteCenterClosureDate !== undefined && { siteCenterClosureDate: data.siteCenterClosureDate }),
+      ...(data.recruitmentStartDate !== undefined && { recruitmentStartDate: data.recruitmentStartDate }),
+      ...(data.recruitmentSuspensionDate !== undefined && { recruitmentSuspensionDate: data.recruitmentSuspensionDate }),
+      ...(data.recruitmentEndDate !== undefined && { recruitmentEndDate: data.recruitmentEndDate }),
       ...(data.expectedRecruitment !== undefined && { expectedRecruitment: data.expectedRecruitment }),
       ...(data.contacts !== undefined && { contacts: jsonValue(data.contacts) }),
       ...(data.protocolVersion !== undefined && { protocolVersion: data.protocolVersion }),
@@ -373,7 +388,8 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
 
     const trackableFields = [
       'codeInternal', 'studyCode', 'acronym', 'siteNumber', 'euCtNumber', 'nctNumber', 'title', 'sponsor', 'phase',
-      'therapeuticArea', 'siteActivationDate', 'expectedRecruitment',
+      'therapeuticArea', 'siteActivationDate', 'setupDate', 'siteCenterClosureDate',
+      'recruitmentStartDate', 'recruitmentSuspensionDate', 'recruitmentEndDate', 'expectedRecruitment',
       'contacts', 'protocolVersion', 'protocolVersionDate', 'amendments', 'pharmacyManualVersion', 'pharmacyManualVersionDate',
       'euCtrApprovalReference', 'ethicsApprovalReference', 'insuranceReference', 'eudamedId',
       'blinded', 'arms', 'cohorts', 'destructionPolicy', 'destructionPolicyDetails', 'returnPolicy',
