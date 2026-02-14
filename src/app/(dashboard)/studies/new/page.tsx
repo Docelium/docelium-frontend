@@ -392,6 +392,8 @@ export default function NewStudyPage() {
 
   // Temporaire pour les champs texte
   const [newArm, setNewArm] = useState('');
+  const [editingArmIndex, setEditingArmIndex] = useState<number | null>(null);
+  const [editingArmValue, setEditingArmValue] = useState('');
   const [newCohort, setNewCohort] = useState('');
   const [newEquipment, setNewEquipment] = useState('');
   const [newExtraField, setNewExtraField] = useState('');
@@ -475,6 +477,27 @@ export default function NewStudyPage() {
 
   const removeArm = (index: number) => {
     setFormData((prev) => ({ ...prev, arms: prev.arms.filter((_, i) => i !== index) }));
+  };
+
+  const startEditArm = (index: number) => {
+    setEditingArmIndex(index);
+    setEditingArmValue(formData.arms[index] ?? '');
+  };
+
+  const saveEditArm = () => {
+    if (editingArmIndex !== null && editingArmValue.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        arms: prev.arms.map((arm, i) => (i === editingArmIndex ? editingArmValue.trim() : arm)),
+      }));
+    }
+    setEditingArmIndex(null);
+    setEditingArmValue('');
+  };
+
+  const cancelEditArm = () => {
+    setEditingArmIndex(null);
+    setEditingArmValue('');
   };
 
   // Gestion des cohortes (BLOC D)
@@ -1091,9 +1114,25 @@ export default function NewStudyPage() {
 
             <Typography variant="subtitle2">Bras de traitement</Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
-              {formData.arms.map((arm, index) => (
-                <Chip key={index} label={arm} onDelete={() => removeArm(index)} />
-              ))}
+              {formData.arms.map((arm, index) =>
+                editingArmIndex === index ? (
+                  <TextField
+                    key={index}
+                    size="small"
+                    value={editingArmValue}
+                    onChange={(e) => setEditingArmValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') { e.preventDefault(); saveEditArm(); }
+                      if (e.key === 'Escape') cancelEditArm();
+                    }}
+                    onBlur={saveEditArm}
+                    autoFocus
+                    sx={{ width: 180 }}
+                  />
+                ) : (
+                  <Chip key={index} label={arm} onClick={() => startEditArm(index)} onDelete={() => removeArm(index)} />
+                )
+              )}
             </Box>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <TextField
