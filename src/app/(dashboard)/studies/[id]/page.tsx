@@ -18,6 +18,7 @@ import LinkButton from '@/components/ui/LinkButton';
 import AuditTrail from '@/components/features/AuditTrail';
 import DownloadPdfButton from '@/components/features/DownloadPdfButton';
 import DuplicateStudyButton from '@/components/features/DuplicateStudyButton';
+import DeleteStudyButton from '@/components/features/DeleteStudyButton';
 import { statusLabels, phaseLabels, destructionPolicyLabels, blindingLabels } from '@/lib/labels';
 
 function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Date | string | null): StudyStatus {
@@ -122,8 +123,11 @@ export default async function StudyDetailPage({ params }: Props) {
           )}
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
+          {['ADMIN', 'PHARMACIEN'].includes(session.user.role) && study._count.medications === 0 && study._count.movements === 0 && (
+            <DeleteStudyButton studyId={study.id} codeInternal={study.codeInternal} />
+          )}
           {['ADMIN', 'PHARMACIEN'].includes(session.user.role) && (
-            <DuplicateStudyButton studyId={study.id} codeInternal={study.codeInternal} variant="detail" />
+            <DuplicateStudyButton studyId={study.id} codeInternal={study.codeInternal} />
           )}
           <DownloadPdfButton studyId={study.id} codeInternal={study.codeInternal} />
           {canEdit && (

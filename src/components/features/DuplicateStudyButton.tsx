@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -15,10 +17,10 @@ import { useToast } from '@/contexts/ToastContext';
 interface DuplicateStudyButtonProps {
   studyId: string;
   codeInternal: string;
-  variant?: 'detail' | 'list';
+  iconOnly?: boolean;
 }
 
-export default function DuplicateStudyButton({ studyId, codeInternal, variant = 'detail' }: DuplicateStudyButtonProps) {
+export default function DuplicateStudyButton({ studyId, codeInternal, iconOnly = false }: DuplicateStudyButtonProps) {
   const [open, setOpen] = useState(false);
   const [newCode, setNewCode] = useState(`${codeInternal}_COPIE`);
   const [loading, setLoading] = useState(false);
@@ -67,14 +69,21 @@ export default function DuplicateStudyButton({ studyId, codeInternal, variant = 
 
   return (
     <>
-      <Button
-        variant={variant === 'list' ? 'text' : 'outlined'}
-        size={variant === 'list' ? 'small' : 'medium'}
-        startIcon={<ContentCopyIcon />}
-        onClick={handleOpen}
-      >
-        Dupliquer
-      </Button>
+      {iconOnly ? (
+        <Tooltip title="Dupliquer">
+          <IconButton size="small" onClick={handleOpen}>
+            <ContentCopyIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Button
+          variant="outlined"
+          startIcon={<ContentCopyIcon />}
+          onClick={handleOpen}
+        >
+          Dupliquer
+        </Button>
+      )}
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Dupliquer le protocole</DialogTitle>

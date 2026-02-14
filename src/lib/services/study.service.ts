@@ -502,27 +502,22 @@ export async function updateStudyStatus(id: string, status: StudyStatus, userId?
 export async function deleteStudy(id: string) {
   const study = await prisma.study.findUnique({
     where: { id },
-    include: { _count: { select: { movements: true } } },
+    include: { _count: { select: { movements: true, medications: true } } },
   });
 
   if (!study) {
     throw new Error('Not found');
   }
 
-  // Can only delete DRAFT studies with no movements
-  if (study.protocolStatus !== 'DRAFT') {
-    throw new Error('Seuls les protocoles en brouillon peuvent etre supprimes');
+  if (study._count.medications > 0) {
+    throw new Error('Impossible de supprimer un protocole avec des medicaments lies');
   }
 
   if (study._count.movements > 0) {
-    throw new Error('Impossible de supprimer un protocole avec des mouvements');
+    throw new Error('Impossible de supprimer un protocole avec des receptions ou dispensations');
   }
 
-  // Soft delete
-  return prisma.study.update({
-    where: { id },
-    data: { isActive: false },
-  });
+  return prisma.study.delete({ where: { id } });
 }
 
 export async function duplicateStudy(

@@ -78,7 +78,7 @@ export const PERMISSIONS = {
   STUDY_CREATE: ['ADMIN', 'PHARMACIEN'] as UserRole[],
   STUDY_READ: ['ADMIN', 'PHARMACIEN', 'TECHNICIEN', 'ARC', 'AUDITOR'] as UserRole[],
   STUDY_UPDATE: ['ADMIN', 'PHARMACIEN'] as UserRole[],
-  STUDY_DELETE: ['ADMIN'] as UserRole[],
+  STUDY_DELETE: ['ADMIN', 'PHARMACIEN'] as UserRole[],
   STUDY_ACTIVATE: ['ADMIN', 'PHARMACIEN'] as UserRole[],
   STUDY_ARCHIVE: ['ADMIN'] as UserRole[],
 

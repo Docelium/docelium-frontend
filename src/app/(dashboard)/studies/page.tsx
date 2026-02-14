@@ -6,12 +6,17 @@ import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
 import AddIcon from '@mui/icons-material/Add';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
 import { StudyStatus, StudyPhase } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
 import DuplicateStudyButton from '@/components/features/DuplicateStudyButton';
+import DeleteStudyButton from '@/components/features/DeleteStudyButton';
 import { statusLabels, phaseLabels, blindingLabels } from '@/lib/labels';
 
 const statusColors: Record<StudyStatus, 'default' | 'primary' | 'warning' | 'error' | 'info' | 'success'> = {
@@ -149,12 +154,24 @@ export default async function StudiesPage() {
                     </Typography>
                   </Box>
                 </CardContent>
-                <CardActions sx={{ justifyContent: 'space-between' }}>
-                  <LinkButton href={`/studies/${study.id}`} size="small">
-                    Voir details
-                  </LinkButton>
+                <CardActions sx={{ justifyContent: 'flex-end' }}>
+                  <Tooltip title="Voir details">
+                    <IconButton size="small" href={`/studies/${study.id}`} component="a">
+                      <VisibilityIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                   {['ADMIN', 'PHARMACIEN'].includes(session.user.role) && (
-                    <DuplicateStudyButton studyId={study.id} codeInternal={study.codeInternal} variant="list" />
+                    <Tooltip title="Modifier">
+                      <IconButton size="small" href={`/studies/${study.id}/edit`} component="a">
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {['ADMIN', 'PHARMACIEN'].includes(session.user.role) && (
+                    <DuplicateStudyButton studyId={study.id} codeInternal={study.codeInternal} iconOnly />
+                  )}
+                  {['ADMIN', 'PHARMACIEN'].includes(session.user.role) && study._count.medications === 0 && study._count.movements === 0 && (
+                    <DeleteStudyButton studyId={study.id} codeInternal={study.codeInternal} iconOnly />
                   )}
                 </CardActions>
               </Card>
