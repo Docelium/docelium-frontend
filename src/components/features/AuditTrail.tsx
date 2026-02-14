@@ -71,7 +71,7 @@ const fieldLabels: Record<string, string> = {
   recruitmentStartDate: 'Debut du recrutement',
   recruitmentSuspensionDate: 'Suspension du recrutement',
   recruitmentEndDate: 'Fin du recrutement',
-  expectedRecruitment: 'Recrutement attendu',
+  expectedRecruitment: 'Recrutement attendu sur centre',
   contacts: 'Contacts',
   protocolVersion: 'Version du protocole',
   protocolVersionDate: 'Date de la version',

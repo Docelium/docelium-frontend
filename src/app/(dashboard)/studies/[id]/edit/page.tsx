@@ -804,7 +804,7 @@ export default function EditStudyPage() {
               />
 
               <TextField
-                label="Recrutement attendu"
+                label="Recrutement attendu sur centre"
                 type="number"
                 value={formData.expectedRecruitment}
                 onChange={handleChange('expectedRecruitment')}

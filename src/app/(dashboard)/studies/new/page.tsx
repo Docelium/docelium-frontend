@@ -842,7 +842,7 @@ export default function NewStudyPage() {
               />
 
               <TextField
-                label="Recrutement attendu"
+                label="Recrutement attendu sur centre"
                 type="number"
                 value={formData.expectedRecruitment}
                 onChange={handleChange('expectedRecruitment')}
