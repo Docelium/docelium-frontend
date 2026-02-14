@@ -130,7 +130,8 @@ async function main() {
         { version: 'Amendment 2', date: '2025-05-20' },
       ],
       euCtrApprovalReference: new Date('2025-01-05'),
-      ethicsApprovalReference: 'CPP-2025-A00123',
+      ethicsApprovalDate: new Date('2025-01-08'),
+      ansmApprovalDate: new Date('2025-01-03'),
       insuranceReference: 'ASSUR-2025-56789',
 
       // === BLOC D : Parametres operationnels ===

@@ -125,7 +125,8 @@ export interface CreateStudyInput {
   pharmacyManualVersion?: string | null;
   pharmacyManualVersionDate?: Date | null;
   euCtrApprovalReference?: Date | null;
-  ethicsApprovalReference?: string | null;
+  ethicsApprovalDate?: Date | null;
+  ansmApprovalDate?: Date | null;
   insuranceReference?: string | null;
   eudamedId?: string | null;
 
@@ -242,7 +243,8 @@ export async function createStudy(data: CreateStudyInput) {
         pharmacyManualVersion: data.pharmacyManualVersion,
         pharmacyManualVersionDate: data.pharmacyManualVersionDate,
         euCtrApprovalReference: data.euCtrApprovalReference,
-        ethicsApprovalReference: data.ethicsApprovalReference,
+        ethicsApprovalDate: data.ethicsApprovalDate,
+        ansmApprovalDate: data.ansmApprovalDate,
         insuranceReference: data.insuranceReference,
         eudamedId: data.eudamedId,
 
@@ -355,7 +357,8 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.pharmacyManualVersion !== undefined && { pharmacyManualVersion: data.pharmacyManualVersion }),
       ...(data.pharmacyManualVersionDate !== undefined && { pharmacyManualVersionDate: data.pharmacyManualVersionDate }),
       ...(data.euCtrApprovalReference !== undefined && { euCtrApprovalReference: data.euCtrApprovalReference }),
-      ...(data.ethicsApprovalReference !== undefined && { ethicsApprovalReference: data.ethicsApprovalReference }),
+      ...(data.ethicsApprovalDate !== undefined && { ethicsApprovalDate: data.ethicsApprovalDate }),
+      ...(data.ansmApprovalDate !== undefined && { ansmApprovalDate: data.ansmApprovalDate }),
       ...(data.insuranceReference !== undefined && { insuranceReference: data.insuranceReference }),
       ...(data.eudamedId !== undefined && { eudamedId: data.eudamedId }),
       ...(data.blinded !== undefined && { blinded: data.blinded as never }),
@@ -391,7 +394,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       'therapeuticArea', 'siteActivationDate', 'setupDate', 'siteCenterClosureDate',
       'recruitmentStartDate', 'recruitmentSuspensionDate', 'recruitmentEndDate', 'expectedRecruitment',
       'contacts', 'protocolVersion', 'protocolVersionDate', 'amendments', 'pharmacyManualVersion', 'pharmacyManualVersionDate',
-      'euCtrApprovalReference', 'ethicsApprovalReference', 'insuranceReference', 'eudamedId',
+      'euCtrApprovalReference', 'ethicsApprovalDate', 'ansmApprovalDate', 'insuranceReference', 'eudamedId',
       'blinded', 'arms', 'cohorts', 'destructionPolicy', 'destructionPolicyDetails', 'returnPolicy',
       'hasIrtSystem', 'irtSystemName',
       'visitSchedule', 'treatmentCycles', 'patientConstraints',

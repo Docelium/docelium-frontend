@@ -148,7 +148,8 @@ interface FormData {
   pharmacyManualVersion: string;
   pharmacyManualVersionDate: string;
   euCtrApprovalReference: string;
-  ethicsApprovalReference: string;
+  ethicsApprovalDate: string;
+  ansmApprovalDate: string;
   insuranceReference: string;
   eudamedId: string;
 
@@ -223,7 +224,8 @@ const initialFormData: FormData = {
   pharmacyManualVersion: '',
   pharmacyManualVersionDate: '',
   euCtrApprovalReference: '',
-  ethicsApprovalReference: '',
+  ethicsApprovalDate: '',
+  ansmApprovalDate: '',
   insuranceReference: '',
   eudamedId: '',
   blinded: 'NONE',
@@ -313,7 +315,8 @@ export default function EditStudyPage() {
           pharmacyManualVersion: study.pharmacyManualVersion || '',
           pharmacyManualVersionDate: formatDateForInput(study.pharmacyManualVersionDate),
           euCtrApprovalReference: formatDateForInput(study.euCtrApprovalReference),
-          ethicsApprovalReference: study.ethicsApprovalReference || '',
+          ethicsApprovalDate: formatDateForInput(study.ethicsApprovalDate),
+          ansmApprovalDate: formatDateForInput(study.ansmApprovalDate),
           insuranceReference: study.insuranceReference || '',
           eudamedId: study.eudamedId || '',
           blinded: study.blinded || 'NONE',
@@ -573,7 +576,8 @@ export default function EditStudyPage() {
         pharmacyManualVersion: formData.pharmacyManualVersion || null,
         pharmacyManualVersionDate: formData.pharmacyManualVersionDate ? new Date(formData.pharmacyManualVersionDate) : null,
         euCtrApprovalReference: formData.euCtrApprovalReference ? new Date(formData.euCtrApprovalReference) : null,
-        ethicsApprovalReference: formData.ethicsApprovalReference || null,
+        ethicsApprovalDate: formData.ethicsApprovalDate ? new Date(formData.ethicsApprovalDate) : null,
+        ansmApprovalDate: formData.ansmApprovalDate ? new Date(formData.ansmApprovalDate) : null,
         insuranceReference: formData.insuranceReference || null,
         eudamedId: formData.eudamedId || null,
 
@@ -955,11 +959,25 @@ export default function EditStudyPage() {
               />
             </Box>
 
-            <TextField
-              label="Reference approbation ethique (CPP)"
-              value={formData.ethicsApprovalReference}
-              onChange={handleChange('ethicsApprovalReference')}
-            />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Date d'approbation CPP"
+                type="date"
+                value={formData.ethicsApprovalDate}
+                onChange={handleChange('ethicsApprovalDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ flex: 1 }}
+              />
+
+              <TextField
+                label="Date d'approbation ANSM"
+                type="date"
+                value={formData.ansmApprovalDate}
+                onChange={handleChange('ansmApprovalDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ flex: 1 }}
+              />
+            </Box>
 
             <TextField
               label="Date approbation EU-CTR"

@@ -147,7 +147,8 @@ interface FormData {
   pharmacyManualVersion: string;
   pharmacyManualVersionDate: string;
   euCtrApprovalReference: string;
-  ethicsApprovalReference: string;
+  ethicsApprovalDate: string;
+  ansmApprovalDate: string;
   insuranceReference: string;
   eudamedId: string;
 
@@ -235,7 +236,8 @@ const testFormData: FormData = {
   pharmacyManualVersion: 'V1.0',
   pharmacyManualVersionDate: '2024-01-15',
   euCtrApprovalReference: '2024-02-01',
-  ethicsApprovalReference: 'CPP-IDF-VI-2024-0123',
+  ethicsApprovalDate: '2024-03-15',
+  ansmApprovalDate: '2024-02-20',
   insuranceReference: 'ASS-2024-456789',
   eudamedId: 'EU-DM-2024-001234',
 
@@ -323,7 +325,8 @@ const initialFormData: FormData = {
   pharmacyManualVersion: '',
   pharmacyManualVersionDate: '',
   euCtrApprovalReference: '',
-  ethicsApprovalReference: '',
+  ethicsApprovalDate: '',
+  ansmApprovalDate: '',
   insuranceReference: '',
   eudamedId: '',
 
@@ -607,7 +610,8 @@ export default function NewStudyPage() {
         pharmacyManualVersion: formData.pharmacyManualVersion || null,
         pharmacyManualVersionDate: formData.pharmacyManualVersionDate ? new Date(formData.pharmacyManualVersionDate) : null,
         euCtrApprovalReference: formData.euCtrApprovalReference ? new Date(formData.euCtrApprovalReference) : null,
-        ethicsApprovalReference: formData.ethicsApprovalReference || null,
+        ethicsApprovalDate: formData.ethicsApprovalDate ? new Date(formData.ethicsApprovalDate) : null,
+        ansmApprovalDate: formData.ansmApprovalDate ? new Date(formData.ansmApprovalDate) : null,
         insuranceReference: formData.insuranceReference || null,
         eudamedId: formData.eudamedId || null,
 
@@ -993,11 +997,25 @@ export default function NewStudyPage() {
               />
             </Box>
 
-            <TextField
-              label="Reference approbation ethique (CPP)"
-              value={formData.ethicsApprovalReference}
-              onChange={handleChange('ethicsApprovalReference')}
-            />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Date d'approbation CPP"
+                type="date"
+                value={formData.ethicsApprovalDate}
+                onChange={handleChange('ethicsApprovalDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ flex: 1 }}
+              />
+
+              <TextField
+                label="Date d'approbation ANSM"
+                type="date"
+                value={formData.ansmApprovalDate}
+                onChange={handleChange('ansmApprovalDate')}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ flex: 1 }}
+              />
+            </Box>
 
             <TextField
               label="Date approbation EU-CTR"

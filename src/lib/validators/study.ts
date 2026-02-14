@@ -75,7 +75,8 @@ export const blocCSchema = z.object({
   pharmacyManualVersion: z.string().nullable().optional(),
   pharmacyManualVersionDate: z.coerce.date().nullable().optional(),
   euCtrApprovalReference: z.coerce.date().nullable().optional(),
-  ethicsApprovalReference: z.string().nullable().optional(),
+  ethicsApprovalDate: z.coerce.date().nullable().optional(),
+  ansmApprovalDate: z.coerce.date().nullable().optional(),
   insuranceReference: z.string().nullable().optional(),
   eudamedId: z.string().nullable().optional(),
 });

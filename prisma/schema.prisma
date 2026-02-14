@@ -357,7 +357,9 @@ model Study {
   euCtrApprovalReference   DateTime? @map("eu_ctr_approval_reference")
   pharmacyManualVersion     String?   @map("pharmacy_manual_version")
   pharmacyManualVersionDate DateTime? @map("pharmacy_manual_version_date")
-  ethicsApprovalReference  String?   @map("ethics_approval_reference")
+  ethicsApprovalReference  String?   @map("ethics_approval_reference")  // legacy, kept for backward compatibility
+  ethicsApprovalDate       DateTime? @map("ethics_approval_date")
+  ansmApprovalDate         DateTime? @map("ansm_approval_date")
   insuranceReference       String?   @map("insurance_reference")
   eudamedId                String?   @map("eudamed_id")
 
