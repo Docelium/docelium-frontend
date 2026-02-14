@@ -9,8 +9,10 @@ import CardActions from '@mui/material/CardActions';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
 import AddIcon from '@mui/icons-material/Add';
-import { StudyStatus, StudyPhase, BlindingType } from '@prisma/client';
+import { StudyStatus, StudyPhase } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
+import DuplicateStudyButton from '@/components/features/DuplicateStudyButton';
+import { statusLabels, phaseLabels, blindingLabels } from '@/lib/labels';
 
 const statusColors: Record<StudyStatus, 'default' | 'primary' | 'warning' | 'error' | 'info' | 'success'> = {
   DRAFT: 'default',
@@ -20,39 +22,6 @@ const statusColors: Record<StudyStatus, 'default' | 'primary' | 'warning' | 'err
   CLOSED_TO_TREATMENT: 'info',
   TERMINATED: 'error',
   ARCHIVED: 'default',
-};
-
-const statusLabels: Record<StudyStatus, string> = {
-  DRAFT: 'Brouillon',
-  ACTIVE: 'Actif',
-  TEMPORARILY_SUSPENDED: 'Suspendu',
-  CLOSED_TO_ENROLLMENT: 'Ferme inclusions',
-  CLOSED_TO_TREATMENT: 'Ferme traitement',
-  TERMINATED: 'Termine',
-  ARCHIVED: 'Archive',
-};
-
-const phaseLabels: Record<StudyPhase, string> = {
-  I: 'Phase I',
-  Ia: 'Phase Ia',
-  Ib: 'Phase Ib',
-  I_II: 'Phase I/II',
-  II: 'Phase II',
-  IIa: 'Phase IIa',
-  IIb: 'Phase IIb',
-  III: 'Phase III',
-  IIIa: 'Phase IIIa',
-  IIIb: 'Phase IIIb',
-  IIIc: 'Phase IIIc',
-  IV: 'Phase IV',
-  OTHER: 'Autre',
-};
-
-const blindingLabels: Record<BlindingType, string> = {
-  NONE: 'Ouvert',
-  SINGLE: 'Simple aveugle',
-  DOUBLE: 'Double aveugle',
-  TRIPLE: 'Triple aveugle',
 };
 
 function isPast(date: Date | null): boolean {
@@ -180,10 +149,13 @@ export default async function StudiesPage() {
                     </Typography>
                   </Box>
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{ justifyContent: 'space-between' }}>
                   <LinkButton href={`/studies/${study.id}`} size="small">
                     Voir details
                   </LinkButton>
+                  {['ADMIN', 'PHARMACIEN'].includes(session.user.role) && (
+                    <DuplicateStudyButton studyId={study.id} codeInternal={study.codeInternal} variant="list" />
+                  )}
                 </CardActions>
               </Card>
             </Grid>

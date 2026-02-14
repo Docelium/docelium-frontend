@@ -525,6 +525,113 @@ export async function deleteStudy(id: string) {
   });
 }
 
+export async function duplicateStudy(
+  sourceId: string,
+  newCodeInternal: string,
+  userId: string,
+  userRole: UserRole,
+) {
+  const source = await prisma.study.findUnique({ where: { id: sourceId } });
+  if (!source) {
+    throw new Error('Not found');
+  }
+
+  const input: CreateStudyInput = {
+    // Bloc A - identification (only codeInternal changes)
+    codeInternal: newCodeInternal,
+    studyCode: source.studyCode,
+    acronym: source.acronym,
+    siteNumber: source.siteNumber,
+    euCtNumber: source.euCtNumber,
+    nctNumber: source.nctNumber,
+    title: source.title,
+    studyObjective: source.studyObjective,
+    sponsor: source.sponsor,
+    phases: source.phases,
+    therapeuticArea: source.therapeuticArea,
+    expectedRecruitment: source.expectedRecruitment,
+    siteActivationDate: source.siteActivationDate,
+    setupDate: source.setupDate,
+    siteCenterClosureDate: source.siteCenterClosureDate,
+    recruitmentStartDate: source.recruitmentStartDate,
+    recruitmentSuspensionDate: source.recruitmentSuspensionDate,
+    recruitmentEndDate: source.recruitmentEndDate,
+    startDate: source.startDate,
+    expectedEndDate: source.expectedEndDate,
+
+    // Bloc B - Contacts
+    contacts: source.contacts as CreateStudyInput['contacts'],
+
+    // Bloc C - Regulatory
+    protocolVersion: source.protocolVersion,
+    protocolVersionDate: source.protocolVersionDate,
+    amendments: source.amendments as CreateStudyInput['amendments'],
+    pharmacyManualVersion: source.pharmacyManualVersion,
+    pharmacyManualVersionDate: source.pharmacyManualVersionDate,
+    euCtrApprovalReference: source.euCtrApprovalReference,
+    ethicsApprovalDate: source.ethicsApprovalDate,
+    ansmApprovalDate: source.ansmApprovalDate,
+    insuranceReference: source.insuranceReference,
+    eudamedId: source.eudamedId,
+
+    // Bloc D - Operational params
+    blinded: source.blinded,
+    arms: source.arms as string[] | null,
+    cohorts: source.cohorts as string[] | null,
+    destructionPolicy: source.destructionPolicy,
+    destructionPolicyDetails: source.destructionPolicyDetails,
+    returnPolicy: source.returnPolicy,
+    hasIrtSystem: source.hasIrtSystem,
+    irtSystemName: source.irtSystemName,
+
+    // Bloc G - Visit Schedule
+    visitSchedule: source.visitSchedule as CreateStudyInput['visitSchedule'],
+    treatmentCycles: source.treatmentCycles as CreateStudyInput['treatmentCycles'],
+
+    // Bloc H - Patient Constraints
+    patientConstraints: source.patientConstraints as CreateStudyInput['patientConstraints'],
+
+    // Bloc I - Temperature
+    temperatureGovernance: source.temperatureGovernance,
+    excursionActionRequired: source.excursionActionRequired,
+    excursionTimeThreshold: source.excursionTimeThreshold,
+
+    // Bloc L - IWRS
+    iwrsGovernance: source.iwrsGovernance as CreateStudyInput['iwrsGovernance'],
+
+    // Bloc M - Equipment
+    protocolRequiredEquipments: source.protocolRequiredEquipments,
+
+    // Bloc N - Site Overrides
+    siteOverrides: source.siteOverrides as CreateStudyInput['siteOverrides'],
+
+    // Comments
+    blockComments: source.blockComments as CreateStudyInput['blockComments'],
+
+    // Metadata
+    createdById: userId,
+  };
+
+  const newStudy = await createStudy(input);
+
+  // Audit trail
+  await createAuditEvent({
+    userId,
+    userRole,
+    action: 'CREATE_STUDY' as never,
+    entityType: 'STUDY',
+    entityId: newStudy.id,
+    studyId: newStudy.id,
+    detailsAfter: {
+      codeInternal: newStudy.codeInternal,
+      title: newStudy.title,
+      duplicatedFrom: source.codeInternal,
+    },
+  }).catch(() => {});
+
+  return newStudy;
+}
+
 export async function assignUserToStudy(studyId: string, userId: string) {
   return prisma.studyUserAssignment.create({
     data: { studyId, userId },

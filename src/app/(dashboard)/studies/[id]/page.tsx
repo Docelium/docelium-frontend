@@ -17,6 +17,7 @@ import { StudyStatus, StudyPhase } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
 import AuditTrail from '@/components/features/AuditTrail';
 import DownloadPdfButton from '@/components/features/DownloadPdfButton';
+import DuplicateStudyButton from '@/components/features/DuplicateStudyButton';
 import { statusLabels, phaseLabels, destructionPolicyLabels, blindingLabels } from '@/lib/labels';
 
 function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Date | string | null): StudyStatus {
@@ -121,6 +122,9 @@ export default async function StudyDetailPage({ params }: Props) {
           )}
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
+          {['ADMIN', 'PHARMACIEN'].includes(session.user.role) && (
+            <DuplicateStudyButton studyId={study.id} codeInternal={study.codeInternal} variant="detail" />
+          )}
           <DownloadPdfButton studyId={study.id} codeInternal={study.codeInternal} />
           {canEdit && (
             <LinkButton
