@@ -151,6 +151,11 @@ export default async function StudyDetailPage({ params }: Props) {
           <Typography variant="h6" color="text.secondary">
             {study.title}
           </Typography>
+          {study.studyObjective && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Objectif : {study.studyObjective}
+            </Typography>
+          )}
         </Box>
         {canEdit && (
           <LinkButton

@@ -35,6 +35,7 @@ export const blocASchema = z.object({
     .string()
     .min(1, 'Le titre est requis')
     .max(500, 'Le titre ne peut pas depasser 500 caracteres'),
+  studyObjective: z.string().nullable().optional(),
   sponsor: z
     .string()
     .min(1, 'Le sponsor est requis')

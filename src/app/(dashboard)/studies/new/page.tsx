@@ -128,6 +128,7 @@ interface FormData {
   euCtNumber: string;
   nctNumber: string;
   title: string;
+  studyObjective: string;
   sponsor: string;
   phases: string[];
   therapeuticArea: string;
@@ -205,6 +206,7 @@ const testFormData: FormData = {
   euCtNumber: '2024-000123-45',
   nctNumber: 'NCT05123456',
   title: 'Etude de phase III randomisee en double aveugle evaluant le medicament XYZ versus placebo chez des patients atteints de cancer du poumon',
+  studyObjective: 'Evaluer l\'efficacite et la securite du medicament XYZ par rapport au placebo',
   sponsor: 'Pharma International SA',
   phases: ['III'],
   therapeuticArea: 'Oncologie',
@@ -296,6 +298,7 @@ const initialFormData: FormData = {
   euCtNumber: '',
   nctNumber: '',
   title: '',
+  studyObjective: '',
   sponsor: '',
   phases: [],
   therapeuticArea: '',
@@ -602,6 +605,7 @@ export default function NewStudyPage() {
         euCtNumber: formData.euCtNumber || null,
         nctNumber: formData.nctNumber || null,
         title: formData.title,
+        studyObjective: formData.studyObjective || null,
         sponsor: formData.sponsor,
         phases: formData.phases,
         therapeuticArea: formData.therapeuticArea || null,
@@ -758,6 +762,15 @@ export default function NewStudyPage() {
               multiline
               rows={2}
               helperText="Minimum 10 caracteres"
+            />
+
+            <TextField
+              label="Objectif de l'etude"
+              value={formData.studyObjective}
+              onChange={handleChange('studyObjective')}
+              multiline
+              rows={2}
+              helperText="Optionnel"
             />
 
             <TextField

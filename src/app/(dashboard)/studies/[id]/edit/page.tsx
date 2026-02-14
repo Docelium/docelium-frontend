@@ -128,6 +128,7 @@ interface FormData {
   euCtNumber: string;
   nctNumber: string;
   title: string;
+  studyObjective: string;
   sponsor: string;
   phases: string[];
   therapeuticArea: string;
@@ -203,6 +204,7 @@ const initialFormData: FormData = {
   euCtNumber: '',
   nctNumber: '',
   title: '',
+  studyObjective: '',
   sponsor: '',
   phases: [],
   therapeuticArea: '',
@@ -291,6 +293,7 @@ export default function EditStudyPage() {
           euCtNumber: study.euCtNumber || '',
           nctNumber: study.nctNumber || '',
           title: study.title || '',
+          studyObjective: study.studyObjective || '',
           sponsor: study.sponsor || '',
           phases: study.phases || (study.phase ? [study.phase] : []),
           therapeuticArea: study.therapeuticArea || '',
@@ -571,6 +574,7 @@ export default function EditStudyPage() {
         euCtNumber: formData.euCtNumber || null,
         nctNumber: formData.nctNumber || null,
         title: formData.title,
+        studyObjective: formData.studyObjective || null,
         sponsor: formData.sponsor,
         phases: formData.phases,
         therapeuticArea: formData.therapeuticArea || null,
@@ -723,6 +727,15 @@ export default function EditStudyPage() {
               multiline
               rows={2}
               helperText="Minimum 10 caracteres"
+            />
+
+            <TextField
+              label="Objectif de l'etude"
+              value={formData.studyObjective}
+              onChange={handleChange('studyObjective')}
+              multiline
+              rows={2}
+              helperText="Optionnel"
             />
 
             <TextField

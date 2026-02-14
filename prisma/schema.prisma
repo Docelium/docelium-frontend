@@ -336,6 +336,7 @@ model Study {
   euCtNumber           String?         @map("eu_ct_number")
   nctNumber            String?         @map("nct_number")
   title                String
+  studyObjective       String?         @map("study_objective")
   sponsor              String
   phases               StudyPhase[]
   therapeuticArea      String?         @map("therapeutic_area")

@@ -99,6 +99,7 @@ export interface CreateStudyInput {
   euCtNumber?: string | null;
   nctNumber?: string | null;
   title: string;
+  studyObjective?: string | null;
   sponsor: string;
   phases: string[];
   therapeuticArea?: string | null;
@@ -221,6 +222,7 @@ export async function createStudy(data: CreateStudyInput) {
         euCtNumber: data.euCtNumber,
         nctNumber: data.nctNumber,
         title: data.title,
+        studyObjective: data.studyObjective,
         sponsor: data.sponsor,
         phases: data.phases as never,
         therapeuticArea: data.therapeuticArea,
@@ -340,6 +342,7 @@ export async function updateStudy(id: string, data: Partial<CreateStudyInput>, u
       ...(data.euCtNumber !== undefined && { euCtNumber: data.euCtNumber }),
       ...(data.nctNumber !== undefined && { nctNumber: data.nctNumber }),
       ...(data.title !== undefined && { title: data.title }),
+      ...(data.studyObjective !== undefined && { studyObjective: data.studyObjective }),
       ...(data.sponsor !== undefined && { sponsor: data.sponsor }),
       ...(data.phases !== undefined && { phases: data.phases as never }),
       ...(data.therapeuticArea !== undefined && { therapeuticArea: data.therapeuticArea }),
