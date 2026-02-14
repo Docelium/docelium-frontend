@@ -36,12 +36,6 @@ function isPast(date: Date | null): boolean {
   return new Date(date) <= today;
 }
 
-function getSiteLifecycleTag(closureDate: Date | null, setupDate: Date | null): { label: string; color: 'default' | 'warning' } | null {
-  if (isPast(closureDate)) return { label: 'Archive', color: 'default' };
-  if (isPast(setupDate)) return { label: 'En attente', color: 'warning' };
-  return null;
-}
-
 function getRecruitmentTag(
   endDate: Date | null,
   suspensionDate: Date | null,
@@ -53,14 +47,13 @@ function getRecruitmentTag(
   return null;
 }
 
-function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Date | string | null): StudyStatus {
-  if (protocolStatus === 'DRAFT' && siteActivationDate) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (new Date(siteActivationDate) <= today) {
-      return 'ACTIVE';
-    }
-  }
+function getEffectiveStatus(
+  protocolStatus: StudyStatus,
+  setupDate: Date | string | null,
+  siteCenterClosureDate: Date | string | null,
+): StudyStatus {
+  if (isPast(siteCenterClosureDate as Date | null)) return 'ARCHIVED';
+  if (isPast(setupDate as Date | null)) return 'ACTIVE';
   return protocolStatus;
 }
 
@@ -108,18 +101,10 @@ export default async function StudiesPage() {
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                       <Chip
-                        label={statusLabels[getEffectiveStatus(study.protocolStatus, study.siteActivationDate)]}
-                        color={statusColors[getEffectiveStatus(study.protocolStatus, study.siteActivationDate)]}
+                        label={statusLabels[getEffectiveStatus(study.protocolStatus, study.setupDate, study.siteCenterClosureDate)]}
+                        color={statusColors[getEffectiveStatus(study.protocolStatus, study.setupDate, study.siteCenterClosureDate)]}
                         size="small"
                       />
-                      {getSiteLifecycleTag(study.siteCenterClosureDate, study.setupDate) && (
-                        <Chip
-                          label={getSiteLifecycleTag(study.siteCenterClosureDate, study.setupDate)!.label}
-                          color={getSiteLifecycleTag(study.siteCenterClosureDate, study.setupDate)!.color}
-                          variant="outlined"
-                          size="small"
-                        />
-                      )}
                       {getRecruitmentTag(study.recruitmentEndDate, study.recruitmentSuspensionDate, study.recruitmentStartDate) && (
                         <Chip
                           label={getRecruitmentTag(study.recruitmentEndDate, study.recruitmentSuspensionDate, study.recruitmentStartDate)!.label}

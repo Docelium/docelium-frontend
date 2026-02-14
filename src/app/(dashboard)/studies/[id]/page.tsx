@@ -21,14 +21,13 @@ import DuplicateStudyButton from '@/components/features/DuplicateStudyButton';
 import DeleteStudyButton from '@/components/features/DeleteStudyButton';
 import { statusLabels, phaseLabels, destructionPolicyLabels, blindingLabels } from '@/lib/labels';
 
-function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Date | string | null): StudyStatus {
-  if (protocolStatus === 'DRAFT' && siteActivationDate) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (new Date(siteActivationDate) <= today) {
-      return 'ACTIVE';
-    }
-  }
+function getEffectiveStatus(
+  protocolStatus: StudyStatus,
+  setupDate: Date | string | null,
+  siteCenterClosureDate: Date | string | null,
+): StudyStatus {
+  if (isPast(siteCenterClosureDate as Date | null)) return 'ARCHIVED';
+  if (isPast(setupDate as Date | null)) return 'ACTIVE';
   return protocolStatus;
 }
 
@@ -47,12 +46,6 @@ function isPast(date: Date | null): boolean {
   const today = new Date();
   today.setHours(23, 59, 59, 999);
   return new Date(date) <= today;
-}
-
-function getSiteLifecycleTag(closureDate: Date | null, setupDate: Date | null): { label: string; color: 'default' | 'warning' } | null {
-  if (isPast(closureDate)) return { label: 'Archive', color: 'default' };
-  if (isPast(setupDate)) return { label: 'En attente', color: 'warning' };
-  return null;
 }
 
 function getRecruitmentTag(
@@ -80,9 +73,8 @@ export default async function StudyDetailPage({ params }: Props) {
     notFound();
   }
 
-  const effectiveStatus = getEffectiveStatus(study.protocolStatus, study.siteActivationDate);
+  const effectiveStatus = getEffectiveStatus(study.protocolStatus, study.setupDate, study.siteCenterClosureDate);
   const canEdit = ['ADMIN', 'PHARMACIEN'].includes(session.user.role) && effectiveStatus !== 'ARCHIVED';
-  const siteTag = getSiteLifecycleTag(study.siteCenterClosureDate, study.setupDate);
   const recruitmentTag = getRecruitmentTag(study.recruitmentEndDate, study.recruitmentSuspensionDate, study.recruitmentStartDate);
 
   return (
@@ -161,14 +153,6 @@ export default async function StudyDetailPage({ params }: Props) {
                       color={statusColors[effectiveStatus]}
                       size="small"
                     />
-                    {siteTag && (
-                      <Chip
-                        label={siteTag.label}
-                        color={siteTag.color}
-                        variant="outlined"
-                        size="small"
-                      />
-                    )}
                     {recruitmentTag && (
                       <Chip
                         label={recruitmentTag.label}
