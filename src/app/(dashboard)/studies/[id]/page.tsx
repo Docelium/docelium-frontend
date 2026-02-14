@@ -13,9 +13,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
-import { StudyStatus, StudyPhase, DestructionPolicy, BlindingType } from '@prisma/client';
+import { StudyStatus, StudyPhase } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
 import AuditTrail from '@/components/features/AuditTrail';
+import DownloadPdfButton from '@/components/features/DownloadPdfButton';
+import { statusLabels, phaseLabels, destructionPolicyLabels, blindingLabels } from '@/lib/labels';
 
 function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Date | string | null): StudyStatus {
   if (protocolStatus === 'DRAFT' && siteActivationDate) {
@@ -28,16 +30,6 @@ function getEffectiveStatus(protocolStatus: StudyStatus, siteActivationDate: Dat
   return protocolStatus;
 }
 
-const statusLabels: Record<StudyStatus, string> = {
-  DRAFT: 'Brouillon',
-  ACTIVE: 'Actif',
-  TEMPORARILY_SUSPENDED: 'Suspendu temporairement',
-  CLOSED_TO_ENROLLMENT: 'Ferme aux inclusions',
-  CLOSED_TO_TREATMENT: 'Ferme aux traitements',
-  TERMINATED: 'Termine',
-  ARCHIVED: 'Archive',
-};
-
 const statusColors: Record<StudyStatus, 'default' | 'success' | 'warning' | 'error' | 'info'> = {
   DRAFT: 'default',
   ACTIVE: 'success',
@@ -46,35 +38,6 @@ const statusColors: Record<StudyStatus, 'default' | 'success' | 'warning' | 'err
   CLOSED_TO_TREATMENT: 'info',
   TERMINATED: 'error',
   ARCHIVED: 'default',
-};
-
-const phaseLabels: Record<StudyPhase, string> = {
-  I: 'Phase I',
-  Ia: 'Phase Ia',
-  Ib: 'Phase Ib',
-  I_II: 'Phase I/II',
-  II: 'Phase II',
-  IIa: 'Phase IIa',
-  IIb: 'Phase IIb',
-  III: 'Phase III',
-  IIIa: 'Phase IIIa',
-  IIIb: 'Phase IIIb',
-  IIIc: 'Phase IIIc',
-  IV: 'Phase IV',
-  OTHER: 'Autre',
-};
-
-const destructionPolicyLabels: Record<DestructionPolicy, string> = {
-  LOCAL: 'Destruction locale',
-  SPONSOR: 'Retour promoteur',
-  MIXED: 'Mixte',
-};
-
-const blindingLabels: Record<BlindingType, string> = {
-  NONE: 'Ouvert',
-  SINGLE: 'Simple aveugle',
-  DOUBLE: 'Double aveugle',
-  TRIPLE: 'Triple aveugle',
 };
 
 function isPast(date: Date | null): boolean {
@@ -157,15 +120,18 @@ export default async function StudyDetailPage({ params }: Props) {
             </Typography>
           )}
         </Box>
-        {canEdit && (
-          <LinkButton
-            href={`/studies/${study.id}/edit`}
-            variant="outlined"
-            startIcon={<EditIcon />}
-          >
-            Modifier
-          </LinkButton>
-        )}
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <DownloadPdfButton studyId={study.id} codeInternal={study.codeInternal} />
+          {canEdit && (
+            <LinkButton
+              href={`/studies/${study.id}/edit`}
+              variant="outlined"
+              startIcon={<EditIcon />}
+            >
+              Modifier
+            </LinkButton>
+          )}
+        </Box>
       </Box>
 
       <Grid container spacing={3}>
