@@ -491,6 +491,28 @@ export default async function MedicationDetailPage({ params }: Props) {
                     <Typography variant="body2">{medication.storageInstructions}</Typography>
                   </Grid>
                 )}
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Monitoring temperature
+                  </Typography>
+                  <Typography variant="body2">{medication.temperatureMonitoringRequired ? 'Oui' : 'Non'}</Typography>
+                </Grid>
+                {medication.stabilityAfterOpening && (
+                  <Grid size={{ xs: 6, md: 4 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Stabilite apres ouverture
+                    </Typography>
+                    <Typography variant="body2">{medication.stabilityAfterOpening}</Typography>
+                  </Grid>
+                )}
+                {medication.excursionPolicy && (
+                  <Grid size={{ xs: 12 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Politique d&apos;excursion
+                    </Typography>
+                    <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>{medication.excursionPolicy}</Typography>
+                  </Grid>
+                )}
               </Grid>
             </CardContent>
           </Card>

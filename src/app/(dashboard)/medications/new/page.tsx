@@ -132,6 +132,9 @@ const initialFormData = {
   destructionPolicyDetails: '',
   complianceRequired: false,
   complianceMethod: '',
+  temperatureMonitoringRequired: false,
+  stabilityAfterOpening: '',
+  excursionPolicy: '',
   iwrsRequired: false,
   requiresEsign: false,
   isBlinded: false,
@@ -162,6 +165,9 @@ const testFormData = {
   destructionPolicyDetails: 'Destruction locale selon procedure PUI',
   complianceRequired: true,
   complianceMethod: 'PILL_COUNT',
+  temperatureMonitoringRequired: true,
+  stabilityAfterOpening: '28 jours apres ouverture a temperature ambiante',
+  excursionPolicy: 'Max 72h hors refrigeration, signaler au promoteur',
   iwrsRequired: true,
   requiresEsign: false,
   isBlinded: true,
@@ -294,6 +300,8 @@ export default function NewMedicationPage() {
           destructionPolicyDetails: formData.destructionPolicyDetails || undefined,
           complianceRequired: formData.complianceRequired,
           complianceMethod: formData.complianceMethod || undefined,
+          stabilityAfterOpening: formData.stabilityAfterOpening || undefined,
+          excursionPolicy: formData.excursionPolicy || undefined,
           initialSupplyMode: formData.initialSupplyMode || undefined,
           resupplyMode: formData.resupplyMode || undefined,
           treatmentAssignmentMode: formData.treatmentAssignmentMode || undefined,
@@ -541,6 +549,39 @@ export default function NewMedicationPage() {
                   onChange={handleChange('storageInstructions')}
                   multiline
                   rows={2}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!formData.temperatureMonitoringRequired}
+                      onChange={handleSwitchChange('temperatureMonitoringRequired')}
+                    />
+                  }
+                  label="Monitoring temperature requis"
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>
+                <TextField
+                  fullWidth
+                  label="Stabilite apres ouverture / decongelation"
+                  value={formData.stabilityAfterOpening}
+                  onChange={handleChange('stabilityAfterOpening')}
+                  multiline
+                  rows={2}
+                  placeholder="Ex: 28 jours apres ouverture a temperature ambiante"
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>
+                <TextField
+                  fullWidth
+                  label="Politique d'excursion"
+                  value={formData.excursionPolicy}
+                  onChange={handleChange('excursionPolicy')}
+                  multiline
+                  rows={2}
+                  placeholder="Ex: Max 72h hors refrigeration, signaler au promoteur"
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>

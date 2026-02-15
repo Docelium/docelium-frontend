@@ -519,9 +519,12 @@ model Medication {
   dilutionSolution            String?
   requiredEquipments          String?
 
-  // Storage
-  storageCondition    StorageCondition
-  storageInstructions String?
+  // Storage & Temperature (Bloc E)
+  storageCondition               StorageCondition
+  storageInstructions            String?
+  temperatureMonitoringRequired  Boolean  @default(false)
+  stabilityAfterOpening          String?
+  excursionPolicy                String?
 
   // Accounting
   countingUnit    CountingUnit

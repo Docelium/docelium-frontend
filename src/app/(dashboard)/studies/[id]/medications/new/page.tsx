@@ -31,6 +31,7 @@ const steps = [
   { id: 'B', label: 'Posologie' },
   { id: 'C', label: 'Preparation & Reconstitution' },
   { id: 'D', label: 'Securite & Compliance' },
+  { id: 'E', label: 'Stockage & Temperature' },
 ];
 
 const medicationTypes = [
@@ -172,6 +173,9 @@ export default function NewMedicationPage({ params }: Props) {
     destructionPolicyDetails: '',
     complianceRequired: false,
     complianceMethod: '',
+    temperatureMonitoringRequired: false,
+    stabilityAfterOpening: '',
+    excursionPolicy: '',
     iwrsRequired: false,
     requiresEsign: false,
     isBlinded: false,
@@ -240,6 +244,8 @@ export default function NewMedicationPage({ params }: Props) {
           destructionPolicyDetails: formData.destructionPolicyDetails || undefined,
           complianceRequired: formData.complianceRequired,
           complianceMethod: formData.complianceMethod || undefined,
+          stabilityAfterOpening: formData.stabilityAfterOpening || undefined,
+          excursionPolicy: formData.excursionPolicy || undefined,
           initialSupplyMode: formData.initialSupplyMode || undefined,
           resupplyMode: formData.resupplyMode || undefined,
           treatmentAssignmentMode: formData.treatmentAssignmentMode || undefined,
@@ -352,32 +358,6 @@ export default function NewMedicationPage({ params }: Props) {
                 label="Fabricant"
                 value={formData.manufacturer}
                 onChange={handleChange('manufacturer')}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <FormControl fullWidth required>
-                <InputLabel>Condition de stockage</InputLabel>
-                <Select
-                  value={formData.storageCondition}
-                  label="Condition de stockage"
-                  onChange={(e) => handleChange('storageCondition')(e as { target: { value: unknown } })}
-                >
-                  {storageConditions.map((c) => (
-                    <MenuItem key={c.value} value={c.value}>
-                      {c.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid size={{ xs: 12 }}>
-              <TextField
-                fullWidth
-                label="Instructions de stockage"
-                value={formData.storageInstructions}
-                onChange={handleChange('storageInstructions')}
-                multiline
-                rows={2}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -802,6 +782,70 @@ export default function NewMedicationPage({ params }: Props) {
                 </FormControl>
               </Grid>
             )}
+          </Grid>
+        );
+      case 4:
+        return (
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth required>
+                <InputLabel>Condition de stockage</InputLabel>
+                <Select
+                  value={formData.storageCondition}
+                  label="Condition de stockage"
+                  onChange={(e) => handleChange('storageCondition')(e as { target: { value: unknown } })}
+                >
+                  {storageConditions.map((c) => (
+                    <MenuItem key={c.value} value={c.value}>
+                      {c.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Instructions de stockage"
+                value={formData.storageInstructions}
+                onChange={handleChange('storageInstructions')}
+                multiline
+                rows={2}
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={!!formData.temperatureMonitoringRequired}
+                    onChange={handleSwitchChange('temperatureMonitoringRequired')}
+                  />
+                }
+                label="Monitoring temperature requis"
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Stabilite apres ouverture / decongelation"
+                value={formData.stabilityAfterOpening}
+                onChange={handleChange('stabilityAfterOpening')}
+                multiline
+                rows={2}
+                placeholder="Ex: 28 jours apres ouverture a temperature ambiante"
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Politique d'excursion"
+                value={formData.excursionPolicy}
+                onChange={handleChange('excursionPolicy')}
+                multiline
+                rows={2}
+                placeholder="Ex: Max 72h hors refrigeration, signaler au promoteur"
+              />
+            </Grid>
           </Grid>
         );
       default:
