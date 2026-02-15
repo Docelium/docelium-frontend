@@ -483,10 +483,16 @@ model Medication {
   // Identification
   code                String
   name                String
+  dciName             String?
   type                MedicationType
   isPediatric         Boolean              @default(false)
   administrationRoute AdministrationRoute?
   status              MedicationStatus     @default(DRAFT)
+
+  // Operational Rules
+  initialSupplyMode       String?
+  resupplyMode            String?
+  treatmentAssignmentMode String?
 
   // Characteristics
   dosageForm   DosageForm

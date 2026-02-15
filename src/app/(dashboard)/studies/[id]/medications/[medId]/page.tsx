@@ -202,6 +202,14 @@ export default async function MedicationDetailPage({ params }: Props) {
                       : '-'}
                   </Typography>
                 </Grid>
+                {medication.dciName && (
+                  <Grid size={{ xs: 6, md: 4 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      DCI
+                    </Typography>
+                    <Typography variant="body2">{medication.dciName}</Typography>
+                  </Grid>
+                )}
               </Grid>
             </CardContent>
           </Card>
@@ -406,15 +414,33 @@ export default async function MedicationDetailPage({ params }: Props) {
                 </Grid>
                 <Grid size={{ xs: 6, md: 4 }}>
                   <Typography variant="caption" color="text.secondary">
-                    E-signature destruction
-                  </Typography>
-                  <Typography variant="body2">{medication.requiresEsign ? 'Oui' : 'Non'}</Typography>
-                </Grid>
-                <Grid size={{ xs: 6, md: 4 }}>
-                  <Typography variant="caption" color="text.secondary">
                     Produit en aveugle
                   </Typography>
                   <Typography variant="body2">{medication.isBlinded ? 'Oui' : 'Non'}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Approvisionnement initial
+                  </Typography>
+                  <Typography variant="body2">
+                    {medication.initialSupplyMode === 'MANUEL' ? 'Manuel' : medication.initialSupplyMode === 'AUTO' ? 'Automatique' : '-'}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Reapprovisionnement
+                  </Typography>
+                  <Typography variant="body2">
+                    {medication.resupplyMode === 'MANUEL' ? 'Manuel' : medication.resupplyMode === 'AUTO' ? 'Automatique' : '-'}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Attribution des traitements
+                  </Typography>
+                  <Typography variant="body2">
+                    {medication.treatmentAssignmentMode === 'IRT' ? 'IRT' : medication.treatmentAssignmentMode === 'MANUEL' ? 'Manuel' : '-'}
+                  </Typography>
                 </Grid>
               </Grid>
             </CardContent>

@@ -9,6 +9,8 @@ const DestructionPolicyValues = ['LOCAL', 'SPONSOR', 'MIXED'] as const;
 const DoseTypeValues = ['FIXED', 'PER_KG', 'PER_M2'] as const;
 const AdministrationRouteValues = ['IV', 'PO', 'SC', 'IM', 'TOPICAL', 'INHALED', 'RECTAL', 'TRANSDERMAL', 'OPHTHALMIC', 'OTHER'] as const;
 const MedicationStatusValues = ['DRAFT', 'ACTIVE', 'WITHDRAWN'] as const;
+const SupplyModeValues = ['MANUEL', 'AUTO'] as const;
+const TreatmentAssignmentModeValues = ['IRT', 'MANUEL'] as const;
 
 export const createMedicationSchema = z.object({
   studyId: z.string().uuid('ID de protocole invalide'),
@@ -21,6 +23,7 @@ export const createMedicationSchema = z.object({
     .string()
     .min(1, 'Le nom est requis')
     .max(200, 'Le nom ne peut pas depasser 200 caracteres'),
+  dciName: z.string().max(200).optional(),
   type: z.enum(MedicationTypeValues, {
     message: 'Le type de medicament est requis (IMP ou NIMP)',
   }),
@@ -60,6 +63,9 @@ export const createMedicationSchema = z.object({
   isPediatric: z.boolean().default(false),
   administrationRoute: z.enum(AdministrationRouteValues).optional(),
   status: z.enum(MedicationStatusValues).default('DRAFT'),
+  initialSupplyMode: z.enum(SupplyModeValues).optional(),
+  resupplyMode: z.enum(SupplyModeValues).optional(),
+  treatmentAssignmentMode: z.enum(TreatmentAssignmentModeValues).optional(),
 });
 
 export const updateMedicationSchema = createMedicationSchema.partial().omit({ studyId: true });
@@ -68,4 +74,4 @@ export type CreateMedicationData = z.infer<typeof createMedicationSchema>;
 export type UpdateMedicationData = z.infer<typeof updateMedicationSchema>;
 
 // Export enum values for use in services
-export { MedicationTypeValues, DosageFormValues, StorageConditionValues, CountingUnitValues, DestructionPolicyValues, DoseTypeValues, AdministrationRouteValues, MedicationStatusValues };
+export { MedicationTypeValues, DosageFormValues, StorageConditionValues, CountingUnitValues, DestructionPolicyValues, DoseTypeValues, AdministrationRouteValues, MedicationStatusValues, SupplyModeValues, TreatmentAssignmentModeValues };

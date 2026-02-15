@@ -90,6 +90,7 @@ const initialFormData = {
   studyId: '',
   code: '',
   name: '',
+  dciName: '',
   type: 'IMP',
   dosageForm: 'TABLET',
   strength: '',
@@ -103,6 +104,9 @@ const initialFormData = {
   isBlinded: false,
   isPediatric: false,
   administrationRoute: '',
+  initialSupplyMode: '',
+  resupplyMode: '',
+  treatmentAssignmentMode: '',
 };
 
 // Donnees de test pre-remplies
@@ -110,6 +114,7 @@ const testFormData = {
   studyId: '', // Sera rempli automatiquement si un seul protocole
   code: 'MED-TEST-001',
   name: 'Medicament Test XYZ 100mg',
+  dciName: 'Paracetamol',
   type: 'IMP',
   dosageForm: 'TABLET',
   strength: '100mg',
@@ -123,6 +128,9 @@ const testFormData = {
   isBlinded: true,
   isPediatric: false,
   administrationRoute: 'PO',
+  initialSupplyMode: 'AUTO',
+  resupplyMode: 'MANUEL',
+  treatmentAssignmentMode: 'IRT',
 };
 
 export default function NewMedicationPage() {
@@ -229,7 +237,11 @@ export default function NewMedicationPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          dciName: formData.dciName || undefined,
           administrationRoute: formData.administrationRoute || undefined,
+          initialSupplyMode: formData.initialSupplyMode || undefined,
+          resupplyMode: formData.resupplyMode || undefined,
+          treatmentAssignmentMode: formData.treatmentAssignmentMode || undefined,
         }),
       });
 
@@ -371,10 +383,27 @@ export default function NewMedicationPage() {
                 </Typography>
               </Grid>
 
+              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+                <TextField
+                  fullWidth
+                  label="Nom Molecule"
+                  value={formData.name}
+                  onChange={handleChange('name')}
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+                <TextField
+                  fullWidth
+                  label="DCI (Denomination Commune Internationale)"
+                  value={formData.dciName}
+                  onChange={handleChange('dciName')}
+                />
+              </Grid>
               <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>
                 <TextField
                   fullWidth
-                  label="Code"
+                  label="Code Molecule"
                   value={formData.code}
                   onChange={handleChange('code')}
                   required
@@ -397,15 +426,6 @@ export default function NewMedicationPage() {
                     ))}
                   </Select>
                 </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
-                <TextField
-                  fullWidth
-                  label="Nom"
-                  value={formData.name}
-                  onChange={handleChange('name')}
-                  required
-                />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>
                 <FormControl fullWidth required>
@@ -546,16 +566,55 @@ export default function NewMedicationPage() {
                     }
                     label="IWRS requis"
                   />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={!!formData.requiresEsign}
-                        onChange={handleSwitchChange('requiresEsign')}
-                      />
-                    }
-                    label="E-signature destruction"
-                  />
                 </Box>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Approvisionnement initial</InputLabel>
+                  <Select
+                    value={formData.initialSupplyMode}
+                    label="Approvisionnement initial"
+                    onChange={(e) => handleChange('initialSupplyMode')(e as { target: { value: unknown } })}
+                  >
+                    <MenuItem value="">
+                      <em>Non defini</em>
+                    </MenuItem>
+                    <MenuItem value="MANUEL">Manuel</MenuItem>
+                    <MenuItem value="AUTO">Automatique</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Reapprovisionnement</InputLabel>
+                  <Select
+                    value={formData.resupplyMode}
+                    label="Reapprovisionnement"
+                    onChange={(e) => handleChange('resupplyMode')(e as { target: { value: unknown } })}
+                  >
+                    <MenuItem value="">
+                      <em>Non defini</em>
+                    </MenuItem>
+                    <MenuItem value="MANUEL">Manuel</MenuItem>
+                    <MenuItem value="AUTO">Automatique</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Attribution des traitements</InputLabel>
+                  <Select
+                    value={formData.treatmentAssignmentMode}
+                    label="Attribution des traitements"
+                    onChange={(e) => handleChange('treatmentAssignmentMode')(e as { target: { value: unknown } })}
+                  >
+                    <MenuItem value="">
+                      <em>Non defini</em>
+                    </MenuItem>
+                    <MenuItem value="IRT">IRT</MenuItem>
+                    <MenuItem value="MANUEL">Manuel</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
             </Grid>
 
