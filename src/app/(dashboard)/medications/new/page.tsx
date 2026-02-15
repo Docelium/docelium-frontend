@@ -96,14 +96,7 @@ const hazardCategories = [
 const wasteCategories = [
   { value: 'DASRI', label: 'DASRI' },
   { value: 'DAOM', label: 'DAOM' },
-  { value: 'CYTOTOXIQUE', label: 'Cytotoxique' },
   { value: 'AUTRE', label: 'Autre' },
-];
-
-const destructionPolicies = [
-  { value: 'LOCAL', label: 'Locale' },
-  { value: 'SPONSOR', label: 'Sponsor' },
-  { value: 'MIXED', label: 'Mixte' },
 ];
 
 const complianceMethods = [
@@ -129,7 +122,6 @@ const initialFormData = {
   unitsPerPackage: 1,
   hazardCategories: [] as string[],
   wasteCategory: '',
-  destructionPolicy: '',
   destructionPolicyDetails: '',
   complianceRequired: false,
   complianceMethod: '',
@@ -159,7 +151,6 @@ const testFormData = {
   unitsPerPackage: 30,
   hazardCategories: ['CYTOTOXIQUE'] as string[],
   wasteCategory: 'DASRI',
-  destructionPolicy: 'LOCAL',
   destructionPolicyDetails: 'Destruction locale selon procedure PUI',
   complianceRequired: true,
   complianceMethod: 'PILL_COUNT',
@@ -291,7 +282,6 @@ export default function NewMedicationPage() {
           administrationRoute: formData.administrationRoute || undefined,
           hazardCategories: formData.hazardCategories,
           wasteCategory: formData.wasteCategory || undefined,
-          destructionPolicy: formData.destructionPolicy || undefined,
           destructionPolicyDetails: formData.destructionPolicyDetails || undefined,
           complianceRequired: formData.complianceRequired,
           complianceMethod: formData.complianceMethod || undefined,
@@ -718,33 +708,13 @@ export default function NewMedicationPage() {
                 </FormControl>
               </Grid>
               <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
-                <FormControl fullWidth>
-                  <InputLabel>Politique de destruction</InputLabel>
-                  <Select
-                    value={formData.destructionPolicy}
-                    label="Politique de destruction"
-                    onChange={(e) => handleChange('destructionPolicy')(e as { target: { value: unknown } })}
-                  >
-                    <MenuItem value="">
-                      <em>Non definie</em>
-                    </MenuItem>
-                    {destructionPolicies.map((d) => (
-                      <MenuItem key={d.value} value={d.value}>
-                        {d.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
                 <TextField
                   fullWidth
-                  label="Details politique de destruction"
+                  label="Politique de destruction"
                   value={formData.destructionPolicyDetails}
                   onChange={handleChange('destructionPolicyDetails')}
                   multiline
                   rows={2}
-                  placeholder="Precisions sur la politique de destruction"
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
