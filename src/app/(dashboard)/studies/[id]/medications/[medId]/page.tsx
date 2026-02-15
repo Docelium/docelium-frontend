@@ -12,7 +12,7 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-import { MedicationType, DosageForm, StorageCondition, CountingUnit, DoseType, AdministrationRoute, MedicationStatus } from '@prisma/client';
+import { MedicationType, DosageForm, StorageCondition, CountingUnit, DoseType, AdministrationRoute, MedicationStatus, DestructionPolicy } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
 import AuditTrail from '@/components/features/AuditTrail';
 
@@ -107,6 +107,12 @@ const wasteCategoryLabels: Record<string, string> = {
   DAOM: 'DAOM',
   CYTOTOXIQUE: 'Cytotoxique',
   AUTRE: 'Autre',
+};
+
+const destructionPolicyLabels: Record<DestructionPolicy, string> = {
+  LOCAL: 'Locale',
+  SPONSOR: 'Sponsor',
+  MIXED: 'Mixte',
 };
 
 const complianceMethodLabels: Record<string, string> = {
@@ -383,7 +389,7 @@ export default async function MedicationDetailPage({ params }: Props) {
             </Card>
           )}
 
-          {(medication.hazardCategories.length > 0 || medication.wasteCategory || medication.destructionPolicyDetails || medication.complianceRequired) && (
+          {(medication.hazardCategories.length > 0 || medication.wasteCategory || medication.destructionPolicy || medication.complianceRequired) && (
             <Card sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -417,10 +423,18 @@ export default async function MedicationDetailPage({ params }: Props) {
                       <Typography variant="body2">{wasteCategoryLabels[medication.wasteCategory] || medication.wasteCategory}</Typography>
                     </Grid>
                   )}
+                  {medication.destructionPolicy && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Politique de destruction
+                      </Typography>
+                      <Typography variant="body2">{destructionPolicyLabels[medication.destructionPolicy]}</Typography>
+                    </Grid>
+                  )}
                   {medication.destructionPolicyDetails && (
                     <Grid size={{ xs: 12 }}>
                       <Typography variant="caption" color="text.secondary">
-                        Politique de destruction
+                        Details politique de destruction
                       </Typography>
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>{medication.destructionPolicyDetails}</Typography>
                     </Grid>
