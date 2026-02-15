@@ -76,6 +76,25 @@ enum MedicationType {
   NIMP
 }
 
+enum AdministrationRoute {
+  IV
+  PO
+  SC
+  IM
+  TOPICAL
+  INHALED
+  RECTAL
+  TRANSDERMAL
+  OPHTHALMIC
+  OTHER
+}
+
+enum MedicationStatus {
+  DRAFT
+  ACTIVE
+  WITHDRAWN
+}
+
 enum DosageForm {
   TABLET
   CAPSULE
@@ -462,9 +481,12 @@ model Medication {
   studyId String
 
   // Identification
-  code String
-  name String
-  type MedicationType
+  code                String
+  name                String
+  type                MedicationType
+  isPediatric         Boolean              @default(false)
+  administrationRoute AdministrationRoute?
+  status              MedicationStatus     @default(DRAFT)
 
   // Characteristics
   dosageForm   DosageForm
@@ -506,7 +528,6 @@ model Medication {
   isBlinded         Boolean            @default(false)
 
   // Metadata
-  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

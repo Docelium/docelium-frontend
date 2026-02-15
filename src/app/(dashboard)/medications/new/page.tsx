@@ -72,6 +72,19 @@ const countingUnits = [
   { value: 'OTHER', label: 'Autre' },
 ];
 
+const administrationRoutes = [
+  { value: 'IV', label: 'Intraveineuse (IV)' },
+  { value: 'PO', label: 'Orale (PO)' },
+  { value: 'SC', label: 'Sous-cutanee (SC)' },
+  { value: 'IM', label: 'Intramusculaire (IM)' },
+  { value: 'TOPICAL', label: 'Topique' },
+  { value: 'INHALED', label: 'Inhalee' },
+  { value: 'RECTAL', label: 'Rectale' },
+  { value: 'TRANSDERMAL', label: 'Transdermique' },
+  { value: 'OPHTHALMIC', label: 'Ophtalmique' },
+  { value: 'OTHER', label: 'Autre' },
+];
+
 // Donnees initiales vides
 const initialFormData = {
   studyId: '',
@@ -88,6 +101,8 @@ const initialFormData = {
   iwrsRequired: false,
   requiresEsign: false,
   isBlinded: false,
+  isPediatric: false,
+  administrationRoute: '',
 };
 
 // Donnees de test pre-remplies
@@ -106,6 +121,8 @@ const testFormData = {
   iwrsRequired: true,
   requiresEsign: false,
   isBlinded: true,
+  isPediatric: false,
+  administrationRoute: 'PO',
 };
 
 export default function NewMedicationPage() {
@@ -210,7 +227,10 @@ export default function NewMedicationPage() {
       const response = await fetch('/api/medications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          administrationRoute: formData.administrationRoute || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -476,12 +496,42 @@ export default function NewMedicationPage() {
                   inputProps={{ min: 1 }}
                 />
               </Grid>
+              <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Route d&apos;administration</InputLabel>
+                  <Select
+                    value={formData.administrationRoute}
+                    label="Route d'administration"
+                    onChange={(e) =>
+                      handleChange('administrationRoute')(e as { target: { value: unknown } })
+                    }
+                  >
+                    <MenuItem value="">
+                      <em>Non definie</em>
+                    </MenuItem>
+                    {administrationRoutes.map((r) => (
+                      <MenuItem key={r.value} value={r.value}>
+                        {r.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
               <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
                 <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                   <FormControlLabel
                     control={
                       <Switch
-                        checked={formData.isBlinded}
+                        checked={!!formData.isPediatric}
+                        onChange={handleSwitchChange('isPediatric')}
+                      />
+                    }
+                    label="Formulation pediatrique"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={!!formData.isBlinded}
                         onChange={handleSwitchChange('isBlinded')}
                       />
                     }
@@ -490,7 +540,7 @@ export default function NewMedicationPage() {
                   <FormControlLabel
                     control={
                       <Switch
-                        checked={formData.iwrsRequired}
+                        checked={!!formData.iwrsRequired}
                         onChange={handleSwitchChange('iwrsRequired')}
                       />
                     }
@@ -499,7 +549,7 @@ export default function NewMedicationPage() {
                   <FormControlLabel
                     control={
                       <Switch
-                        checked={formData.requiresEsign}
+                        checked={!!formData.requiresEsign}
                         onChange={handleSwitchChange('requiresEsign')}
                       />
                     }

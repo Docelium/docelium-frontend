@@ -9,7 +9,7 @@ export interface MedicationFilters {
 
 export async function getAllMedications(filters?: MedicationFilters) {
   const where: Record<string, unknown> = {
-    isActive: true,
+    status: { not: 'WITHDRAWN' },
   };
 
   if (filters?.studyId) {
@@ -51,7 +51,7 @@ export async function getMedicationsByStudy(studyId: string) {
   return prisma.medication.findMany({
     where: {
       studyId,
-      isActive: true,
+      status: { not: 'WITHDRAWN' },
     },
     include: {
       _count: {
@@ -182,7 +182,7 @@ export async function deactivateMedication(id: string) {
 
   return prisma.medication.update({
     where: { id },
-    data: { isActive: false },
+    data: { status: 'WITHDRAWN' },
   });
 }
 

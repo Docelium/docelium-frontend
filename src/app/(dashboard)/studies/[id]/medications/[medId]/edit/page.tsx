@@ -80,6 +80,25 @@ const countingUnits = [
   { value: 'OTHER', label: 'Autre' },
 ];
 
+const administrationRoutes = [
+  { value: 'IV', label: 'Intraveineuse (IV)' },
+  { value: 'PO', label: 'Orale (PO)' },
+  { value: 'SC', label: 'Sous-cutanee (SC)' },
+  { value: 'IM', label: 'Intramusculaire (IM)' },
+  { value: 'TOPICAL', label: 'Topique' },
+  { value: 'INHALED', label: 'Inhalee' },
+  { value: 'RECTAL', label: 'Rectale' },
+  { value: 'TRANSDERMAL', label: 'Transdermique' },
+  { value: 'OPHTHALMIC', label: 'Ophtalmique' },
+  { value: 'OTHER', label: 'Autre' },
+];
+
+const medicationStatuses = [
+  { value: 'DRAFT', label: 'Brouillon' },
+  { value: 'ACTIVE', label: 'Actif' },
+  { value: 'WITHDRAWN', label: 'Retiré' },
+];
+
 interface Props {
   params: Promise<{ id: string; medId: string }>;
 }
@@ -114,6 +133,9 @@ interface MedicationFormData {
   iwrsRequired: boolean;
   requiresEsign: boolean;
   isBlinded: boolean;
+  isPediatric: boolean;
+  administrationRoute: string;
+  status: string;
 }
 
 export default function EditMedicationPage({ params }: Props) {
@@ -154,6 +176,9 @@ export default function EditMedicationPage({ params }: Props) {
     iwrsRequired: false,
     requiresEsign: false,
     isBlinded: false,
+    isPediatric: false,
+    administrationRoute: '',
+    status: 'DRAFT',
   });
 
   useEffect(() => {
@@ -201,6 +226,9 @@ export default function EditMedicationPage({ params }: Props) {
           iwrsRequired: med.iwrsRequired || false,
           requiresEsign: med.requiresEsign || false,
           isBlinded: med.isBlinded || false,
+          isPediatric: med.isPediatric || false,
+          administrationRoute: med.administrationRoute || '',
+          status: med.status || 'DRAFT',
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -238,6 +266,7 @@ export default function EditMedicationPage({ params }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          administrationRoute: formData.administrationRoute || undefined,
           doseType: formData.doseType || undefined,
           dosage: formData.dosage || undefined,
           packaging: formData.packaging || undefined,
@@ -406,8 +435,52 @@ export default function EditMedicationPage({ params }: Props) {
                 inputProps={{ min: 1 }}
               />
             </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth>
+                <InputLabel>Route d&apos;administration</InputLabel>
+                <Select
+                  value={formData.administrationRoute}
+                  label="Route d'administration"
+                  onChange={(e) => handleChange('administrationRoute')(e as { target: { value: unknown } })}
+                >
+                  <MenuItem value="">
+                    <em>Non definie</em>
+                  </MenuItem>
+                  {administrationRoutes.map((r) => (
+                    <MenuItem key={r.value} value={r.value}>
+                      {r.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth>
+                <InputLabel>Statut</InputLabel>
+                <Select
+                  value={formData.status}
+                  label="Statut"
+                  onChange={(e) => handleChange('status')(e as { target: { value: unknown } })}
+                >
+                  {medicationStatuses.map((s) => (
+                    <MenuItem key={s.value} value={s.value}>
+                      {s.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
             <Grid size={{ xs: 12 }}>
               <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!formData.isPediatric}
+                      onChange={handleSwitchChange('isPediatric')}
+                    />
+                  }
+                  label="Formulation pediatrique"
+                />
                 <FormControlLabel
                   control={
                     <Switch

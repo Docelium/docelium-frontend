@@ -12,7 +12,7 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-import { MedicationType, DosageForm, StorageCondition, CountingUnit, DoseType } from '@prisma/client';
+import { MedicationType, DosageForm, StorageCondition, CountingUnit, DoseType, AdministrationRoute, MedicationStatus } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
 import AuditTrail from '@/components/features/AuditTrail';
 
@@ -70,6 +70,31 @@ const countingUnitLabels: Record<CountingUnit, string> = {
   OTHER: 'Autre',
 };
 
+const administrationRouteLabels: Record<AdministrationRoute, string> = {
+  IV: 'Intraveineuse (IV)',
+  PO: 'Orale (PO)',
+  SC: 'Sous-cutanee (SC)',
+  IM: 'Intramusculaire (IM)',
+  TOPICAL: 'Topique',
+  INHALED: 'Inhalee',
+  RECTAL: 'Rectale',
+  TRANSDERMAL: 'Transdermique',
+  OPHTHALMIC: 'Ophtalmique',
+  OTHER: 'Autre',
+};
+
+const medicationStatusLabels: Record<MedicationStatus, string> = {
+  DRAFT: 'Brouillon',
+  ACTIVE: 'Actif',
+  WITHDRAWN: 'Retiré',
+};
+
+const statusColors: Record<MedicationStatus, 'default' | 'success' | 'error'> = {
+  DRAFT: 'default',
+  ACTIVE: 'success',
+  WITHDRAWN: 'error',
+};
+
 interface Props {
   params: Promise<{ id: string; medId: string }>;
 }
@@ -110,6 +135,14 @@ export default async function MedicationDetailPage({ params }: Props) {
               color={typeColors[medication.type]}
               size="small"
             />
+            <Chip
+              label={medicationStatusLabels[medication.status]}
+              color={statusColors[medication.status]}
+              size="small"
+            />
+            {medication.isPediatric && (
+              <Chip label="Pediatrique" color="info" size="small" />
+            )}
             {medication.isBlinded && (
               <Chip label="Aveugle" variant="outlined" size="small" />
             )}
@@ -158,6 +191,16 @@ export default async function MedicationDetailPage({ params }: Props) {
                     Fabricant
                   </Typography>
                   <Typography variant="body2">{medication.manufacturer || '-'}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Route d&apos;administration
+                  </Typography>
+                  <Typography variant="body2">
+                    {medication.administrationRoute
+                      ? administrationRouteLabels[medication.administrationRoute]
+                      : '-'}
+                  </Typography>
                 </Grid>
               </Grid>
             </CardContent>

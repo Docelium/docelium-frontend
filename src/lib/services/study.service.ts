@@ -57,7 +57,7 @@ export async function getStudyById(id: string, userId: string, role: UserRole) {
     where: { id },
     include: {
       medications: {
-        where: { isActive: true },
+        where: { status: { not: 'WITHDRAWN' } },
         orderBy: { code: 'asc' },
       },
       equipments: {

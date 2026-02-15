@@ -7,6 +7,8 @@ const StorageConditionValues = ['ROOM_TEMPERATURE', 'REFRIGERATED', 'FROZEN', 'C
 const CountingUnitValues = ['UNIT', 'BOX', 'VIAL', 'AMPOULE', 'SYRINGE', 'BOTTLE', 'SACHET', 'BLISTER', 'KIT', 'OTHER'] as const;
 const DestructionPolicyValues = ['LOCAL', 'SPONSOR', 'MIXED'] as const;
 const DoseTypeValues = ['FIXED', 'PER_KG', 'PER_M2'] as const;
+const AdministrationRouteValues = ['IV', 'PO', 'SC', 'IM', 'TOPICAL', 'INHALED', 'RECTAL', 'TRANSDERMAL', 'OPHTHALMIC', 'OTHER'] as const;
+const MedicationStatusValues = ['DRAFT', 'ACTIVE', 'WITHDRAWN'] as const;
 
 export const createMedicationSchema = z.object({
   studyId: z.string().uuid('ID de protocole invalide'),
@@ -55,6 +57,9 @@ export const createMedicationSchema = z.object({
   iwrsRequired: z.boolean().default(false),
   requiresEsign: z.boolean().default(false),
   isBlinded: z.boolean().default(false),
+  isPediatric: z.boolean().default(false),
+  administrationRoute: z.enum(AdministrationRouteValues).optional(),
+  status: z.enum(MedicationStatusValues).default('DRAFT'),
 });
 
 export const updateMedicationSchema = createMedicationSchema.partial().omit({ studyId: true });
@@ -63,4 +68,4 @@ export type CreateMedicationData = z.infer<typeof createMedicationSchema>;
 export type UpdateMedicationData = z.infer<typeof updateMedicationSchema>;
 
 // Export enum values for use in services
-export { MedicationTypeValues, DosageFormValues, StorageConditionValues, CountingUnitValues, DestructionPolicyValues, DoseTypeValues };
+export { MedicationTypeValues, DosageFormValues, StorageConditionValues, CountingUnitValues, DestructionPolicyValues, DoseTypeValues, AdministrationRouteValues, MedicationStatusValues };

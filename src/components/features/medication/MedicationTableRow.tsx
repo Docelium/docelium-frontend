@@ -5,7 +5,7 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
-import { MedicationType, DosageForm, StorageCondition } from '@prisma/client';
+import { MedicationType, DosageForm, StorageCondition, MedicationStatus } from '@prisma/client';
 
 const typeLabels: Record<MedicationType, string> = {
   IMP: 'IMP',
@@ -42,6 +42,18 @@ const storageLabels: Record<StorageCondition, string> = {
   OTHER: 'Autre',
 };
 
+const statusLabels: Record<MedicationStatus, string> = {
+  DRAFT: 'Brouillon',
+  ACTIVE: 'Actif',
+  WITHDRAWN: 'Retiré',
+};
+
+const statusColors: Record<MedicationStatus, 'default' | 'success' | 'error'> = {
+  DRAFT: 'default',
+  ACTIVE: 'success',
+  WITHDRAWN: 'error',
+};
+
 interface MedicationTableRowProps {
   medication: {
     id: string;
@@ -51,6 +63,7 @@ interface MedicationTableRowProps {
     dosageForm: DosageForm;
     strength: string | null;
     storageCondition: StorageCondition;
+    status: MedicationStatus;
     _count: {
       stockItems: number;
       movements: number;
@@ -78,6 +91,13 @@ export default function MedicationTableRow({ medication, studyId }: MedicationTa
         <Chip
           label={typeLabels[medication.type]}
           color={typeColors[medication.type]}
+          size="small"
+        />
+      </TableCell>
+      <TableCell>
+        <Chip
+          label={statusLabels[medication.status]}
+          color={statusColors[medication.status]}
           size="small"
         />
       </TableCell>

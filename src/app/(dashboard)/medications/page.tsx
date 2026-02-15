@@ -54,6 +54,7 @@ interface Medication {
   dosageForm: string;
   strength?: string;
   storageCondition: string;
+  status: 'DRAFT' | 'ACTIVE' | 'WITHDRAWN';
   isBlinded: boolean;
   study: Study;
   _count: {
@@ -85,6 +86,18 @@ const storageLabels: Record<string, string> = {
   CONTROLLED_ROOM_TEMPERATURE: 'Temp. controlee',
   PROTECT_FROM_LIGHT: 'Proteger lumiere',
   OTHER: 'Autre',
+};
+
+const medicationStatusLabels: Record<string, string> = {
+  DRAFT: 'Brouillon',
+  ACTIVE: 'Actif',
+  WITHDRAWN: 'Retiré',
+};
+
+const medicationStatusColors: Record<string, 'default' | 'success' | 'error'> = {
+  DRAFT: 'default',
+  ACTIVE: 'success',
+  WITHDRAWN: 'error',
 };
 
 export default function MedicationsPage() {
@@ -286,6 +299,7 @@ export default function MedicationsPage() {
                     <TableCell>Nom</TableCell>
                     <TableCell>Protocole</TableCell>
                     <TableCell>Type</TableCell>
+                    <TableCell>Statut</TableCell>
                     <TableCell>Forme</TableCell>
                     <TableCell>Stockage</TableCell>
                     <TableCell align="center">Stock</TableCell>
@@ -323,6 +337,13 @@ export default function MedicationsPage() {
                         <Chip
                           label={medication.type}
                           color={medication.type === 'IMP' ? 'primary' : 'default'}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={medicationStatusLabels[medication.status] || medication.status}
+                          color={medicationStatusColors[medication.status] || 'default'}
                           size="small"
                         />
                       </TableCell>

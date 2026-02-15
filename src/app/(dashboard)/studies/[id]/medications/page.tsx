@@ -81,6 +81,7 @@ export default async function StudyMedicationsPage({ params }: Props) {
                   <TableCell>Code</TableCell>
                   <TableCell>Nom</TableCell>
                   <TableCell>Type</TableCell>
+                  <TableCell>Statut</TableCell>
                   <TableCell>Forme</TableCell>
                   <TableCell>Dosage</TableCell>
                   <TableCell>Stockage</TableCell>

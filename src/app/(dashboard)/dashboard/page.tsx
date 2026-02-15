@@ -55,7 +55,7 @@ export default async function DashboardPage() {
   // Fetch statistics
   const [studyCount, medicationCount, movementCount, stockItemCount] = await Promise.all([
     prisma.study.count({ where: { isActive: true } }),
-    prisma.medication.count({ where: { isActive: true } }),
+    prisma.medication.count({ where: { status: { not: 'WITHDRAWN' } } }),
     prisma.movement.count(),
     prisma.stockItem.count({ where: { status: 'AVAILABLE' } }),
   ]);
