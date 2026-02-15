@@ -106,6 +106,7 @@ const wasteCategoryLabels: Record<string, string> = {
   DASRI: 'DASRI',
   DAOM: 'DAOM',
   CYTOTOXIQUE: 'Cytotoxique',
+  AUTRE: 'Autre',
 };
 
 const destructionPolicyLabels: Record<DestructionPolicy, string> = {
@@ -428,6 +429,14 @@ export default async function MedicationDetailPage({ params }: Props) {
                         Politique de destruction
                       </Typography>
                       <Typography variant="body2">{destructionPolicyLabels[medication.destructionPolicy]}</Typography>
+                    </Grid>
+                  )}
+                  {medication.destructionPolicyDetails && (
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Details politique de destruction
+                      </Typography>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>{medication.destructionPolicyDetails}</Typography>
                     </Grid>
                   )}
                   <Grid size={{ xs: 6, md: 4 }}>

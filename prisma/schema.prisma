@@ -534,8 +534,9 @@ model Medication {
   complianceMethod    String?
 
   // Configuration
-  destructionPolicy DestructionPolicy?
-  iwrsRequired      Boolean            @default(false)
+  destructionPolicy        DestructionPolicy?
+  destructionPolicyDetails String?
+  iwrsRequired             Boolean            @default(false)
   requiresEsign     Boolean            @default(false)
   isBlinded         Boolean            @default(false)
 

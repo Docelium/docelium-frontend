@@ -10,7 +10,7 @@ const DoseTypeValues = ['FIXED', 'PER_KG', 'PER_M2'] as const;
 const AdministrationRouteValues = ['IV', 'PO', 'SC', 'IM', 'TOPICAL', 'INHALED', 'RECTAL', 'TRANSDERMAL', 'OPHTHALMIC', 'OTHER'] as const;
 const MedicationStatusValues = ['DRAFT', 'ACTIVE', 'WITHDRAWN'] as const;
 const HazardCategoryValues = ['CYTOTOXIQUE', 'RADIOACTIF', 'BIOLOGIQUE', 'CMR'] as const;
-const WasteCategoryValues = ['DASRI', 'DAOM', 'CYTOTOXIQUE'] as const;
+const WasteCategoryValues = ['DASRI', 'DAOM', 'CYTOTOXIQUE', 'AUTRE'] as const;
 const ComplianceMethodValues = ['PILL_COUNT', 'DIARY', 'ELECTRONIC', 'OTHER'] as const;
 const SupplyModeValues = ['MANUEL', 'AUTO'] as const;
 const TreatmentAssignmentModeValues = ['IRT', 'MANUEL'] as const;
@@ -44,6 +44,7 @@ export const createMedicationSchema = z.object({
   }),
   unitsPerPackage: z.number().int().positive().default(1),
   destructionPolicy: z.enum(DestructionPolicyValues).optional(),
+  destructionPolicyDetails: z.string().max(500).optional(),
   doseType: z.enum(DoseTypeValues).optional(),
   dosage: z.string().max(200).optional(),
   packaging: z.string().max(200).optional(),

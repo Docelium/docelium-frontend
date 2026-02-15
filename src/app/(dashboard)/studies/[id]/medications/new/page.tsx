@@ -112,6 +112,7 @@ const wasteCategories = [
   { value: 'DASRI', label: 'DASRI' },
   { value: 'DAOM', label: 'DAOM' },
   { value: 'CYTOTOXIQUE', label: 'Cytotoxique' },
+  { value: 'AUTRE', label: 'Autre' },
 ];
 
 const destructionPolicies = [
@@ -169,6 +170,7 @@ export default function NewMedicationPage({ params }: Props) {
     hazardCategories: [] as string[],
     wasteCategory: '',
     destructionPolicy: '',
+    destructionPolicyDetails: '',
     complianceRequired: false,
     complianceMethod: '',
     iwrsRequired: false,
@@ -236,6 +238,7 @@ export default function NewMedicationPage({ params }: Props) {
           hazardCategories: formData.hazardCategories,
           wasteCategory: formData.wasteCategory || undefined,
           destructionPolicy: formData.destructionPolicy || undefined,
+          destructionPolicyDetails: formData.destructionPolicyDetails || undefined,
           complianceRequired: formData.complianceRequired,
           complianceMethod: formData.complianceMethod || undefined,
           initialSupplyMode: formData.initialSupplyMode || undefined,
@@ -755,6 +758,17 @@ export default function NewMedicationPage({ params }: Props) {
                   ))}
                 </Select>
               </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Details politique de destruction"
+                value={formData.destructionPolicyDetails}
+                onChange={handleChange('destructionPolicyDetails')}
+                multiline
+                rows={2}
+                placeholder="Precisions sur la politique de destruction"
+              />
             </Grid>
             <Grid size={{ xs: 12 }}>
               <FormControlLabel
