@@ -527,6 +527,12 @@ model Medication {
   countingUnit    CountingUnit
   unitsPerPackage Int          @default(1)
 
+  // Safety & Compliance (Bloc D)
+  hazardCategories    String[]
+  wasteCategory       String?
+  complianceRequired  Boolean  @default(false)
+  complianceMethod    String?
+
   // Configuration
   destructionPolicy DestructionPolicy?
   iwrsRequired      Boolean            @default(false)

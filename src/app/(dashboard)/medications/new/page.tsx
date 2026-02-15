@@ -15,6 +15,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
+import Checkbox from '@mui/material/Checkbox';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
@@ -85,6 +86,32 @@ const administrationRoutes = [
   { value: 'OTHER', label: 'Autre' },
 ];
 
+const hazardCategories = [
+  { value: 'CYTOTOXIQUE', label: 'Cytotoxique' },
+  { value: 'RADIOACTIF', label: 'Radioactif' },
+  { value: 'BIOLOGIQUE', label: 'Biologique' },
+  { value: 'CMR', label: 'CMR (Cancerogene, Mutagene, Reprotoxique)' },
+];
+
+const wasteCategories = [
+  { value: 'DASRI', label: 'DASRI' },
+  { value: 'DAOM', label: 'DAOM' },
+  { value: 'CYTOTOXIQUE', label: 'Cytotoxique' },
+];
+
+const destructionPolicies = [
+  { value: 'LOCAL', label: 'Locale' },
+  { value: 'SPONSOR', label: 'Sponsor' },
+  { value: 'MIXED', label: 'Mixte' },
+];
+
+const complianceMethods = [
+  { value: 'PILL_COUNT', label: 'Comptage de comprimes' },
+  { value: 'DIARY', label: 'Journal patient' },
+  { value: 'ELECTRONIC', label: 'Electronique' },
+  { value: 'OTHER', label: 'Autre' },
+];
+
 // Donnees initiales vides
 const initialFormData = {
   studyId: '',
@@ -99,6 +126,11 @@ const initialFormData = {
   storageInstructions: '',
   countingUnit: 'UNIT',
   unitsPerPackage: 1,
+  hazardCategories: [] as string[],
+  wasteCategory: '',
+  destructionPolicy: '',
+  complianceRequired: false,
+  complianceMethod: '',
   iwrsRequired: false,
   requiresEsign: false,
   isBlinded: false,
@@ -123,6 +155,11 @@ const testFormData = {
   storageInstructions: 'Conserver entre 2 et 8 degres. Ne pas congeler.',
   countingUnit: 'BOX',
   unitsPerPackage: 30,
+  hazardCategories: ['CYTOTOXIQUE'] as string[],
+  wasteCategory: 'DASRI',
+  destructionPolicy: 'LOCAL',
+  complianceRequired: true,
+  complianceMethod: 'PILL_COUNT',
   iwrsRequired: true,
   requiresEsign: false,
   isBlinded: true,
@@ -220,6 +257,16 @@ export default function NewMedicationPage() {
     }));
   };
 
+  const handleHazardToggle = (value: string) => () => {
+    setFormData((prev) => {
+      const current = prev.hazardCategories;
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+      return { ...prev, hazardCategories: next };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -239,6 +286,11 @@ export default function NewMedicationPage() {
           ...formData,
           dciName: formData.dciName || undefined,
           administrationRoute: formData.administrationRoute || undefined,
+          hazardCategories: formData.hazardCategories,
+          wasteCategory: formData.wasteCategory || undefined,
+          destructionPolicy: formData.destructionPolicy || undefined,
+          complianceRequired: formData.complianceRequired,
+          complianceMethod: formData.complianceMethod || undefined,
           initialSupplyMode: formData.initialSupplyMode || undefined,
           resupplyMode: formData.resupplyMode || undefined,
           treatmentAssignmentMode: formData.treatmentAssignmentMode || undefined,
@@ -616,6 +668,102 @@ export default function NewMedicationPage() {
                   </Select>
                 </FormControl>
               </Grid>
+            </Grid>
+
+            {/* Securite & Compliance */}
+            <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 4 }}>
+              Securite & Compliance
+            </Typography>
+            <Grid container spacing={3} sx={{ maxWidth: '100%', mt: 1 }}>
+              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Categories de danger
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  {hazardCategories.map((h) => (
+                    <FormControlLabel
+                      key={h.value}
+                      control={
+                        <Checkbox
+                          checked={formData.hazardCategories.includes(h.value)}
+                          onChange={handleHazardToggle(h.value)}
+                        />
+                      }
+                      label={h.label}
+                    />
+                  ))}
+                </Box>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Categorie de dechets</InputLabel>
+                  <Select
+                    value={formData.wasteCategory}
+                    label="Categorie de dechets"
+                    onChange={(e) => handleChange('wasteCategory')(e as { target: { value: unknown } })}
+                  >
+                    <MenuItem value="">
+                      <em>Non definie</em>
+                    </MenuItem>
+                    {wasteCategories.map((w) => (
+                      <MenuItem key={w.value} value={w.value}>
+                        {w.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Politique de destruction</InputLabel>
+                  <Select
+                    value={formData.destructionPolicy}
+                    label="Politique de destruction"
+                    onChange={(e) => handleChange('destructionPolicy')(e as { target: { value: unknown } })}
+                  >
+                    <MenuItem value="">
+                      <em>Non definie</em>
+                    </MenuItem>
+                    {destructionPolicies.map((d) => (
+                      <MenuItem key={d.value} value={d.value}>
+                        {d.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!formData.complianceRequired}
+                      onChange={handleSwitchChange('complianceRequired')}
+                    />
+                  }
+                  label="Compliance requise"
+                />
+              </Grid>
+              {!!formData.complianceRequired && (
+                <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Methode de compliance</InputLabel>
+                    <Select
+                      value={formData.complianceMethod}
+                      label="Methode de compliance"
+                      onChange={(e) => handleChange('complianceMethod')(e as { target: { value: unknown } })}
+                    >
+                      <MenuItem value="">
+                        <em>Non definie</em>
+                      </MenuItem>
+                      {complianceMethods.map((c) => (
+                        <MenuItem key={c.value} value={c.value}>
+                          {c.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              )}
             </Grid>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4, gap: 2 }}>

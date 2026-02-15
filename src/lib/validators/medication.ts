@@ -9,6 +9,9 @@ const DestructionPolicyValues = ['LOCAL', 'SPONSOR', 'MIXED'] as const;
 const DoseTypeValues = ['FIXED', 'PER_KG', 'PER_M2'] as const;
 const AdministrationRouteValues = ['IV', 'PO', 'SC', 'IM', 'TOPICAL', 'INHALED', 'RECTAL', 'TRANSDERMAL', 'OPHTHALMIC', 'OTHER'] as const;
 const MedicationStatusValues = ['DRAFT', 'ACTIVE', 'WITHDRAWN'] as const;
+const HazardCategoryValues = ['CYTOTOXIQUE', 'RADIOACTIF', 'BIOLOGIQUE', 'CMR'] as const;
+const WasteCategoryValues = ['DASRI', 'DAOM', 'CYTOTOXIQUE'] as const;
+const ComplianceMethodValues = ['PILL_COUNT', 'DIARY', 'ELECTRONIC', 'OTHER'] as const;
 const SupplyModeValues = ['MANUEL', 'AUTO'] as const;
 const TreatmentAssignmentModeValues = ['IRT', 'MANUEL'] as const;
 
@@ -57,6 +60,10 @@ export const createMedicationSchema = z.object({
   dilutionFinalConcentration: z.string().max(200).optional(),
   dilutionSolution: z.string().max(200).optional(),
   requiredEquipments: z.string().max(500).optional(),
+  hazardCategories: z.array(z.enum(HazardCategoryValues)).default([]),
+  wasteCategory: z.enum(WasteCategoryValues).optional(),
+  complianceRequired: z.boolean().default(false),
+  complianceMethod: z.enum(ComplianceMethodValues).optional(),
   iwrsRequired: z.boolean().default(false),
   requiresEsign: z.boolean().default(false),
   isBlinded: z.boolean().default(false),
@@ -74,4 +81,4 @@ export type CreateMedicationData = z.infer<typeof createMedicationSchema>;
 export type UpdateMedicationData = z.infer<typeof updateMedicationSchema>;
 
 // Export enum values for use in services
-export { MedicationTypeValues, DosageFormValues, StorageConditionValues, CountingUnitValues, DestructionPolicyValues, DoseTypeValues, AdministrationRouteValues, MedicationStatusValues, SupplyModeValues, TreatmentAssignmentModeValues };
+export { MedicationTypeValues, DosageFormValues, StorageConditionValues, CountingUnitValues, DestructionPolicyValues, DoseTypeValues, AdministrationRouteValues, MedicationStatusValues, HazardCategoryValues, WasteCategoryValues, ComplianceMethodValues, SupplyModeValues, TreatmentAssignmentModeValues };

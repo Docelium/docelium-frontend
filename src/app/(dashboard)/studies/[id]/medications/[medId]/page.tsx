@@ -12,7 +12,7 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-import { MedicationType, DosageForm, StorageCondition, CountingUnit, DoseType, AdministrationRoute, MedicationStatus } from '@prisma/client';
+import { MedicationType, DosageForm, StorageCondition, CountingUnit, DoseType, AdministrationRoute, MedicationStatus, DestructionPolicy } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
 import AuditTrail from '@/components/features/AuditTrail';
 
@@ -93,6 +93,32 @@ const statusColors: Record<MedicationStatus, 'default' | 'success' | 'error'> = 
   DRAFT: 'default',
   ACTIVE: 'success',
   WITHDRAWN: 'error',
+};
+
+const hazardCategoryLabels: Record<string, string> = {
+  CYTOTOXIQUE: 'Cytotoxique',
+  RADIOACTIF: 'Radioactif',
+  BIOLOGIQUE: 'Biologique',
+  CMR: 'CMR',
+};
+
+const wasteCategoryLabels: Record<string, string> = {
+  DASRI: 'DASRI',
+  DAOM: 'DAOM',
+  CYTOTOXIQUE: 'Cytotoxique',
+};
+
+const destructionPolicyLabels: Record<DestructionPolicy, string> = {
+  LOCAL: 'Locale',
+  SPONSOR: 'Sponsor',
+  MIXED: 'Mixte',
+};
+
+const complianceMethodLabels: Record<string, string> = {
+  PILL_COUNT: 'Comptage de comprimes',
+  DIARY: 'Journal patient',
+  ELECTRONIC: 'Electronique',
+  OTHER: 'Autre',
 };
 
 interface Props {
@@ -355,6 +381,67 @@ export default async function MedicationDetailPage({ params }: Props) {
                         Equipements requis
                       </Typography>
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>{medication.requiredEquipments}</Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
+
+          {(medication.hazardCategories.length > 0 || medication.wasteCategory || medication.destructionPolicy || medication.complianceRequired) && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Securite & Compliance
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={2}>
+                  {medication.hazardCategories.length > 0 && (
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Categories de danger
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                        {medication.hazardCategories.map((cat) => (
+                          <Chip
+                            key={cat}
+                            label={hazardCategoryLabels[cat] || cat}
+                            color="error"
+                            size="small"
+                            variant="outlined"
+                          />
+                        ))}
+                      </Box>
+                    </Grid>
+                  )}
+                  {medication.wasteCategory && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Categorie de dechets
+                      </Typography>
+                      <Typography variant="body2">{wasteCategoryLabels[medication.wasteCategory] || medication.wasteCategory}</Typography>
+                    </Grid>
+                  )}
+                  {medication.destructionPolicy && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Politique de destruction
+                      </Typography>
+                      <Typography variant="body2">{destructionPolicyLabels[medication.destructionPolicy]}</Typography>
+                    </Grid>
+                  )}
+                  <Grid size={{ xs: 6, md: 4 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Compliance requise
+                    </Typography>
+                    <Typography variant="body2">{medication.complianceRequired ? 'Oui' : 'Non'}</Typography>
+                  </Grid>
+                  {medication.complianceMethod && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Methode de compliance
+                      </Typography>
+                      <Typography variant="body2">{complianceMethodLabels[medication.complianceMethod] || medication.complianceMethod}</Typography>
                     </Grid>
                   )}
                 </Grid>
