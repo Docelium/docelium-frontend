@@ -131,6 +131,9 @@ export default function Sidebar({ userRole }: SidebarProps) {
 
   const isActive = (path?: string) => {
     if (!path) return false;
+    // /studies/[id]/medications/... should match "Medicaments", not "Protocoles"
+    if (path === '/studies' && pathname.includes('/medications')) return false;
+    if (path === '/medications' && pathname.includes('/medications')) return true;
     return pathname === path || pathname.startsWith(path + '/');
   };
 

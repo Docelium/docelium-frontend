@@ -18,8 +18,17 @@ import Switch from '@mui/material/Switch';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SaveIcon from '@mui/icons-material/Save';
 import { useToast } from '@/contexts/ToastContext';
+
+const steps = [
+  { id: 'A', label: 'Identification' },
+  { id: 'B', label: 'Posologie' },
+];
 
 const medicationTypes = [
   { value: 'IMP', label: 'IMP - Medicament experimental' },
@@ -51,6 +60,12 @@ const storageConditions = [
   { value: 'OTHER', label: 'Autre' },
 ];
 
+const doseTypes = [
+  { value: 'FIXED', label: 'Dose fixe' },
+  { value: 'PER_KG', label: 'Par kg' },
+  { value: 'PER_M2', label: 'Par m\u00b2' },
+];
+
 const countingUnits = [
   { value: 'UNIT', label: 'Unite' },
   { value: 'BOX', label: 'Boite' },
@@ -74,6 +89,7 @@ export default function NewMedicationPage({ params }: Props) {
   const { showSuccess, showError } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     code: '',
     name: '',
@@ -85,6 +101,12 @@ export default function NewMedicationPage({ params }: Props) {
     storageInstructions: '',
     countingUnit: 'UNIT',
     unitsPerPackage: 1,
+    doseType: '',
+    dosage: '',
+    packaging: '',
+    protocolRequiredDose: '',
+    doseRounding: '',
+    requiresAnthropometricData: false,
     iwrsRequired: false,
     requiresEsign: false,
     isBlinded: false,
@@ -106,8 +128,7 @@ export default function NewMedicationPage({ params }: Props) {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setLoading(true);
     setError('');
 
@@ -115,7 +136,14 @@ export default function NewMedicationPage({ params }: Props) {
       const response = await fetch(`/api/studies/${studyId}/medications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          doseType: formData.doseType || undefined,
+          dosage: formData.dosage || undefined,
+          packaging: formData.packaging || undefined,
+          protocolRequiredDose: formData.protocolRequiredDose || undefined,
+          doseRounding: formData.doseRounding || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -131,6 +159,250 @@ export default function NewMedicationPage({ params }: Props) {
       showError(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const isStepValid = () => {
+    if (activeStep === 0) {
+      return formData.code.trim() !== '' && formData.name.trim() !== '';
+    }
+    return true;
+  };
+
+  const handleNext = () => setActiveStep((prev) => prev + 1);
+  const handleBack = () => setActiveStep((prev) => prev - 1);
+
+  const renderStepContent = (step: number) => {
+    switch (step) {
+      case 0:
+        return (
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Code"
+                value={formData.code}
+                onChange={handleChange('code')}
+                required
+                helperText="Ex: MED-001"
+                inputProps={{ style: { textTransform: 'uppercase' } }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth required>
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={formData.type}
+                  label="Type"
+                  onChange={(e) => handleChange('type')(e as { target: { value: unknown } })}
+                >
+                  {medicationTypes.map((t) => (
+                    <MenuItem key={t.value} value={t.value}>
+                      {t.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Nom"
+                value={formData.name}
+                onChange={handleChange('name')}
+                required
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth required>
+                <InputLabel>Forme galenique</InputLabel>
+                <Select
+                  value={formData.dosageForm}
+                  label="Forme galenique"
+                  onChange={(e) => handleChange('dosageForm')(e as { target: { value: unknown } })}
+                >
+                  {dosageForms.map((f) => (
+                    <MenuItem key={f.value} value={f.value}>
+                      {f.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Dosage"
+                value={formData.strength}
+                onChange={handleChange('strength')}
+                placeholder="Ex: 100mg, 5mg/ml"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Fabricant"
+                value={formData.manufacturer}
+                onChange={handleChange('manufacturer')}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth required>
+                <InputLabel>Condition de stockage</InputLabel>
+                <Select
+                  value={formData.storageCondition}
+                  label="Condition de stockage"
+                  onChange={(e) => handleChange('storageCondition')(e as { target: { value: unknown } })}
+                >
+                  {storageConditions.map((c) => (
+                    <MenuItem key={c.value} value={c.value}>
+                      {c.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Instructions de stockage"
+                value={formData.storageInstructions}
+                onChange={handleChange('storageInstructions')}
+                multiline
+                rows={2}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth required>
+                <InputLabel>Unite de comptage</InputLabel>
+                <Select
+                  value={formData.countingUnit}
+                  label="Unite de comptage"
+                  onChange={(e) => handleChange('countingUnit')(e as { target: { value: unknown } })}
+                >
+                  {countingUnits.map((u) => (
+                    <MenuItem key={u.value} value={u.value}>
+                      {u.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Unites par conditionnement"
+                type="number"
+                value={formData.unitsPerPackage}
+                onChange={handleChange('unitsPerPackage')}
+                inputProps={{ min: 1 }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!formData.isBlinded}
+                      onChange={handleSwitchChange('isBlinded')}
+                    />
+                  }
+                  label="Produit en aveugle"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!formData.iwrsRequired}
+                      onChange={handleSwitchChange('iwrsRequired')}
+                    />
+                  }
+                  label="IWRS requis"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!formData.requiresEsign}
+                      onChange={handleSwitchChange('requiresEsign')}
+                    />
+                  }
+                  label="E-signature destruction"
+                />
+              </Box>
+            </Grid>
+          </Grid>
+        );
+      case 1:
+        return (
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth>
+                <InputLabel>Type de dose</InputLabel>
+                <Select
+                  value={formData.doseType}
+                  label="Type de dose"
+                  onChange={(e) => handleChange('doseType')(e as { target: { value: unknown } })}
+                >
+                  <MenuItem value="">
+                    <em>Non defini</em>
+                  </MenuItem>
+                  {doseTypes.map((d) => (
+                    <MenuItem key={d.value} value={d.value}>
+                      {d.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Dosage"
+                value={formData.dosage}
+                onChange={handleChange('dosage')}
+                placeholder="Ex: 200mg par prise"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Conditionnement"
+                value={formData.packaging}
+                onChange={handleChange('packaging')}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Dose requise selon protocole"
+                value={formData.protocolRequiredDose}
+                onChange={handleChange('protocolRequiredDose')}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Arrondi de dose"
+                value={formData.doseRounding}
+                onChange={handleChange('doseRounding')}
+              />
+            </Grid>
+            {!!(formData.doseType === 'PER_KG' || formData.doseType === 'PER_M2') && (
+              <Grid size={{ xs: 12 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!formData.requiresAnthropometricData}
+                      onChange={handleSwitchChange('requiresAnthropometricData')}
+                    />
+                  }
+                  label="Donnees anthropometriques requises"
+                />
+              </Grid>
+            )}
+          </Grid>
+        );
+      default:
+        return null;
     }
   };
 
@@ -153,175 +425,56 @@ export default function NewMedicationPage({ params }: Props) {
 
       <Card sx={{ mt: 3 }}>
         <CardContent>
+          <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
+            {steps.map((step, index) => (
+              <Step key={step.id} completed={index < activeStep}>
+                <StepLabel
+                  onClick={() => setActiveStep(index)}
+                  sx={{
+                    cursor: 'pointer',
+                    '& .MuiStepLabel-label': {
+                      fontSize: '0.75rem',
+                    },
+                  }}
+                >
+                  {step.id}. {step.label}
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+
           {error && (
             <Alert severity="error" sx={{ mb: 3 }}>
               {error}
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Code"
-                  value={formData.code}
-                  onChange={handleChange('code')}
-                  required
-                  helperText="Ex: MED-001"
-                  inputProps={{ style: { textTransform: 'uppercase' } }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <FormControl fullWidth required>
-                  <InputLabel>Type</InputLabel>
-                  <Select
-                    value={formData.type}
-                    label="Type"
-                    onChange={(e) => handleChange('type')(e as { target: { value: unknown } })}
-                  >
-                    {medicationTypes.map((t) => (
-                      <MenuItem key={t.value} value={t.value}>
-                        {t.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  label="Nom"
-                  value={formData.name}
-                  onChange={handleChange('name')}
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <FormControl fullWidth required>
-                  <InputLabel>Forme galenique</InputLabel>
-                  <Select
-                    value={formData.dosageForm}
-                    label="Forme galenique"
-                    onChange={(e) => handleChange('dosageForm')(e as { target: { value: unknown } })}
-                  >
-                    {dosageForms.map((f) => (
-                      <MenuItem key={f.value} value={f.value}>
-                        {f.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Dosage"
-                  value={formData.strength}
-                  onChange={handleChange('strength')}
-                  placeholder="Ex: 100mg, 5mg/ml"
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Fabricant"
-                  value={formData.manufacturer}
-                  onChange={handleChange('manufacturer')}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <FormControl fullWidth required>
-                  <InputLabel>Condition de stockage</InputLabel>
-                  <Select
-                    value={formData.storageCondition}
-                    label="Condition de stockage"
-                    onChange={(e) => handleChange('storageCondition')(e as { target: { value: unknown } })}
-                  >
-                    {storageConditions.map((c) => (
-                      <MenuItem key={c.value} value={c.value}>
-                        {c.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  label="Instructions de stockage"
-                  value={formData.storageInstructions}
-                  onChange={handleChange('storageInstructions')}
-                  multiline
-                  rows={2}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <FormControl fullWidth required>
-                  <InputLabel>Unite de comptage</InputLabel>
-                  <Select
-                    value={formData.countingUnit}
-                    label="Unite de comptage"
-                    onChange={(e) => handleChange('countingUnit')(e as { target: { value: unknown } })}
-                  >
-                    {countingUnits.map((u) => (
-                      <MenuItem key={u.value} value={u.value}>
-                        {u.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Unites par conditionnement"
-                  type="number"
-                  value={formData.unitsPerPackage}
-                  onChange={handleChange('unitsPerPackage')}
-                  inputProps={{ min: 1 }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formData.isBlinded}
-                        onChange={handleSwitchChange('isBlinded')}
-                      />
-                    }
-                    label="Produit en aveugle"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formData.iwrsRequired}
-                        onChange={handleSwitchChange('iwrsRequired')}
-                      />
-                    }
-                    label="IWRS requis"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formData.requiresEsign}
-                        onChange={handleSwitchChange('requiresEsign')}
-                      />
-                    }
-                    label="E-signature destruction"
-                  />
-                </Box>
-              </Grid>
-            </Grid>
+          <Box sx={{ minHeight: 300, px: 2 }}>
+            {renderStepContent(activeStep)}
+          </Box>
 
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4, gap: 2 }}>
-              <Button component={Link} href={`/studies/${studyId}/medications`}>
-                Annuler
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+            <Button disabled={activeStep === 0} onClick={handleBack}>
+              Precedent
+            </Button>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                Etape {activeStep + 1} / {steps.length}
+              </Typography>
+              <Button
+                variant="outlined"
+                color="success"
+                startIcon={loading ? <CircularProgress size={16} /> : <SaveIcon />}
+                onClick={handleSubmit}
+                disabled={loading || !isStepValid()}
+              >
+                Creer
               </Button>
-              <Button type="submit" variant="contained" disabled={loading}>
-                {loading ? <CircularProgress size={24} /> : 'Creer'}
-              </Button>
+              {activeStep < steps.length - 1 && (
+                <Button variant="contained" onClick={handleNext} disabled={!isStepValid()}>
+                  Suivant
+                </Button>
+              )}
             </Box>
           </Box>
         </CardContent>

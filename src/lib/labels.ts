@@ -1,4 +1,4 @@
-import { StudyStatus, StudyPhase, DestructionPolicy, BlindingType, ReturnPolicy, TemperatureGovernance } from '@prisma/client';
+import { StudyStatus, StudyPhase, DestructionPolicy, BlindingType, ReturnPolicy, TemperatureGovernance, DoseType } from '@prisma/client';
 
 export const statusLabels: Record<StudyStatus, string> = {
   DRAFT: 'Brouillon',
@@ -47,6 +47,12 @@ export const returnPolicyLabels: Record<ReturnPolicy, string> = {
 export const temperatureGovernanceLabels: Record<TemperatureGovernance, string> = {
   BASIC: 'Basique',
   FULL: 'Complet',
+};
+
+export const doseTypeLabels: Record<DoseType, string> = {
+  FIXED: 'Dose fixe',
+  PER_KG: 'Par kg',
+  PER_M2: 'Par m\u00b2',
 };
 
 export const contactRoleLabels: Record<string, string> = {

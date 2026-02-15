@@ -6,6 +6,7 @@ const DosageFormValues = ['TABLET', 'CAPSULE', 'INJECTION', 'SOLUTION', 'CREAM',
 const StorageConditionValues = ['ROOM_TEMPERATURE', 'REFRIGERATED', 'FROZEN', 'CONTROLLED_ROOM_TEMPERATURE', 'PROTECT_FROM_LIGHT', 'OTHER'] as const;
 const CountingUnitValues = ['UNIT', 'BOX', 'VIAL', 'AMPOULE', 'SYRINGE', 'BOTTLE', 'SACHET', 'BLISTER', 'KIT', 'OTHER'] as const;
 const DestructionPolicyValues = ['LOCAL', 'SPONSOR', 'MIXED'] as const;
+const DoseTypeValues = ['FIXED', 'PER_KG', 'PER_M2'] as const;
 
 export const createMedicationSchema = z.object({
   studyId: z.string().uuid('ID de protocole invalide'),
@@ -35,6 +36,12 @@ export const createMedicationSchema = z.object({
   }),
   unitsPerPackage: z.number().int().positive().default(1),
   destructionPolicy: z.enum(DestructionPolicyValues).optional(),
+  doseType: z.enum(DoseTypeValues).optional(),
+  dosage: z.string().max(200).optional(),
+  packaging: z.string().max(200).optional(),
+  protocolRequiredDose: z.string().max(500).optional(),
+  doseRounding: z.string().max(200).optional(),
+  requiresAnthropometricData: z.boolean().default(false),
   iwrsRequired: z.boolean().default(false),
   requiresEsign: z.boolean().default(false),
   isBlinded: z.boolean().default(false),
@@ -46,4 +53,4 @@ export type CreateMedicationData = z.infer<typeof createMedicationSchema>;
 export type UpdateMedicationData = z.infer<typeof updateMedicationSchema>;
 
 // Export enum values for use in services
-export { MedicationTypeValues, DosageFormValues, StorageConditionValues, CountingUnitValues, DestructionPolicyValues };
+export { MedicationTypeValues, DosageFormValues, StorageConditionValues, CountingUnitValues, DestructionPolicyValues, DoseTypeValues };

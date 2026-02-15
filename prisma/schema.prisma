@@ -107,6 +107,12 @@ enum DestructionPolicy {
   MIXED
 }
 
+enum DoseType {
+  FIXED
+  PER_KG
+  PER_M2
+}
+
 enum CountingUnit {
   UNIT
   BOX
@@ -464,6 +470,14 @@ model Medication {
   dosageForm   DosageForm
   strength     String?
   manufacturer String?
+
+  // Posologie (Bloc B)
+  doseType                    DoseType?
+  dosage                      String?
+  packaging                   String?
+  protocolRequiredDose        String?
+  doseRounding                String?
+  requiresAnthropometricData  Boolean  @default(false)
 
   // Storage
   storageCondition    StorageCondition

@@ -12,7 +12,7 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-import { MedicationType, DosageForm, StorageCondition, CountingUnit } from '@prisma/client';
+import { MedicationType, DosageForm, StorageCondition, CountingUnit, DoseType } from '@prisma/client';
 import LinkButton from '@/components/ui/LinkButton';
 import AuditTrail from '@/components/features/AuditTrail';
 
@@ -49,6 +49,12 @@ const storageLabels: Record<StorageCondition, string> = {
   CONTROLLED_ROOM_TEMPERATURE: 'Temperature controlee',
   PROTECT_FROM_LIGHT: 'Proteger de la lumiere',
   OTHER: 'Autre',
+};
+
+const doseTypeLabels: Record<DoseType, string> = {
+  FIXED: 'Dose fixe',
+  PER_KG: 'Par kg',
+  PER_M2: 'Par m\u00b2',
 };
 
 const countingUnitLabels: Record<CountingUnit, string> = {
@@ -156,6 +162,67 @@ export default async function MedicationDetailPage({ params }: Props) {
               </Grid>
             </CardContent>
           </Card>
+
+          {(medication.doseType || medication.dosage || medication.packaging || medication.protocolRequiredDose || medication.doseRounding) && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Posologie
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={2}>
+                  {medication.doseType && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Type de dose
+                      </Typography>
+                      <Typography variant="body2">{doseTypeLabels[medication.doseType]}</Typography>
+                    </Grid>
+                  )}
+                  {medication.dosage && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Dosage
+                      </Typography>
+                      <Typography variant="body2">{medication.dosage}</Typography>
+                    </Grid>
+                  )}
+                  {medication.packaging && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Conditionnement
+                      </Typography>
+                      <Typography variant="body2">{medication.packaging}</Typography>
+                    </Grid>
+                  )}
+                  {medication.protocolRequiredDose && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Dose requise selon protocole
+                      </Typography>
+                      <Typography variant="body2">{medication.protocolRequiredDose}</Typography>
+                    </Grid>
+                  )}
+                  {medication.doseRounding && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Arrondi de dose
+                      </Typography>
+                      <Typography variant="body2">{medication.doseRounding}</Typography>
+                    </Grid>
+                  )}
+                  {medication.requiresAnthropometricData && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Donnees anthropometriques
+                      </Typography>
+                      <Typography variant="body2">Requises</Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
 
           <Card sx={{ mb: 3 }}>
             <CardContent>
