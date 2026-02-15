@@ -28,6 +28,7 @@ import { useToast } from '@/contexts/ToastContext';
 const steps = [
   { id: 'A', label: 'Identification' },
   { id: 'B', label: 'Posologie' },
+  { id: 'C', label: 'Preparation & Reconstitution' },
 ];
 
 const medicationTypes = [
@@ -100,6 +101,16 @@ interface MedicationFormData {
   protocolRequiredDose: string;
   doseRounding: string;
   requiresAnthropometricData: boolean;
+  requiresPreparation: boolean;
+  preparationInstructions: string;
+  requiresReconstitution: boolean;
+  reconstitutionInstructions: string;
+  stabilityAfterPreparation: string;
+  dilutionType: string;
+  dilutionVolume: string;
+  dilutionFinalConcentration: string;
+  dilutionSolution: string;
+  requiredEquipments: string;
   iwrsRequired: boolean;
   requiresEsign: boolean;
   isBlinded: boolean;
@@ -130,6 +141,16 @@ export default function EditMedicationPage({ params }: Props) {
     protocolRequiredDose: '',
     doseRounding: '',
     requiresAnthropometricData: false,
+    requiresPreparation: false,
+    preparationInstructions: '',
+    requiresReconstitution: false,
+    reconstitutionInstructions: '',
+    stabilityAfterPreparation: '',
+    dilutionType: '',
+    dilutionVolume: '',
+    dilutionFinalConcentration: '',
+    dilutionSolution: '',
+    requiredEquipments: '',
     iwrsRequired: false,
     requiresEsign: false,
     isBlinded: false,
@@ -167,6 +188,16 @@ export default function EditMedicationPage({ params }: Props) {
           protocolRequiredDose: med.protocolRequiredDose || '',
           doseRounding: med.doseRounding || '',
           requiresAnthropometricData: med.requiresAnthropometricData || false,
+          requiresPreparation: med.requiresPreparation || false,
+          preparationInstructions: med.preparationInstructions || '',
+          requiresReconstitution: med.requiresReconstitution || false,
+          reconstitutionInstructions: med.reconstitutionInstructions || '',
+          stabilityAfterPreparation: med.stabilityAfterPreparation || '',
+          dilutionType: med.dilutionType || '',
+          dilutionVolume: med.dilutionVolume || '',
+          dilutionFinalConcentration: med.dilutionFinalConcentration || '',
+          dilutionSolution: med.dilutionSolution || '',
+          requiredEquipments: med.requiredEquipments || '',
           iwrsRequired: med.iwrsRequired || false,
           requiresEsign: med.requiresEsign || false,
           isBlinded: med.isBlinded || false,
@@ -212,6 +243,14 @@ export default function EditMedicationPage({ params }: Props) {
           packaging: formData.packaging || undefined,
           protocolRequiredDose: formData.protocolRequiredDose || undefined,
           doseRounding: formData.doseRounding || undefined,
+          preparationInstructions: formData.preparationInstructions || undefined,
+          reconstitutionInstructions: formData.reconstitutionInstructions || undefined,
+          stabilityAfterPreparation: formData.stabilityAfterPreparation || undefined,
+          dilutionType: formData.dilutionType || undefined,
+          dilutionVolume: formData.dilutionVolume || undefined,
+          dilutionFinalConcentration: formData.dilutionFinalConcentration || undefined,
+          dilutionSolution: formData.dilutionSolution || undefined,
+          requiredEquipments: formData.requiredEquipments || undefined,
         }),
       });
 
@@ -468,6 +507,112 @@ export default function EditMedicationPage({ params }: Props) {
                 />
               </Grid>
             )}
+          </Grid>
+        );
+      case 2:
+        return (
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={!!formData.requiresPreparation}
+                    onChange={handleSwitchChange('requiresPreparation')}
+                  />
+                }
+                label="Preparation requise"
+              />
+            </Grid>
+            {!!formData.requiresPreparation && (
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  fullWidth
+                  label="Instructions de preparation"
+                  value={formData.preparationInstructions ?? ''}
+                  onChange={handleChange('preparationInstructions')}
+                  multiline
+                  rows={3}
+                />
+              </Grid>
+            )}
+            <Grid size={{ xs: 12 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={!!formData.requiresReconstitution}
+                    onChange={handleSwitchChange('requiresReconstitution')}
+                  />
+                }
+                label="Reconstitution requise"
+              />
+            </Grid>
+            {!!formData.requiresReconstitution && (
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  fullWidth
+                  label="Instructions de reconstitution"
+                  value={formData.reconstitutionInstructions ?? ''}
+                  onChange={handleChange('reconstitutionInstructions')}
+                  multiline
+                  rows={3}
+                />
+              </Grid>
+            )}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Stabilite apres preparation/reconstitution"
+                value={formData.stabilityAfterPreparation}
+                onChange={handleChange('stabilityAfterPreparation')}
+                placeholder="Ex: 24h a temperature ambiante"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Type de dilution"
+                value={formData.dilutionType}
+                onChange={handleChange('dilutionType')}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Volume de dilution"
+                value={formData.dilutionVolume}
+                onChange={handleChange('dilutionVolume')}
+                placeholder="Ex: 250ml"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Concentration finale"
+                value={formData.dilutionFinalConcentration}
+                onChange={handleChange('dilutionFinalConcentration')}
+                placeholder="Ex: 1mg/ml"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Solution de dilution"
+                value={formData.dilutionSolution}
+                onChange={handleChange('dilutionSolution')}
+                placeholder="Ex: NaCl 0.9%, Glucose 5%"
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Equipements requis"
+                value={formData.requiredEquipments}
+                onChange={handleChange('requiredEquipments')}
+                multiline
+                rows={3}
+                placeholder="Ex: CSTD, filtre 0.2um, protection lumiere"
+              />
+            </Grid>
           </Grid>
         );
       default:

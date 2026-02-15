@@ -224,6 +224,93 @@ export default async function MedicationDetailPage({ params }: Props) {
             </Card>
           )}
 
+          {(medication.requiresPreparation || medication.requiresReconstitution || medication.stabilityAfterPreparation || medication.dilutionType || medication.dilutionVolume || medication.dilutionFinalConcentration || medication.dilutionSolution || medication.requiredEquipments) && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Preparation & Reconstitution
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={2}>
+                  {medication.requiresPreparation && (
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Preparation
+                      </Typography>
+                      <Typography variant="body2">Requise</Typography>
+                      {medication.preparationInstructions && (
+                        <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-line' }}>
+                          {medication.preparationInstructions}
+                        </Typography>
+                      )}
+                    </Grid>
+                  )}
+                  {medication.requiresReconstitution && (
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Reconstitution
+                      </Typography>
+                      <Typography variant="body2">Requise</Typography>
+                      {medication.reconstitutionInstructions && (
+                        <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-line' }}>
+                          {medication.reconstitutionInstructions}
+                        </Typography>
+                      )}
+                    </Grid>
+                  )}
+                  {medication.stabilityAfterPreparation && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Stabilite apres preparation
+                      </Typography>
+                      <Typography variant="body2">{medication.stabilityAfterPreparation}</Typography>
+                    </Grid>
+                  )}
+                  {medication.dilutionType && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Type de dilution
+                      </Typography>
+                      <Typography variant="body2">{medication.dilutionType}</Typography>
+                    </Grid>
+                  )}
+                  {medication.dilutionVolume && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Volume de dilution
+                      </Typography>
+                      <Typography variant="body2">{medication.dilutionVolume}</Typography>
+                    </Grid>
+                  )}
+                  {medication.dilutionFinalConcentration && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Concentration finale
+                      </Typography>
+                      <Typography variant="body2">{medication.dilutionFinalConcentration}</Typography>
+                    </Grid>
+                  )}
+                  {medication.dilutionSolution && (
+                    <Grid size={{ xs: 6, md: 4 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Solution de dilution
+                      </Typography>
+                      <Typography variant="body2">{medication.dilutionSolution}</Typography>
+                    </Grid>
+                  )}
+                  {medication.requiredEquipments && (
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Equipements requis
+                      </Typography>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>{medication.requiredEquipments}</Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
+
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>

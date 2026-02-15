@@ -479,6 +479,18 @@ model Medication {
   doseRounding                String?
   requiresAnthropometricData  Boolean  @default(false)
 
+  // Preparation & Reconstitution (Bloc C)
+  requiresPreparation         Boolean  @default(false)
+  preparationInstructions     String?
+  requiresReconstitution      Boolean  @default(false)
+  reconstitutionInstructions  String?
+  stabilityAfterPreparation   String?
+  dilutionType                String?
+  dilutionVolume              String?
+  dilutionFinalConcentration  String?
+  dilutionSolution            String?
+  requiredEquipments          String?
+
   // Storage
   storageCondition    StorageCondition
   storageInstructions String?
