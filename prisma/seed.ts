@@ -250,7 +250,7 @@ async function main() {
         countingUnit: CountingUnit.UNIT,
         unitsPerPackage: 30,
         isBlinded: true,
-        iwrsRequired: true,
+        iwrsPerMovement: { reception: true, dispensation: true, retour: false },
       },
     }),
     prisma.medication.upsert({
@@ -273,7 +273,7 @@ async function main() {
         countingUnit: CountingUnit.UNIT,
         unitsPerPackage: 30,
         isBlinded: true,
-        iwrsRequired: true,
+        iwrsPerMovement: { reception: true, dispensation: true, retour: false },
       },
     }),
     prisma.medication.upsert({
@@ -296,7 +296,7 @@ async function main() {
         storageInstructions: 'Conserver entre 2-8C. Proteger de la lumiere.',
         countingUnit: CountingUnit.VIAL,
         unitsPerPackage: 10,
-        iwrsRequired: false,
+        iwrsPerMovement: { reception: false, dispensation: false, retour: false },
       },
     }),
   ]);

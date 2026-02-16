@@ -62,7 +62,7 @@ describe('Medication Validators', () => {
         countingUnit: 'VIAL',
         unitsPerPackage: 10,
         isBlinded: true,
-        iwrsRequired: true,
+        iwrsPerMovement: { reception: true, dispensation: true, retour: false },
       };
 
       const result = createMedicationSchema.safeParse(data);

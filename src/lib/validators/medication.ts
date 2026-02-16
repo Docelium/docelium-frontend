@@ -68,7 +68,17 @@ export const createMedicationSchema = z.object({
   temperatureMonitoringRequired: z.boolean().default(false),
   stabilityAfterOpening: z.string().max(500).optional(),
   excursionPolicy: z.string().max(500).optional(),
-  iwrsRequired: z.boolean().default(false),
+  iwrsPerMovement: z.object({
+    reception: z.boolean(),
+    dispensation: z.boolean(),
+    retour: z.boolean(),
+  }).optional(),
+  isAtmp: z.boolean().default(false),
+  dosageEscalationScheme: z.string().max(1000).optional(),
+  customLogFields: z.array(z.object({
+    name: z.string().min(1).max(100),
+    type: z.enum(['TEXT', 'NUMBER', 'BOOLEAN']),
+  })).max(10).optional(),
   requiresEsign: z.boolean().default(false),
   isBlinded: z.boolean().default(false),
   isPediatric: z.boolean().default(false),

@@ -16,6 +16,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Divider from '@mui/material/Divider';
 import DateField from '@/components/DateField';
 
 interface Study {
@@ -28,6 +31,7 @@ interface Medication {
   id: string;
   code: string;
   name: string;
+  customLogFields: { name: string; type: 'TEXT' | 'NUMBER' | 'BOOLEAN' }[] | null;
 }
 
 interface StockItem {
@@ -62,6 +66,7 @@ export default function ReturnPage() {
   const [error, setError] = useState('');
   const [studies, setStudies] = useState<Study[]>([]);
   const [medications, setMedications] = useState<Medication[]>([]);
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, string | number | boolean>>({});
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [formData, setFormData] = useState({
     studyId: '',
@@ -102,6 +107,21 @@ export default function ReturnPage() {
     }
   }, [formData.studyId, formData.medicationId]);
 
+  useEffect(() => {
+    const med = medications.find((m) => m.id === formData.medicationId);
+    const fields = med?.customLogFields || [];
+    const defaults: Record<string, string | number | boolean> = {};
+    fields.forEach((f) => {
+      if (f.type === 'TEXT') defaults[f.name] = '';
+      else if (f.type === 'NUMBER') defaults[f.name] = 0;
+      else if (f.type === 'BOOLEAN') defaults[f.name] = false;
+    });
+    setCustomFieldValues(defaults);
+  }, [formData.medicationId, medications]);
+
+  const selectedMedication = medications.find((m) => m.id === formData.medicationId);
+  const customFields = selectedMedication?.customLogFields || [];
+
   const handleChange = (field: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { value: unknown } }
   ) => {
@@ -124,6 +144,7 @@ export default function ReturnPage() {
           movementDate: formData.movementDate ? new Date(formData.movementDate) : new Date(),
           returnedQuantityUsed: formData.returnedQuantityUsed ? parseInt(formData.returnedQuantityUsed, 10) : undefined,
           returnedQuantityUnused: formData.returnedQuantityUnused ? parseInt(formData.returnedQuantityUnused, 10) : undefined,
+          ...(customFields.length > 0 ? { customFieldValues } : {}),
         }),
       });
 
@@ -306,6 +327,46 @@ export default function ReturnPage() {
                   rows={2}
                 />
               </Grid>
+              {customFields.length > 0 && (
+                <>
+                  <Grid size={{ xs: 12 }}>
+                    <Divider />
+                    <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                      Champs personnalises
+                    </Typography>
+                  </Grid>
+                  {customFields.map((field) => (
+                    <Grid size={{ xs: 12, md: 6 }} key={field.name}>
+                      {field.type === 'BOOLEAN' ? (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={!!customFieldValues[field.name]}
+                              onChange={(e) =>
+                                setCustomFieldValues((prev) => ({ ...prev, [field.name]: e.target.checked }))
+                              }
+                            />
+                          }
+                          label={field.name}
+                        />
+                      ) : (
+                        <TextField
+                          fullWidth
+                          label={field.name}
+                          type={field.type === 'NUMBER' ? 'number' : 'text'}
+                          value={customFieldValues[field.name] ?? ''}
+                          onChange={(e) =>
+                            setCustomFieldValues((prev) => ({
+                              ...prev,
+                              [field.name]: field.type === 'NUMBER' ? Number(e.target.value) : e.target.value,
+                            }))
+                          }
+                        />
+                      )}
+                    </Grid>
+                  ))}
+                </>
+              )}
             </Grid>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4, gap: 2 }}>

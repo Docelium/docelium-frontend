@@ -53,7 +53,16 @@ export async function getMedicationsByStudy(studyId: string) {
       studyId,
       status: { not: 'WITHDRAWN' },
     },
-    include: {
+    select: {
+      id: true,
+      code: true,
+      name: true,
+      type: true,
+      dosageForm: true,
+      strength: true,
+      storageCondition: true,
+      status: true,
+      customLogFields: true,
       _count: {
         select: {
           stockItems: true,

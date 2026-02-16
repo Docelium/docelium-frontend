@@ -20,7 +20,10 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useToast } from '@/contexts/ToastContext';
 
 interface Study {
@@ -135,7 +138,10 @@ const initialFormData = {
   temperatureMonitoringRequired: false,
   stabilityAfterOpening: '',
   excursionPolicy: '',
-  iwrsRequired: false,
+  iwrsPerMovement: { reception: false, dispensation: false, retour: false },
+  isAtmp: false,
+  dosageEscalationScheme: '',
+  customLogFields: [] as { name: string; type: string }[],
   requiresEsign: false,
   isBlinded: false,
   isPediatric: false,
@@ -168,7 +174,10 @@ const testFormData = {
   temperatureMonitoringRequired: true,
   stabilityAfterOpening: '28 jours apres ouverture a temperature ambiante',
   excursionPolicy: 'Max 72h hors refrigeration, signaler au promoteur',
-  iwrsRequired: true,
+  iwrsPerMovement: { reception: true, dispensation: true, retour: false },
+  isAtmp: false,
+  dosageEscalationScheme: 'Escalade 3+3, dose initiale 50mg',
+  customLogFields: [{ name: 'Temperature', type: 'TEXT' }] as { name: string; type: string }[],
   requiresEsign: false,
   isBlinded: true,
   isPediatric: false,
@@ -302,6 +311,10 @@ export default function NewMedicationPage() {
           complianceMethod: formData.complianceMethod || undefined,
           stabilityAfterOpening: formData.stabilityAfterOpening || undefined,
           excursionPolicy: formData.excursionPolicy || undefined,
+          iwrsPerMovement: formData.iwrsPerMovement,
+          isAtmp: formData.isAtmp,
+          dosageEscalationScheme: formData.dosageEscalationScheme || undefined,
+          customLogFields: formData.customLogFields.length > 0 ? formData.customLogFields : undefined,
           initialSupplyMode: formData.initialSupplyMode || undefined,
           resupplyMode: formData.resupplyMode || undefined,
           treatmentAssignmentMode: formData.treatmentAssignmentMode || undefined,
@@ -653,15 +666,6 @@ export default function NewMedicationPage() {
                     }
                     label="Produit en aveugle"
                   />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={!!formData.iwrsRequired}
-                        onChange={handleSwitchChange('iwrsRequired')}
-                      />
-                    }
-                    label="IWRS requis"
-                  />
                 </Box>
               </Grid>
               <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
@@ -820,6 +824,151 @@ export default function NewMedicationPage() {
                   </FormControl>
                 </Grid>
               )}
+            </Grid>
+
+            {/* Regles Avancees & Tracabilite */}
+            <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 4 }}>
+              Regles Avancees & Tracabilite
+            </Typography>
+            <Grid container spacing={3} sx={{ maxWidth: '100%', mt: 1 }}>
+              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  IWRS par type de mouvement
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={!!formData.iwrsPerMovement.reception}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            iwrsPerMovement: { ...prev.iwrsPerMovement, reception: e.target.checked },
+                          }))
+                        }
+                      />
+                    }
+                    label="Reception"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={!!formData.iwrsPerMovement.dispensation}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            iwrsPerMovement: { ...prev.iwrsPerMovement, dispensation: e.target.checked },
+                          }))
+                        }
+                      />
+                    }
+                    label="Dispensation"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={!!formData.iwrsPerMovement.retour}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            iwrsPerMovement: { ...prev.iwrsPerMovement, retour: e.target.checked },
+                          }))
+                        }
+                      />
+                    }
+                    label="Retour"
+                  />
+                </Box>
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!formData.isAtmp}
+                      onChange={handleSwitchChange('isAtmp')}
+                    />
+                  }
+                  label="ATMP (Medicament de therapie innovante)"
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+                <TextField
+                  fullWidth
+                  label="Schema dose / escalade"
+                  value={formData.dosageEscalationScheme}
+                  onChange={handleChange('dosageEscalationScheme')}
+                  multiline
+                  rows={3}
+                  placeholder="Ex: Escalade 3+3, dose initiale 50mg..."
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Champs personnalisés pour logs de comptabilite
+                </Typography>
+                {formData.customLogFields.map((field, index) => (
+                  <Box key={index} sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+                    <TextField
+                      label="Nom du champ"
+                      value={field.name}
+                      onChange={(e) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          customLogFields: prev.customLogFields.map((f, i) =>
+                            i === index ? { name: e.target.value, type: f.type } : f
+                          ),
+                        }));
+                      }}
+                      sx={{ flex: 1 }}
+                    />
+                    <FormControl sx={{ minWidth: 150 }}>
+                      <InputLabel>Type</InputLabel>
+                      <Select
+                        value={field.type}
+                        label="Type"
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            customLogFields: prev.customLogFields.map((f, i) =>
+                              i === index ? { name: f.name, type: e.target.value as string } : f
+                            ),
+                          }));
+                        }}
+                      >
+                        <MenuItem value="TEXT">Texte</MenuItem>
+                        <MenuItem value="NUMBER">Nombre</MenuItem>
+                        <MenuItem value="BOOLEAN">Booleen</MenuItem>
+                      </Select>
+                    </FormControl>
+                    <IconButton
+                      color="error"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          customLogFields: prev.customLogFields.filter((_, i) => i !== index),
+                        }));
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                ))}
+                {formData.customLogFields.length < 10 && (
+                  <Button
+                    startIcon={<AddIcon />}
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        customLogFields: [...prev.customLogFields, { name: '', type: 'TEXT' }],
+                      }));
+                    }}
+                    variant="outlined"
+                    size="small"
+                  >
+                    Ajouter un champ
+                  </Button>
+                )}
+              </Grid>
             </Grid>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4, gap: 2 }}>

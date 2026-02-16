@@ -22,8 +22,11 @@ import Grid from '@mui/material/Grid';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
+import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useToast } from '@/contexts/ToastContext';
 
 const steps = [
@@ -32,6 +35,7 @@ const steps = [
   { id: 'C', label: 'Preparation & Reconstitution' },
   { id: 'D', label: 'Securite & Compliance' },
   { id: 'E', label: 'Stockage & Temperature' },
+  { id: 'F', label: 'Regles Avancees' },
 ];
 
 const medicationTypes = [
@@ -169,7 +173,10 @@ interface MedicationFormData {
   temperatureMonitoringRequired: boolean;
   stabilityAfterOpening: string;
   excursionPolicy: string;
-  iwrsRequired: boolean;
+  iwrsPerMovement: { reception: boolean; dispensation: boolean; retour: boolean };
+  isAtmp: boolean;
+  dosageEscalationScheme: string;
+  customLogFields: { name: string; type: string }[];
   requiresEsign: boolean;
   isBlinded: boolean;
   isPediatric: boolean;
@@ -225,7 +232,10 @@ export default function EditMedicationPage({ params }: Props) {
     temperatureMonitoringRequired: false,
     stabilityAfterOpening: '',
     excursionPolicy: '',
-    iwrsRequired: false,
+    iwrsPerMovement: { reception: false, dispensation: false, retour: false },
+    isAtmp: false,
+    dosageEscalationScheme: '',
+    customLogFields: [],
     requiresEsign: false,
     isBlinded: false,
     isPediatric: false,
@@ -288,7 +298,10 @@ export default function EditMedicationPage({ params }: Props) {
           temperatureMonitoringRequired: med.temperatureMonitoringRequired || false,
           stabilityAfterOpening: med.stabilityAfterOpening || '',
           excursionPolicy: med.excursionPolicy || '',
-          iwrsRequired: med.iwrsRequired || false,
+          iwrsPerMovement: med.iwrsPerMovement || { reception: false, dispensation: false, retour: false },
+          isAtmp: med.isAtmp || false,
+          dosageEscalationScheme: med.dosageEscalationScheme || '',
+          customLogFields: med.customLogFields || [],
           requiresEsign: med.requiresEsign || false,
           isBlinded: med.isBlinded || false,
           isPediatric: med.isPediatric || false,
@@ -367,6 +380,10 @@ export default function EditMedicationPage({ params }: Props) {
           complianceMethod: formData.complianceMethod || undefined,
           stabilityAfterOpening: formData.stabilityAfterOpening || undefined,
           excursionPolicy: formData.excursionPolicy || undefined,
+          iwrsPerMovement: formData.iwrsPerMovement,
+          isAtmp: formData.isAtmp,
+          dosageEscalationScheme: formData.dosageEscalationScheme || undefined,
+          customLogFields: formData.customLogFields.length > 0 ? formData.customLogFields : undefined,
           initialSupplyMode: formData.initialSupplyMode || undefined,
           resupplyMode: formData.resupplyMode || undefined,
           treatmentAssignmentMode: formData.treatmentAssignmentMode || undefined,
@@ -561,15 +578,6 @@ export default function EditMedicationPage({ params }: Props) {
                     />
                   }
                   label="Produit en aveugle"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={!!formData.iwrsRequired}
-                      onChange={handleSwitchChange('iwrsRequired')}
-                    />
-                  }
-                  label="IWRS requis"
                 />
               </Box>
             </Grid>
@@ -966,6 +974,147 @@ export default function EditMedicationPage({ params }: Props) {
                 rows={2}
                 placeholder="Ex: Max 72h hors refrigeration, signaler au promoteur"
               />
+            </Grid>
+          </Grid>
+        );
+      case 5:
+        return (
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                IWRS par type de mouvement
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={!!formData.iwrsPerMovement.reception}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          iwrsPerMovement: { ...prev.iwrsPerMovement, reception: e.target.checked },
+                        }))
+                      }
+                    />
+                  }
+                  label="Reception"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={!!formData.iwrsPerMovement.dispensation}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          iwrsPerMovement: { ...prev.iwrsPerMovement, dispensation: e.target.checked },
+                        }))
+                      }
+                    />
+                  }
+                  label="Dispensation"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={!!formData.iwrsPerMovement.retour}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          iwrsPerMovement: { ...prev.iwrsPerMovement, retour: e.target.checked },
+                        }))
+                      }
+                    />
+                  }
+                  label="Retour"
+                />
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={!!formData.isAtmp}
+                    onChange={handleSwitchChange('isAtmp')}
+                  />
+                }
+                label="ATMP (Medicament de therapie innovante)"
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Schema dose / escalade"
+                value={formData.dosageEscalationScheme}
+                onChange={handleChange('dosageEscalationScheme')}
+                multiline
+                rows={3}
+                placeholder="Ex: Escalade 3+3, dose initiale 50mg..."
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                Champs personnalisés pour logs de comptabilite
+              </Typography>
+              {formData.customLogFields.map((field, index) => (
+                <Box key={index} sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+                  <TextField
+                    label="Nom du champ"
+                    value={field.name}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        customLogFields: prev.customLogFields.map((f, i) =>
+                          i === index ? { name: e.target.value, type: f.type } : f
+                        ),
+                      }));
+                    }}
+                    sx={{ flex: 1 }}
+                  />
+                  <FormControl sx={{ minWidth: 150 }}>
+                    <InputLabel>Type</InputLabel>
+                    <Select
+                      value={field.type}
+                      label="Type"
+                      onChange={(e) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          customLogFields: prev.customLogFields.map((f, i) =>
+                            i === index ? { name: f.name, type: e.target.value as string } : f
+                          ),
+                        }));
+                      }}
+                    >
+                      <MenuItem value="TEXT">Texte</MenuItem>
+                      <MenuItem value="NUMBER">Nombre</MenuItem>
+                      <MenuItem value="BOOLEAN">Booleen</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <IconButton
+                    color="error"
+                    onClick={() => {
+                      const updated = formData.customLogFields.filter((_, i) => i !== index);
+                      setFormData((prev) => ({ ...prev, customLogFields: updated }));
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              ))}
+              {formData.customLogFields.length < 10 && (
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      customLogFields: [...prev.customLogFields, { name: '', type: 'TEXT' }],
+                    }));
+                  }}
+                  variant="outlined"
+                  size="small"
+                >
+                  Ajouter un champ
+                </Button>
+              )}
             </Grid>
           </Grid>
         );

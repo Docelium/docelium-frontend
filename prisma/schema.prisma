@@ -536,10 +536,15 @@ model Medication {
   complianceRequired  Boolean  @default(false)
   complianceMethod    String?
 
+  // Regles Avancees & Tracabilite (Bloc F)
+  iwrsPerMovement          Json?
+  isAtmp                   Boolean  @default(false)
+  dosageEscalationScheme   String?
+  customLogFields          Json?
+
   // Configuration
   destructionPolicy        DestructionPolicy?
   destructionPolicyDetails String?
-  iwrsRequired             Boolean            @default(false)
   requiresEsign     Boolean            @default(false)
   isBlinded         Boolean            @default(false)
 
@@ -693,7 +698,8 @@ model Movement {
   iwrsConfirmationNumber String?
 
   // Additional data
-  notes String?
+  notes             String?
+  customFieldValues Json?
 
   // E-Signature
   isSigned Boolean   @default(false)

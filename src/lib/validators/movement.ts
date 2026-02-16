@@ -15,6 +15,7 @@ const baseMovementSchema = z.object({
   quantity: z.number().int().positive('La quantite doit etre positive'),
   movementDate: z.coerce.date(),
   notes: z.string().max(1000).optional(),
+  customFieldValues: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
 });
 
 // Reception

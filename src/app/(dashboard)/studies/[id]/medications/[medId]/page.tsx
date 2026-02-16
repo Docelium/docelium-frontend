@@ -517,6 +517,78 @@ export default async function MedicationDetailPage({ params }: Props) {
             </CardContent>
           </Card>
 
+          {/* Regles Avancees & Tracabilite (Bloc F) */}
+          {(medication.iwrsPerMovement || medication.isAtmp || medication.dosageEscalationScheme || (medication.customLogFields as { name: string; type: string }[] | null)?.length) && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Regles Avancees & Tracabilite
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={2}>
+                  {medication.iwrsPerMovement && (
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        IWRS par type de mouvement
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 2, mt: 0.5 }}>
+                        <Chip
+                          label="Reception"
+                          color={(medication.iwrsPerMovement as { reception: boolean }).reception ? 'success' : 'default'}
+                          size="small"
+                          variant={(medication.iwrsPerMovement as { reception: boolean }).reception ? 'filled' : 'outlined'}
+                        />
+                        <Chip
+                          label="Dispensation"
+                          color={(medication.iwrsPerMovement as { dispensation: boolean }).dispensation ? 'success' : 'default'}
+                          size="small"
+                          variant={(medication.iwrsPerMovement as { dispensation: boolean }).dispensation ? 'filled' : 'outlined'}
+                        />
+                        <Chip
+                          label="Retour"
+                          color={(medication.iwrsPerMovement as { retour: boolean }).retour ? 'success' : 'default'}
+                          size="small"
+                          variant={(medication.iwrsPerMovement as { retour: boolean }).retour ? 'filled' : 'outlined'}
+                        />
+                      </Box>
+                    </Grid>
+                  )}
+                  <Grid size={{ xs: 6, md: 4 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      ATMP
+                    </Typography>
+                    <Typography variant="body2">{medication.isAtmp ? 'Oui' : 'Non'}</Typography>
+                  </Grid>
+                  {medication.dosageEscalationScheme && (
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Schema dose / escalade
+                      </Typography>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>{medication.dosageEscalationScheme}</Typography>
+                    </Grid>
+                  )}
+                  {(medication.customLogFields as { name: string; type: string }[] | null)?.length ? (
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Champs personnalisés
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                        {(medication.customLogFields as { name: string; type: string }[]).map((field) => (
+                          <Chip
+                            key={field.name}
+                            label={`${field.name} (${field.type === 'TEXT' ? 'Texte' : field.type === 'NUMBER' ? 'Nombre' : 'Booleen'})`}
+                            size="small"
+                            variant="outlined"
+                          />
+                        ))}
+                      </Box>
+                    </Grid>
+                  ) : null}
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -524,12 +596,6 @@ export default async function MedicationDetailPage({ params }: Props) {
               </Typography>
               <Divider sx={{ mb: 2 }} />
               <Grid container spacing={2}>
-                <Grid size={{ xs: 6, md: 4 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    IWRS requis
-                  </Typography>
-                  <Typography variant="body2">{medication.iwrsRequired ? 'Oui' : 'Non'}</Typography>
-                </Grid>
                 <Grid size={{ xs: 6, md: 4 }}>
                   <Typography variant="caption" color="text.secondary">
                     Produit en aveugle
