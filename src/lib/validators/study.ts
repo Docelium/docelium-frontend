@@ -52,10 +52,12 @@ export const blocASchema = z.object({
 });
 
 // BLOC B - Organisation & Contacts
+export const MandatoryContactRoles = ['PI', 'SC', 'CRA', 'PHARMA'] as const;
+
 const contactSchema = z.object({
   role: z.enum(ContactRoleValues),
-  name: z.string().min(1),
-  email: z.string().email(),
+  name: z.string().min(1, 'Le nom est requis'),
+  email: z.string().email('Email invalide'),
   phone: z.string().optional(),
 });
 
@@ -170,8 +172,8 @@ export const datesSchema = z.object({
   expectedEndDate: z.coerce.date().nullable().optional(),
 });
 
-// Schema complet de creation de protocole
-export const createStudySchema = z.object({
+// Schema de base (sans refinements) pour pouvoir utiliser .partial()
+const baseStudySchema = z.object({
   // BLOC A - Identification (requis)
   ...blocASchema.shape,
   // BLOC B - Contacts
@@ -196,7 +198,36 @@ export const createStudySchema = z.object({
   blockComments: z.record(z.string(), z.string()).nullable().optional(),
 });
 
-export const updateStudySchema = createStudySchema.partial();
+// Schema de creation avec validation des contacts obligatoires
+export const createStudySchema = baseStudySchema.check((ctx) => {
+  const contacts = ctx.value.contacts;
+  if (!contacts || contacts.length === 0) {
+    for (const role of MandatoryContactRoles) {
+      const label = role === 'PHARMA' ? 'Pharmacien (PH)' : role;
+      ctx.issues.push({
+        code: 'custom',
+        path: ['contacts'],
+        message: `Le contact ${label} est obligatoire`,
+        input: contacts,
+      });
+    }
+    return;
+  }
+  const presentRoles = new Set(contacts.map((c) => c.role));
+  for (const role of MandatoryContactRoles) {
+    if (!presentRoles.has(role)) {
+      const label = role === 'PHARMA' ? 'Pharmacien (PH)' : role;
+      ctx.issues.push({
+        code: 'custom',
+        path: ['contacts'],
+        message: `Le contact ${label} est obligatoire`,
+        input: contacts,
+      });
+    }
+  }
+});
+
+export const updateStudySchema = baseStudySchema.partial();
 
 // Types
 export type BlocAData = z.infer<typeof blocASchema>;

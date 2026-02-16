@@ -96,11 +96,13 @@ const weightReferences = [
 ];
 
 interface Contact {
-  role: 'PI' | 'SC' | 'CRA' | 'PM';
+  role: 'PI' | 'SC' | 'CRA' | 'PM' | 'PHARMA';
   name: string;
   email: string;
   phone: string;
 }
+
+const MANDATORY_CONTACT_ROLES: Contact['role'][] = ['PI', 'SC', 'CRA', 'PHARMA'];
 
 interface Amendment {
   version: string;
@@ -906,8 +908,17 @@ export default function NewStudyPage() {
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
-              Ajoutez les contacts cles du protocole : PI, SC, CRA, PM.
+              Les contacts PI, SC, CRA et Pharmacien (PH) sont obligatoires. Les autres roles sont optionnels.
             </Typography>
+
+            {!hasMandatoryContacts() && (
+              <Alert severity="warning">
+                Contacts obligatoires manquants :{' '}
+                {MANDATORY_CONTACT_ROLES.filter(
+                  (role) => !formData.contacts.some((c) => c.role === role)
+                ).map((role) => (role === 'PHARMA' ? 'Pharmacien (PH)' : role)).join(', ')}
+              </Alert>
+            )}
 
             {formData.contacts.map((contact, index) => (
               <Card key={index} variant="outlined" sx={{ p: 2 }}>
@@ -939,6 +950,7 @@ export default function NewStudyPage() {
                     label="Nom"
                     value={contact.name}
                     onChange={(e) => updateContact(index, 'name', e.target.value)}
+                    required
                     sx={{ flex: 1, minWidth: 200 }}
                   />
                   <TextField
@@ -946,6 +958,7 @@ export default function NewStudyPage() {
                     type="email"
                     value={contact.email}
                     onChange={(e) => updateContact(index, 'email', e.target.value)}
+                    required
                     sx={{ flex: 1, minWidth: 200 }}
                   />
                   <TextField
@@ -1555,10 +1568,21 @@ export default function NewStudyPage() {
     }
   };
 
+  const hasMandatoryContacts = () => {
+    const presentRoles = new Set(formData.contacts.map((c) => c.role));
+    return MANDATORY_CONTACT_ROLES.every((role) => presentRoles.has(role));
+  };
+
+  const allContactsFilled = () => {
+    return formData.contacts.every((c) => c.name.trim() && c.email.trim());
+  };
+
   const isStepValid = () => {
     switch (activeStep) {
       case 0: // BLOC A - obligatoire: codeInternal, acronym, siteNumber, title, sponsor, phases, setupDate
         return formData.codeInternal && formData.studyCode && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0 && formData.setupDate;
+      case 1: // BLOC B - contacts obligatoires: PI, SC, CRA, PHARMA
+        return hasMandatoryContacts() && allContactsFilled();
       default:
         return true;
     }
@@ -1566,7 +1590,7 @@ export default function NewStudyPage() {
 
   // Validation globale pour le bouton "Creer" (verifie tous les champs obligatoires)
   const isFormValidForSubmit = () => {
-    return !!(formData.codeInternal && formData.studyCode && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0 && formData.setupDate);
+    return !!(formData.codeInternal && formData.studyCode && formData.acronym && formData.siteNumber && formData.title && formData.sponsor && formData.phases.length > 0 && formData.setupDate && hasMandatoryContacts() && allContactsFilled());
   };
 
   return (
