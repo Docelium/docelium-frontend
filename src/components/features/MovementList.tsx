@@ -49,6 +49,7 @@ interface MovementListProps {
   createHref: string;
   createLabel: string;
   canCreate: boolean;
+  hideHeader?: boolean;
 }
 
 export default function MovementList({
@@ -58,28 +59,31 @@ export default function MovementList({
   createHref,
   createLabel,
   canCreate,
+  hideHeader,
 }: MovementListProps) {
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            {title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {subtitle}
-          </Typography>
+      {!hideHeader && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+          <Box>
+            <Typography variant="h4" gutterBottom>
+              {title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {subtitle}
+            </Typography>
+          </Box>
+          {canCreate && (
+            <LinkButton
+              href={createHref}
+              variant="contained"
+              startIcon={<AddIcon />}
+            >
+              {createLabel}
+            </LinkButton>
+          )}
         </Box>
-        {canCreate && (
-          <LinkButton
-            href={createHref}
-            variant="contained"
-            startIcon={<AddIcon />}
-          >
-            {createLabel}
-          </LinkButton>
-        )}
-      </Box>
+      )}
 
       <Card>
         {movements.length === 0 ? (
