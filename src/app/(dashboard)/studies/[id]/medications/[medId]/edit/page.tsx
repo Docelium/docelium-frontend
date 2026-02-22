@@ -176,7 +176,7 @@ interface MedicationFormData {
   iwrsPerMovement: { reception: boolean; dispensation: boolean; retour: boolean };
   isAtmp: boolean;
   dosageEscalationScheme: string;
-  customLogFields: { name: string; type: string }[];
+  customLogFields: { name: string; type: string; movementTypes: string[] }[];
   requiresEsign: boolean;
   isBlinded: boolean;
   isPediatric: boolean;
@@ -235,7 +235,7 @@ export default function EditMedicationPage({ params }: Props) {
     iwrsPerMovement: { reception: false, dispensation: false, retour: false },
     isAtmp: false,
     dosageEscalationScheme: '',
-    customLogFields: [],
+    customLogFields: [] as { name: string; type: string; movementTypes: string[] }[],
     requiresEsign: false,
     isBlinded: false,
     isPediatric: false,
@@ -301,7 +301,10 @@ export default function EditMedicationPage({ params }: Props) {
           iwrsPerMovement: med.iwrsPerMovement || { reception: false, dispensation: false, retour: false },
           isAtmp: med.isAtmp || false,
           dosageEscalationScheme: med.dosageEscalationScheme || '',
-          customLogFields: med.customLogFields || [],
+          customLogFields: (med.customLogFields || []).map((f: { name: string; type: string; movementTypes?: string[] }) => ({
+            ...f,
+            movementTypes: f.movementTypes || ['RECEPTION', 'DISPENSATION', 'RETOUR'],
+          })),
           requiresEsign: med.requiresEsign || false,
           isBlinded: med.isBlinded || false,
           isPediatric: med.isPediatric || false,
@@ -1056,7 +1059,7 @@ export default function EditMedicationPage({ params }: Props) {
                 Champs personnalisés pour logs de comptabilite
               </Typography>
               {formData.customLogFields.map((field, index) => (
-                <Box key={index} sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+                <Box key={index} sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                   <TextField
                     label="Nom du champ"
                     value={field.name}
@@ -1064,11 +1067,11 @@ export default function EditMedicationPage({ params }: Props) {
                       setFormData((prev) => ({
                         ...prev,
                         customLogFields: prev.customLogFields.map((f, i) =>
-                          i === index ? { name: e.target.value, type: f.type } : f
+                          i === index ? { ...f, name: e.target.value } : f
                         ),
                       }));
                     }}
-                    sx={{ flex: 1 }}
+                    sx={{ flex: 1, minWidth: 150 }}
                   />
                   <FormControl sx={{ minWidth: 150 }}>
                     <InputLabel>Type</InputLabel>
@@ -1079,7 +1082,7 @@ export default function EditMedicationPage({ params }: Props) {
                         setFormData((prev) => ({
                           ...prev,
                           customLogFields: prev.customLogFields.map((f, i) =>
-                            i === index ? { name: f.name, type: e.target.value as string } : f
+                            i === index ? { ...f, type: e.target.value as string } : f
                           ),
                         }));
                       }}
@@ -1087,6 +1090,41 @@ export default function EditMedicationPage({ params }: Props) {
                       <MenuItem value="TEXT">Texte</MenuItem>
                       <MenuItem value="NUMBER">Nombre</MenuItem>
                       <MenuItem value="BOOLEAN">Booleen</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl sx={{ minWidth: 220 }}>
+                    <InputLabel>Types de mouvement</InputLabel>
+                    <Select
+                      multiple
+                      value={field.movementTypes}
+                      label="Types de mouvement"
+                      onChange={(e) => {
+                        const value = e.target.value as string[];
+                        if (value.length === 0) return;
+                        setFormData((prev) => ({
+                          ...prev,
+                          customLogFields: prev.customLogFields.map((f, i) =>
+                            i === index ? { ...f, movementTypes: value } : f
+                          ),
+                        }));
+                      }}
+                      renderValue={(selected) =>
+                        (selected as string[]).map((v) => {
+                          const labels: Record<string, string> = { RECEPTION: 'Reception', DISPENSATION: 'Dispensation', RETOUR: 'Retour' };
+                          return labels[v] || v;
+                        }).join(', ')
+                      }
+                    >
+                      {[
+                        { value: 'RECEPTION', label: 'Reception' },
+                        { value: 'DISPENSATION', label: 'Dispensation' },
+                        { value: 'RETOUR', label: 'Retour' },
+                      ].map((opt) => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          <Checkbox checked={field.movementTypes.includes(opt.value)} />
+                          {opt.label}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                   <IconButton
@@ -1106,7 +1144,7 @@ export default function EditMedicationPage({ params }: Props) {
                   onClick={() => {
                     setFormData((prev) => ({
                       ...prev,
-                      customLogFields: [...prev.customLogFields, { name: '', type: 'TEXT' }],
+                      customLogFields: [...prev.customLogFields, { name: '', type: 'TEXT', movementTypes: ['RECEPTION', 'DISPENSATION', 'RETOUR'] }],
                     }));
                   }}
                   variant="outlined"

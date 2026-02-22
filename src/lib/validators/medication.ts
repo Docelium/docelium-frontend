@@ -78,6 +78,7 @@ export const createMedicationSchema = z.object({
   customLogFields: z.array(z.object({
     name: z.string().min(1).max(100),
     type: z.enum(['TEXT', 'NUMBER', 'BOOLEAN']),
+    movementTypes: z.array(z.enum(['RECEPTION', 'DISPENSATION', 'RETOUR'])).min(1),
   })).max(10).optional(),
   requiresEsign: z.boolean().default(false),
   isBlinded: z.boolean().default(false),

@@ -31,7 +31,7 @@ interface Medication {
   id: string;
   code: string;
   name: string;
-  customLogFields: { name: string; type: 'TEXT' | 'NUMBER' | 'BOOLEAN' }[] | null;
+  customLogFields: { name: string; type: 'TEXT' | 'NUMBER' | 'BOOLEAN'; movementTypes?: string[] }[] | null;
 }
 
 interface StockItem {
@@ -99,7 +99,9 @@ export default function TransferPage() {
 
   useEffect(() => {
     const med = medications.find((m) => m.id === formData.medicationId);
-    const fields = med?.customLogFields || [];
+    const fields = (med?.customLogFields || []).filter(
+      (f) => !f.movementTypes
+    );
     const defaults: Record<string, string | number | boolean> = {};
     fields.forEach((f) => {
       if (f.type === 'TEXT') defaults[f.name] = '';
@@ -110,7 +112,9 @@ export default function TransferPage() {
   }, [formData.medicationId, medications]);
 
   const selectedMedication = medications.find((m) => m.id === formData.medicationId);
-  const customFields = selectedMedication?.customLogFields || [];
+  const customFields = (selectedMedication?.customLogFields || []).filter(
+    (f) => !f.movementTypes
+  );
 
   const handleChange = (field: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { value: unknown } }

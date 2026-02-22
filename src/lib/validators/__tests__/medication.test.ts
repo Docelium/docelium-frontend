@@ -68,5 +68,78 @@ describe('Medication Validators', () => {
       const result = createMedicationSchema.safeParse(data);
       expect(result.success).toBe(true);
     });
+
+    it('should validate customLogFields with movementTypes', () => {
+      const data = {
+        studyId: '550e8400-e29b-41d4-a716-446655440000',
+        code: 'MED-001',
+        name: 'Test Medication',
+        type: 'IMP',
+        dosageForm: 'TABLET',
+        storageCondition: 'ROOM_TEMPERATURE',
+        countingUnit: 'UNIT',
+        customLogFields: [
+          { name: 'Temperature', type: 'NUMBER', movementTypes: ['RECEPTION'] },
+          { name: 'Commentaire', type: 'TEXT', movementTypes: ['RECEPTION', 'DISPENSATION', 'RETOUR'] },
+        ],
+      };
+
+      const result = createMedicationSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject customLogFields without movementTypes', () => {
+      const data = {
+        studyId: '550e8400-e29b-41d4-a716-446655440000',
+        code: 'MED-001',
+        name: 'Test Medication',
+        type: 'IMP',
+        dosageForm: 'TABLET',
+        storageCondition: 'ROOM_TEMPERATURE',
+        countingUnit: 'UNIT',
+        customLogFields: [
+          { name: 'Temperature', type: 'NUMBER' },
+        ],
+      };
+
+      const result = createMedicationSchema.safeParse(data);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject customLogFields with empty movementTypes', () => {
+      const data = {
+        studyId: '550e8400-e29b-41d4-a716-446655440000',
+        code: 'MED-001',
+        name: 'Test Medication',
+        type: 'IMP',
+        dosageForm: 'TABLET',
+        storageCondition: 'ROOM_TEMPERATURE',
+        countingUnit: 'UNIT',
+        customLogFields: [
+          { name: 'Temperature', type: 'NUMBER', movementTypes: [] },
+        ],
+      };
+
+      const result = createMedicationSchema.safeParse(data);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject customLogFields with invalid movementType', () => {
+      const data = {
+        studyId: '550e8400-e29b-41d4-a716-446655440000',
+        code: 'MED-001',
+        name: 'Test Medication',
+        type: 'IMP',
+        dosageForm: 'TABLET',
+        storageCondition: 'ROOM_TEMPERATURE',
+        countingUnit: 'UNIT',
+        customLogFields: [
+          { name: 'Temperature', type: 'NUMBER', movementTypes: ['INVALID'] },
+        ],
+      };
+
+      const result = createMedicationSchema.safeParse(data);
+      expect(result.success).toBe(false);
+    });
   });
 });
